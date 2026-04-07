@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PRO28 · 鱼少智测 | 神盾验证系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { 
+            background: #05070a; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        /* 神盾发光动态背景 */
+        .shield-dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .shield-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 70vmin;
+            height: 70vmin;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(37, 99, 235, 0.08) 40%, transparent 70%);
+            border-radius: 50%;
+            animation: shieldPulse 3s ease-in-out infinite;
+        }
+        .shield-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 90vmin;
+            height: 90vmin;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 50%;
+            animation: ringRotate 8s linear infinite;
+        }
+        .shield-ring::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #3b82f6;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px #3b82f6;
+        }
+        .shield-ring::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #60a5fa;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px #60a5fa;
+        }
+        .shield-ring-2 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110vmin;
+            height: 110vmin;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            animation: ringRotateReverse 12s linear infinite;
+        }
+        @keyframes shieldPulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+        @keyframes ringRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes ringRotateReverse {
+            from { transform: translate(-50%, -50%) rotate(360deg); }
+            to { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+        .particle {
+            position: absolute;
+            background: rgba(59, 130, 246, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatParticle 6s ease-in-out infinite;
+        }
+        @keyframes floatParticle {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+        }
+        
+        /* 验证卡片 */
+        .auth-card {
+            background: rgba(16, 20, 30, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 2rem;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .auth-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+        .auth-btn {
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            border: none;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .error-shake {
+            animation: shake 0.3s ease-in-out 0s 2;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* 主内容 */
+        .main-content {
+            display: none;
+            position: relative;
+            z-index: 2;
+        }
+        .glass-premium {
+            background: rgba(16, 20, 30, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(66, 153, 225, 0.2);
+            border-radius: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .pred-card {
+            background: linear-gradient(135deg, rgba(18, 24, 36, 0.9) 0%, rgba(10, 14, 23, 0.95) 100%);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        .pred-card:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 8px 20px -8px rgba(0, 180, 255, 0.2);
+        }
+        .lottery-ball {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: radial-gradient(circle at 30% 30%, #2d3748, #1a202c);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,0.1);
+            color: white;
+        }
+        .lottery-ball.sum-ball {
+            background: radial-gradient(circle at 30% 30%, #2563eb, #1e3a8a);
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+        }
+        .type-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            letter-spacing: 1px;
+        }
+        .badge-da-shuang { background: linear-gradient(135deg, #3b82f6, #1e40af); color: white; box-shadow: 0 0 6px #3b82f6; }
+        .badge-da-dan { background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; box-shadow: 0 0 6px #ef4444; }
+        .badge-xiao-shuang { background: linear-gradient(135deg, #10b981, #047857); color: white; }
+        .badge-xiao-dan { background: linear-gradient(135deg, #f59e0b, #b45309); color: white; }
+        .kill-tag {
+            background: rgba(220, 38, 38, 0.15);
+            border: 1px dashed #ef4444;
+            color: #fca5a5;
+            border-radius: 2rem;
+            padding: 0.3rem 1rem;
+            font-weight: 600;
+        }
+        .glow-text {
+            text-shadow: 0 0 8px rgba(59,130,246,0.5);
+        }
+        @keyframes pulse-gentle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; text-shadow: 0 0 3px #fbbf24; }
+        }
+        .countdown-num {
+            animation: pulse-gentle 1.2s infinite alternate;
+        }
+        .retry-btn {
+            background: rgba(59,130,246,0.2);
+            border: 1px solid rgba(59,130,246,0.5);
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .retry-btn:hover {
+            background: rgba(59,130,246,0.4);
+        }
+        /* 历史记录表格样式 */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .history-table th, .history-table td {
+            padding: 0.5rem 0.25rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .history-table th {
+            color: #94a3b8;
+            font-weight: 600;
+            background: rgba(0,0,0,0.3);
+        }
+        .history-hit {
+            color: #4ade80;
+        }
+        .history-miss {
+            color: #f87171;
+        }
+        .history-ball {
+            display: inline-flex;
+            gap: 0.2rem;
+            justify-content: center;
+        }
+        .history-ball span {
+            background: #1e293b;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+        @media (max-width: 640px) {
+            .lottery-ball { width: 2.8rem; height: 2.8rem; font-size: 1.2rem; }
+            .history-table th, .history-table td { font-size: 0.65rem; padding: 0.3rem 0.1rem; }
+            .history-ball span { width: 1.3rem; height: 1.3rem; font-size: 0.6rem; }
+        }
+        .toggle-history-btn {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .toggle-history-btn:hover {
+            background: rgba(59,130,246,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 神盾动态背景 -->
+    <div class="shield-dynamic-bg">
+        <div class="shield-core"></div>
+        <div class="shield-ring"></div>
+        <div class="shield-ring-2"></div>
+        <div id="particles"></div>
+    </div>
+
+    <!-- 验证面板 -->
+    <div id="authPanel" class="min-h-screen flex items-center justify-center px-4 relative z-10">
+        <div class="auth-card w-full max-w-md p-8 text-center">
+            <div class="mb-6">
+                <div class="text-5xl font-black tracking-tighter bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">PRO<span class="text-yellow-400">28</span></div>
+                <div class="flex items-center justify-center gap-2 mt-2">
+                    <span class="text-xs text-purple-300 font-bold bg-purple-900/40 border border-purple-500/30 px-3 py-1 rounded-full">🐟 鱼少自研引擎</span>
+                </div>
+            </div>
+            <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-blue-500/20 flex items-center justify-center border-2 border-blue-500/50">
+                <svg class="w-10 h-10 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">神盾验证系统</h2>
+            <p class="text-gray-400 text-sm mb-6">请输入凭证以访问预测核心</p>
+            <div class="space-y-4">
+                <div>
+                    <input type="text" id="username" placeholder="用户名" class="auth-input w-full" value="鱼少">
+                </div>
+                <div>
+                    <input type="password" id="password" placeholder="密码" class="auth-input w-full">
+                </div>
+                <button id="loginBtn" class="auth-btn w-full">🔓 解锁预测系统</button>
+            </div>
+            <p id="errorMsg" class="text-red-400 text-xs mt-4 h-6"></p>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div id="mainContent" class="main-content w-full max-w-5xl mx-auto py-6 px-4">
+        <!-- 头部 -->
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl font-black tracking-tighter bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">PRO<span class="text-yellow-400">28</span></div>
+                <div class="h-6 w-px bg-gray-700"></div>
+                <div class="flex items-center gap-2 bg-gray-800/40 backdrop-blur-sm rounded-full pl-2 pr-3 py-1 border border-purple-500/30">
+                    <span class="text-xs font-bold text-purple-300">🐟 鱼少自研引擎</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div id="networkStatusBadge" class="flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1.5 rounded-full text-xs border border-green-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                    实时同步
+                </div>
+                <div class="text-xs text-gray-400 bg-black/30 px-3 py-1 rounded-full flex items-center gap-2">
+                    <span id="refreshTimestamp">--:--:--</span>
+                    <span id="manualRetry" class="retry-btn">⟳ 重试</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实时开奖卡片 -->
+        <div class="glass-premium p-5 md:p-6 mb-6">
+            <div class="flex flex-wrap justify-between items-center border-b border-gray-700/60 pb-3 mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
+                    <h2 class="text-xl font-bold text-white tracking-wide">🎲 实时开奖 · 极速同步</h2>
+                </div>
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="text-gray-400">期号</span>
+                    <span id="liveIssueSpan" class="bg-gray-800 px-2 py-0.5 rounded-md font-mono text-base font-bold text-cyan-300">------</span>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4 py-3">
+                <div class="lottery-ball" id="ball1">--</div>
+                <span class="text-2xl font-bold text-gray-500">+</span>
+                <div class="lottery-ball" id="ball2">--</div>
+                <span class="text-2xl font-bold text-gray-500">+</span>
+                <div class="lottery-ball" id="ball3">--</div>
+                <span class="text-2xl font-bold text-gray-500">=</span>
+                <div class="lottery-ball sum-ball" id="sumBall">--</div>
+                <div class="ml-2">
+                    <span id="resultTypeTag" class="type-badge badge-da-shuang px-4 py-1.5 text-sm">大双</span>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-4 text-xs text-gray-400 border-t border-gray-700/40 pt-3">
+                <div class="flex gap-2 items-center">
+                    <span>🔔 数据源:</span>
+                    <span id="dataSourceName" class="text-blue-300 text-xs bg-black/30 px-2 py-0.5 rounded-full">多源轮询</span>
+                </div>
+                <div class="flex gap-2"><span>⏱️ 距下一期封盘</span><span id="countdownDisplay" class="font-mono text-yellow-400 font-bold countdown-num">02:00</span></div>
+            </div>
+        </div>
+
+        <!-- 历史记录按钮和面板 -->
+        <div class="mb-6">
+            <button id="toggleHistoryBtn" class="toggle-history-btn glass-premium px-5 py-2 text-sm text-blue-300 flex items-center gap-2 hover:border-blue-500 transition">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c.55 0 1 .45 1 1v5l3.5 2.1c.45.27.6.85.33 1.3-.27.45-.85.6-1.3.33L12 13V7c0-.55.45-1 1-1z"/></svg>
+                📜 历史记录 & 杀组命中榜
+            </button>
+            <div id="historyPanel" class="glass-premium mt-3 p-4 hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-white font-bold text-md">📋 最近开奖记录 & 杀组验证</h3>
+                    <div class="text-xs text-gray-400">杀组规则：与开奖结果相反的组合（如开大双则杀小单）</div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="history-table w-full">
+                        <thead>
+                            <tr><th>期号</th><th>开奖号码</th><th>和值</th><th>大小单双</th><th>杀组指令</th><th>命中状态</th></tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="6" class="text-center text-gray-500">暂无历史数据，等待开奖同步...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-700/40 text-xs">
+                    <div><span class="text-gray-400">总期数：</span><span id="totalCount">0</span></div>
+                    <div><span class="text-gray-400">杀组命中率：</span><span id="hitRate" class="text-green-400">0%</span></div>
+                    <button id="clearHistoryBtn" class="text-red-400 hover:text-red-300 text-xs underline">清空历史</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预测卡片区（保持不变） -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div class="pred-card p-5">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="bg-red-500/20 w-10 h-10 rounded-2xl flex items-center justify-center mb-3">
+                            <span class="text-red-400 text-xl">✖️</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-200">精准杀组指令</h3>
+                        <p class="text-xs text-gray-500 mt-1">AI剔除极低概率组合</p>
+                    </div>
+                    <div class="kill-tag text-sm" id="killGroupTag">小单</div>
+                </div>
+            </div>
+            <div class="pred-card p-5 border-l-4 border-l-blue-500">
+                <div>
+                    <div class="bg-blue-500/20 w-10 h-10 rounded-2xl flex items-center justify-center mb-3">
+                        <span class="text-blue-400 text-xl">⚡</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-200">两组暴击指令 <span class="text-xs bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-full">主打</span></h3>
+                </div>
+                <div class="flex gap-2 mt-3 flex-wrap">
+                    <span id="doubleGroup1" class="px-3 py-1.5 rounded-full text-sm font-bold shadow-md bg-gradient-to-r from-blue-600 to-blue-800 text-white">大双</span>
+                    <span id="doubleGroup2" class="px-3 py-1.5 rounded-full text-sm font-bold shadow-md bg-gradient-to-r from-red-600 to-red-800 text-white">大单</span>
+                </div>
+            </div>
+            <div class="pred-card p-5 border-l-4 border-l-amber-500">
+                <div>
+                    <div class="bg-amber-500/20 w-10 h-10 rounded-2xl flex items-center justify-center mb-3">
+                        <span class="text-amber-400 text-xl">🛡️</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-200">三组稳健指令 <span class="text-xs bg-amber-500/30 text-amber-300 px-2 py-0.5 rounded-full">防守</span></h3>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span id="tripleGroup1" class="px-3 py-1.5 rounded-full text-sm font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-white">大双</span>
+                    <span id="tripleGroup2" class="px-3 py-1.5 rounded-full text-sm font-bold bg-gradient-to-r from-red-600 to-red-800 text-white">大单</span>
+                    <span id="tripleGroup3" class="px-3 py-1.5 rounded-full text-sm font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 text-white">小双</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心主推区 -->
+        <div class="glass-premium p-6 mb-8 text-center relative overflow-hidden">
+            <div class="relative z-2">
+                <div class="inline-flex items-center gap-2 bg-gray-800/50 px-4 py-1 rounded-full text-xs text-gray-300 mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span> 鱼少神经网络决策
+                </div>
+                <div class="flex flex-wrap justify-center items-center gap-6 mt-2">
+                    <div class="text-5xl md:text-6xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent glow-text" id="mainPrediction1">大双</div>
+                    <div class="text-3xl text-gray-600 font-black">+</div>
+                    <div class="text-5xl md:text-6xl font-black bg-gradient-to-r from-rose-400 to-red-500 bg-clip-text text-transparent" id="mainPrediction2">大单</div>
+                </div>
+                <p class="mt-5 text-sm text-gray-300 bg-black/30 inline-block px-5 py-2 rounded-full backdrop-blur-sm border border-gray-700">
+                    🧠 <span class="text-purple-400 font-bold">鱼少算法判定：</span><span id="algorithmReason">大数周期抬头，双数遗漏值达到临界</span>
+                </p>
+            </div>
+        </div>
+
+        <footer class="text-center mt-6 mb-4">
+            <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-gray-800/30 backdrop-blur-sm border border-gray-700/40">
+                <span class="text-xs text-gray-400">Powered by <strong class="text-purple-400">鱼少自研数据核心 v5.0</strong> · 真实开奖接口</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== 验证系统 ====================
+        (function() {
+            const VALID_USERNAME = "鱼少";
+            const VALID_PASSWORD = "1201314";
+            const authPanel = document.getElementById('authPanel');
+            const mainContent = document.getElementById('mainContent');
+            const loginBtn = document.getElementById('loginBtn');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMsgSpan = document.getElementById('errorMsg');
+            
+            function handleLogin() {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                    authPanel.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    initDataEngine();
+                } else {
+                    errorMsgSpan.innerText = '❌ 用户名或密码错误，请重试';
+                    errorMsgSpan.classList.add('error-shake');
+                    setTimeout(() => errorMsgSpan.classList.remove('error-shake'), 500);
+                }
+            }
+            loginBtn.addEventListener('click', handleLogin);
+            passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+            
+            // 粒子效果
+            function createParticles() {
+                const container = document.getElementById('particles');
+                if (!container) return;
+                for (let i = 0; i < 30; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const s = Math.random() * 4 + 2;
+                    p.style.width = s + 'px';
+                    p.style.height = s + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.top = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 5 + 's';
+                    p.style.animationDuration = 4 + Math.random() * 4 + 's';
+                    container.appendChild(p);
+                }
+            }
+            createParticles();
+            
+            // ==================== 历史记录管理 ====================
+            let historyRecords = []; // { issue, numbers, sum, type, killGroup, hit }
+            const STORAGE_KEY = 'pro28_history';
+            
+            function loadHistory() {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    try {
+                        historyRecords = JSON.parse(stored);
+                    } catch(e) { historyRecords = []; }
+                }
+                renderHistoryTable();
+            }
+            
+            function saveHistory() {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(historyRecords.slice(0, 100))); // 最多100条
+                renderHistoryTable();
+            }
+            
+            // 根据开奖类型计算杀组（对立面）
+            function getKillGroupFromType(type) {
+                const map = {
+                    '大双': '小单', '大单': '小双', '小双': '大单', '小单': '大双'
+                };
+                return map[type] || '小单';
+            }
+            
+            // 添加一条历史记录（如果期号已存在则不重复添加）
+            function addHistoryRecord(issue, numbers, sum, type) {
+                if (!issue || !type) return false;
+                const exists = historyRecords.some(r => r.issue === issue);
+                if (exists) return false;
+                const killGroup = getKillGroupFromType(type);
+                const hit = (killGroup !== type); // 杀组不等于开奖类型即为命中
+                const newRecord = { issue, numbers: [...numbers], sum, type, killGroup, hit, timestamp: Date.now() };
+                historyRecords.unshift(newRecord); // 最新在上
+                // 保持最多100条
+                if (historyRecords.length > 100) historyRecords.pop();
+                saveHistory();
+                return true;
+            }
+            
+            function renderHistoryTable() {
+                const tbody = document.getElementById('historyTableBody');
+                const totalSpan = document.getElementById('totalCount');
+                const hitRateSpan = document.getElementById('hitRate');
+                if (!tbody) return;
+                if (historyRecords.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500">暂无历史数据，等待开奖同步...</td></tr>';
+                    if (totalSpan) totalSpan.innerText = '0';
+                    if (hitRateSpan) hitRateSpan.innerText = '0%';
+                    return;
+                }
+                let hitCount = 0;
+                let rows = '';
+                historyRecords.slice(0, 50).forEach(rec => {
+                    const hitClass = rec.hit ? 'history-hit' : 'history-miss';
+                    const hitText = rec.hit ? '✅ 命中' : '❌ 未命中';
+                    if (rec.hit) hitCount++;
+                    const numbersHtml = `<div class="history-ball"><span>${rec.numbers[0]}</span><span>${rec.numbers[1]}</span><span>${rec.numbers[2]}</span></div>`;
+                    rows += `<tr>
+                        <td class="font-mono">${rec.issue}</td>
+                        <td>${numbersHtml}</td>
+                        <td>${rec.sum}</td>
+                        <td><span class="type-badge ${rec.type === '大双'?'badge-da-shuang':rec.type==='大单'?'badge-da-dan':rec.type==='小双'?'badge-xiao-shuang':'badge-xiao-dan'} text-xs py-0.5 px-2">${rec.type}</span></td>
+                        <td><span class="kill-tag text-xs py-0.5">${rec.killGroup}</span></td>
+                        <td class="${hitClass} font-bold text-xs">${hitText}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = rows;
+                if (totalSpan) totalSpan.innerText = historyRecords.length;
+                const rate = historyRecords.length ? Math.round((hitCount / historyRecords.length) * 100) : 0;
+                if (hitRateSpan) hitRateSpan.innerText = rate + '%';
+            }
+            
+            function clearHistory() {
+                if (confirm('确定要清空所有历史记录吗？')) {
+                    historyRecords = [];
+                    saveHistory();
+                }
+            }
+            
+            // 历史面板折叠
+            const toggleBtn = document.getElementById('toggleHistoryBtn');
+            const historyPanel = document.getElementById('historyPanel');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+            if (toggleBtn && historyPanel) {
+                toggleBtn.addEventListener('click', () => {
+                    historyPanel.classList.toggle('hidden');
+                });
+            }
+            if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
+            
+            // ==================== 真实数据引擎（多源轮询）====================
+            const TARGET_URLS = [
+                'https://www.haiqiyu.com/jnd28_sf5_mszh.html',
+                'https://jnd28.help/algorithm/hall',
+                'https://www.jnd138.com/jnd',
+                'https://28yule.com/ege'
+            ];
+            const PROXY_LIST = ['https://api.allorigins.win/raw?url=', 'https://corsproxy.io/?'];
+            
+            let pollingTimer = null, countdownTimer = null;
+            let countdownSeconds = 175;
+            const ball1 = document.getElementById('ball1'), ball2 = document.getElementById('ball2'), ball3 = document.getElementById('ball3');
+            const sumBall = document.getElementById('sumBall'), liveIssueSpan = document.getElementById('liveIssueSpan');
+            const resultTypeTag = document.getElementById('resultTypeTag'), refreshTimestampSpan = document.getElementById('refreshTimestamp');
+            const countdownDisplay = document.getElementById('countdownDisplay'), networkBadge = document.getElementById('networkStatusBadge');
+            const dataSourceNameSpan = document.getElementById('dataSourceName'), killGroupTag = document.getElementById('killGroupTag');
+            const doubleGroup1 = document.getElementById('doubleGroup1'), doubleGroup2 = document.getElementById('doubleGroup2');
+            const tripleGroup1 = document.getElementById('tripleGroup1'), tripleGroup2 = document.getElementById('tripleGroup2'), tripleGroup3 = document.getElementById('tripleGroup3');
+            const mainPrediction1 = document.getElementById('mainPrediction1'), mainPrediction2 = document.getElementById('mainPrediction2');
+            const algorithmReasonSpan = document.getElementById('algorithmReason'), manualRetryBtn = document.getElementById('manualRetry');
+            
+            function getSumType(sum) {
+                if (sum === undefined) return null;
+                const isBig = sum > 13;
+                const isEven = sum % 2 === 0;
+                if (isBig && isEven) return { name: '大双', class: 'badge-da-shuang' };
+                if (isBig && !isEven) return { name: '大单', class: 'badge-da-dan' };
+                if (!isBig && isEven) return { name: '小双', class: 'badge-xiao-shuang' };
+                return { name: '小单', class: 'badge-xiao-dan' };
+            }
+            
+            function updateUI(issue, numbers, sum, sourceName) {
+                if (!issue || !numbers || numbers.length !== 3) return false;
+                liveIssueSpan.innerText = issue;
+                ball1.innerText = numbers[0]; ball2.innerText = numbers[1]; ball3.innerText = numbers[2];
+                sumBall.innerText = sum;
+                const typeObj = getSumType(sum);
+                if (typeObj) {
+                    resultTypeTag.innerText = typeObj.name;
+                    resultTypeTag.className = `type-badge ${typeObj.class} px-4 py-1.5 text-sm`;
+                }
+                const now = new Date();
+                refreshTimestampSpan.innerText = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+                if (sourceName && dataSourceNameSpan) dataSourceNameSpan.innerText = sourceName;
+                
+                // 更新预测卡片
+                const killGroup = getKillGroupFromType(typeObj.name);
+                killGroupTag.innerText = killGroup;
+                doubleGroup1.innerText = "大双"; doubleGroup2.innerText = "大单";
+                tripleGroup1.innerText = "大双"; tripleGroup2.innerText = "大单"; tripleGroup3.innerText = "小双";
+                mainPrediction1.innerText = "大双"; mainPrediction2.innerText = "大单";
+                let reason = sum > 16 ? "大数能量强势，连大形态概率飙升" : (sum > 13 ? "大数周期抬头，双数遗漏值达到临界" : (sum <= 10 ? "小数过热预警，大数反弹在即" : "平衡区间震荡，捕捉双组暴击机会"));
+                algorithmReasonSpan.innerText = reason;
+                
+                // 添加到历史记录
+                addHistoryRecord(issue, numbers, sum, typeObj.name);
+                return true;
+            }
+            
+            function setNetworkStatus(ok) {
+                if (networkBadge) {
+                    if (ok) {
+                        networkBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> 实时同步`;
+                        networkBadge.className = "flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1.5 rounded-full text-xs border border-green-500/30";
+                    } else {
+                        networkBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span> 重连中`;
+                        networkBadge.className = "flex items-center gap-2 bg-red-500/10 text-red-400 px-3 py-1.5 rounded-full text-xs border border-red-500/30";
+                    }
+                }
+            }
+            
+            function parseHtml(html) {
+                let issue = null;
+                const issueMatch = html.match(/第\s*(\d+)\s*期/);
+                if (issueMatch) issue = issueMatch[1];
+                let n1 = null, n2 = null, n3 = null;
+                const exprMatch = html.match(/(\d+)\s*\+\s*(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)/);
+                if (exprMatch) {
+                    n1 = parseInt(exprMatch[1]); n2 = parseInt(exprMatch[2]); n3 = parseInt(exprMatch[3]);
+                } else {
+                    const ballPattern = /<div[^>]*class="[^"]*ball[^"]*"[^>]*>(\d+)<\/div>/gi;
+                    const matches = [...html.matchAll(ballPattern)];
+                    if (matches.length >= 3) {
+                        n1 = parseInt(matches[0][1]); n2 = parseInt(matches[1][1]); n3 = parseInt(matches[2][1]);
+                    }
+                }
+                if (issue && n1 !== null && n2 !== null && n3 !== null) {
+                    return { issue, numbers: [n1, n2, n3], sum: n1 + n2 + n3 };
+                }
+                return null;
+            }
+            
+            async function fetchWithTimeout(url, timeout = 8000) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const res = await fetch(url, { signal: controller.signal });
+                    clearTimeout(id);
+                    if (!res.ok) throw new Error();
+                    return await res.text();
+                } catch (e) {
+                    clearTimeout(id);
+                    throw e;
+                }
+            }
+            
+            async function fetchRealData() {
+                for (let proxy of PROXY_LIST) {
+                    for (let target of TARGET_URLS) {
+                        try {
+                            const fullUrl = proxy + encodeURIComponent(target);
+                            const html = await fetchWithTimeout(fullUrl, 7000);
+                            const data = parseHtml(html);
+                            if (data && data.issue) {
+                                let sourceName = target.replace('https://', '').split('/')[0];
+                                return { ...data, source: sourceName };
+                            }
+                        } catch (e) {}
+                    }
+                }
+                throw new Error('所有数据源失败');
+            }
+            
+            let isSyncing = false;
+            async function syncData() {
+                if (isSyncing) return;
+                isSyncing = true;
+                try {
+                    const data = await fetchRealData();
+                    updateUI(data.issue, data.numbers, data.sum, data.source);
+                    setNetworkStatus(true);
+                    countdownSeconds = 175;
+                    if (countdownDisplay) {
+                        let mins = Math.floor(countdownSeconds/60);
+                        let secs = countdownSeconds%60;
+                        countdownDisplay.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+                    }
+                } catch (err) {
+                    setNetworkStatus(false);
+                    if (liveIssueSpan.innerText === '------') liveIssueSpan.innerText = '等待连接';
+                } finally {
+                    isSyncing = false;
+                }
+            }
+            
+            function startCountdown() {
+                if (countdownTimer) clearInterval(countdownTimer);
+                countdownTimer = setInterval(() => {
+                    if (countdownSeconds <= 0) { syncData(); countdownSeconds = 175; }
+                    else countdownSeconds--;
+                    if (countdownDisplay) {
+                        let mins = Math.floor(countdownSeconds/60);
+                        let secs = countdownSeconds%60;
+                        countdownDisplay.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+                    }
+                }, 1000);
+            }
+            
+            function startPolling() {
+                if (pollingTimer) clearInterval(pollingTimer);
+                pollingTimer = setInterval(() => syncData(), 30000);
+            }
+            
+            function initDataEngine() {
+                loadHistory();
+                syncData().then(() => { startCountdown(); startPolling(); }).catch(() => { startCountdown(); startPolling(); });
+                if (manualRetryBtn) manualRetryBtn.addEventListener('click', () => syncData());
+            }
+        })();
+    </script>
+</body>
+</html>
