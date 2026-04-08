@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>PC28 · 凤凰智测 | 三组预测系统</title>
+    <title>PC28 · 动态真预测 | 最终版</title>
     <style>
         * {
             margin: 0;
@@ -145,7 +145,7 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* 选项卡 (三组预测 / 两组预测 / 历史记录) */
+        /* 选项卡 */
         .tabs {
             display: flex;
             border-bottom: 1px solid #eef2f6;
@@ -180,7 +180,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 卡片样式 */
+        /* 卡片 */
         .card {
             background: white;
             border-radius: 20px;
@@ -189,7 +189,7 @@
             overflow: hidden;
         }
 
-        /* 当期开奖卡片 */
+        /* 开奖卡片 */
         .draw-card {
             text-align: center;
             padding: 20px 16px;
@@ -233,6 +233,11 @@
         .type-dd { background: #fee2e2; color: #b91c1c; }
         .type-xs { background: #d1fae5; color: #065f46; }
         .type-xd { background: #fed7aa; color: #9a3412; }
+        .info-note {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
 
         /* 算法切换器 */
         .algo-switch {
@@ -371,7 +376,7 @@
             cursor: pointer;
         }
 
-        /* 统计卡片 (嵌入历史记录底部) */
+        /* 统计卡片 */
         .stats-grid {
             padding: 16px;
             display: flex;
@@ -398,7 +403,7 @@
 <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
         <div class="login-title">凤凰智测</div>
-        <div class="login-sub">PC28 · 三组预测系统</div>
+        <div class="login-sub">PC28 · 动态真预测</div>
         <input type="text" id="loginUsername" class="login-input" placeholder="用户名" value="鱼少">
         <input type="password" id="loginPassword" class="login-input" placeholder="密码">
         <button id="doLoginBtn" class="login-btn">验证登录</button>
@@ -439,14 +444,14 @@
                 <span class="ball sum" id="sumBall">--</span>
             </div>
             <div><span id="resultType" class="type-badge">--</span></div>
+            <div class="info-note">※ 红色数字为开奖个位，蓝色数字为和值（特码）</div>
         </div>
 
         <div class="card">
             <div class="algo-switch" id="algoSwitch">
-                <button class="algo-btn" data-algo="weighted">🎯 加权综合</button>
+                <button class="algo-btn active" data-algo="dynamic">🔥 动态真预测</button>
+                <button class="algo-btn" data-algo="weighted">📊 加权综合</button>
                 <button class="algo-btn" data-algo="mix">⚖️ 冷热混合</button>
-                <button class="algo-btn" data-algo="cross">🧬 高频交叉</button>
-                <button class="algo-btn active" data-algo="crack">🔥 凤凰融合</button>
             </div>
             <div>
                 <div class="predict-row">
@@ -463,7 +468,7 @@
                 </div>
                 <div class="accuracy-tip">
                     📊 杀组历史准确率: <strong id="killAccuracy" style="color:#10b981;">--%</strong>
-                    <span style="margin-left: 10px;">实时算法引擎</span>
+                    <span style="margin-left: 10px;">基于真实开奖动态计算</span>
                 </div>
             </div>
         </div>
@@ -480,6 +485,7 @@
                 <span class="ball sum" id="sumBall2">--</span>
             </div>
             <div><span id="resultType2" class="type-badge">--</span></div>
+            <div class="info-note">※ 红色数字为开奖个位，蓝色数字为和值（特码）</div>
         </div>
         <div class="card">
             <div class="predict-row">
@@ -490,7 +496,7 @@
                 </div>
             </div>
             <div class="accuracy-tip">
-                📊 基于当前算法 <span id="algoHint">凤凰融合</span> 实时生成
+                📊 基于当前算法 <span id="algoHint">动态真预测</span> 实时生成
             </div>
         </div>
     </div>
@@ -508,7 +514,6 @@
             </table>
         </div>
         <button id="clearHistoryBtn" class="clear-btn">清空历史记录</button>
-        <!-- 遗漏统计卡片 -->
         <div class="stats-grid">
             <div class="stat-item"><span>📈 大数未开</span><strong id="missBig">--</strong> 期</div>
             <div class="stat-item"><span>📉 小数未开</span><strong id="missSmall">--</strong> 期</div>
@@ -524,7 +529,7 @@
 </div>
 
 <script>
-    // ==================== 认证 (鱼少 / 1201314) ====================
+    // ==================== 认证 ====================
     const LOGIN_USER = "鱼少";
     const LOGIN_PASS = "1201314";
     const loginOverlay = document.getElementById('loginOverlay');
@@ -546,13 +551,12 @@
     // ==================== 全局变量 & API ====================
     const API_BASE = 'https://pc28.ai';
     const ALL_TYPES = ['大双', '大单', '小双', '小单'];
-    let historyRecords = [];      // { issue, numbers, sum, type, kill, hit }
+    let historyRecords = [];
     let currentIssue = null;
     let pollTimer = null, cdTimer = null;
-    let currentAlgo = 'crack';
+    let currentAlgo = 'dynamic';  // 默认动态真预测
     let isRefreshing = false;
 
-    // 辅助函数
     function getTypeFromCombination(comb) {
         if (comb === '大单') return '大单';
         if (comb === '大双') return '大双';
@@ -602,98 +606,118 @@
         } catch(e) { console.warn(e); return null; }
     }
 
-    // ========== 算法核心 ==========
-    function getStats() {
+    // ========== 动态真预测算法 (完全基于实时数据，绝不会固化) ==========
+    // 核心：频率权重40% + 遗漏权重40% + 短期趋势权重20%，并加入微量随机扰动防止机械重复
+    function dynamicAlgorithm() {
+        if (historyRecords.length === 0) {
+            // 无历史数据时随机返回，但依然不会固定
+            const rand = Math.floor(Math.random() * 4);
+            const defaultKill = ALL_TYPES[rand];
+            const others = ALL_TYPES.filter(t => t !== defaultKill);
+            return {
+                kill: defaultKill,
+                double: [others[0], others[1]],
+                triple: [others[0], others[1], others[2]]
+            };
+        }
+        const limit = Math.min(historyRecords.length, 30);
+        // 1. 频率统计 (最近30期)
+        const freq = { '大双':0, '大单':0, '小双':0, '小单':0 };
+        for (let i = 0; i < limit; i++) freq[historyRecords[i].type]++;
+        const maxFreq = Math.max(...Object.values(freq));
+        // 2. 遗漏统计 (从最近一期开始往前数)
+        const lastPos = { '大双': null, '大单': null, '小双': null, '小单': null };
+        for (let i = 0; i < historyRecords.length; i++) {
+            const t = historyRecords[i].type;
+            if (lastPos[t] === null) lastPos[t] = i;
+        }
+        const maxMiss = Math.max(...Object.values(lastPos).map(v => v !== null ? v : historyRecords.length));
+        // 3. 短期趋势 (最近5期，出现越少越值得追)
+        const recentLimit = Math.min(historyRecords.length, 5);
+        const recentCnt = { '大双':0, '大单':0, '小双':0, '小单':0 };
+        for (let i = 0; i < recentLimit; i++) recentCnt[historyRecords[i].type]++;
+        
+        // 综合得分 = 频率分(0~1) * 0.4 + 遗漏分(遗漏越大得分越高) * 0.4 + 短期冷分(最近出现越少得分越高) * 0.2
+        const score = {};
+        for (let t of ALL_TYPES) {
+            const freqScore = maxFreq === 0 ? 0.25 : freq[t] / maxFreq;
+            const missValue = lastPos[t] !== null ? lastPos[t] : historyRecords.length;
+            const missScore = maxMiss === 0 ? 0.5 : missValue / maxMiss;
+            const shortScore = recentLimit === 0 ? 0.5 : 1 - (recentCnt[t] / recentLimit);
+            let total = freqScore * 0.4 + missScore * 0.4 + shortScore * 0.2;
+            // 增加极少量随机扰动 (±0.02)，避免长期固化
+            total += (Math.random() - 0.5) * 0.04;
+            score[t] = total;
+        }
+        // 按得分降序排列 (得分越高越推荐)
+        const sorted = Object.entries(score).sort((a, b) => b[1] - a[1]);
+        const kill = sorted[3][0];      // 得分最低的作为杀组
+        const double = [sorted[0][0], sorted[1][0]];
+        const triple = [sorted[0][0], sorted[1][0], sorted[2][0]];
+        return { kill, double, triple };
+    }
+
+    // 保留加权综合算法作为备选
+    function weightedAlgorithm() {
+        if (historyRecords.length < 3) return dynamicAlgorithm();
         const cnt = { '大双':0,'大单':0,'小双':0,'小单':0 };
         const limit = Math.min(historyRecords.length, 30);
-        for(let i=0;i<limit;i++) cnt[historyRecords[i].type]++;
+        for (let i=0;i<limit;i++) cnt[historyRecords[i].type]++;
         const last = { '大双':null,'大单':null,'小双':null,'小单':null };
-        for(let i=0;i<historyRecords.length;i++) { const t=historyRecords[i].type; if(last[t]==null) last[t]=i; }
-        return { cnt, last, limit };
-    }
-    function weightedAlgorithm() {
-        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
-        const { cnt, last, limit } = getStats();
+        for (let i=0;i<historyRecords.length;i++) { const t=historyRecords[i].type; if(last[t]==null) last[t]=i; }
         const score = {};
-        for(let k of ALL_TYPES) { const hot=cnt[k]/limit; const miss=1/(last[k]+1); score[k]=hot*0.6+miss*0.4; }
+        for (let k of ALL_TYPES) {
+            const hot = cnt[k] / limit;
+            const missScore = 1 / (last[k] + 1);
+            score[k] = hot * 0.6 + missScore * 0.4;
+        }
         const sorted = Object.entries(score).sort((a,b)=>b[1]-a[1]);
         return { kill:sorted[3][0], double:[sorted[0][0],sorted[1][0]], triple:[sorted[0][0],sorted[1][0],sorted[2][0]] };
     }
+
     function mixAlgorithm() {
-        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
-        const { cnt, last } = getStats();
-        const hot=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
-        const cold=Object.entries(last).sort((a,b)=>b[1]-a[1]);
-        const double=[hot[0][0], cold[0][0]];
-        const triple=[hot[0][0], cold[0][0], cold[1][0]];
-        const kill=cold[3]?cold[3][0]:'小单';
+        if (historyRecords.length < 3) return dynamicAlgorithm();
+        const cnt = { '大双':0,'大单':0,'小双':0,'小单':0 };
+        const limit = Math.min(historyRecords.length, 30);
+        for (let i=0;i<limit;i++) cnt[historyRecords[i].type]++;
+        const last = { '大双':null,'大单':null,'小双':null,'小单':null };
+        for (let i=0;i<historyRecords.length;i++) { const t=historyRecords[i].type; if(last[t]==null) last[t]=i; }
+        const hot = Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+        const cold = Object.entries(last).sort((a,b)=>b[1]-a[1]);
+        const double = [hot[0][0], cold[0][0]];
+        const triple = [hot[0][0], cold[0][0], cold[1][0]];
+        const kill = cold[3] ? cold[3][0] : '小单';
         return { kill, double, triple };
     }
-    function crossAlgorithm() {
-        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
-        const { cnt, last, limit } = getStats();
-        const score={};
-        for(let k of ALL_TYPES) {
-            const hot=cnt[k]/limit;
-            const miss=1/(last[k]+1);
-            let trend=0;
-            for(let i=0;i<Math.min(historyRecords.length,5);i++) if(historyRecords[i].type===k) { trend+=0.15; break; }
-            score[k]=hot*0.5+miss*0.3+trend;
-        }
-        const sorted=Object.entries(score).sort((a,b)=>b[1]-a[1]);
-        return { kill:sorted[3][0], double:[sorted[0][0],sorted[1][0]], triple:[sorted[0][0],sorted[1][0],sorted[2][0]] };
-    }
-    function crackFusionAlgorithm() {
-        if(historyRecords.length<3) return { kill:'小单', double:['大双','大单'], triple:['大双','大单','小双'] };
-        const w = weightedAlgorithm(), m = mixAlgorithm(), c = crossAlgorithm();
-        const votes = [w.kill, m.kill, c.kill];
-        const cntVote = {}; for(let v of votes) cntVote[v] = (cntVote[v]||0)+1;
-        const finalKill = Object.entries(cntVote).sort((a,b)=>b[1]-a[1])[0][0];
-        const doubleCands = [w.double[0], w.double[1], m.double[0], m.double[1], c.double[0], c.double[1]];
-        const doubleFreq = {}; for(let d of doubleCands) if(d !== finalKill) doubleFreq[d] = (doubleFreq[d]||0)+1;
-        const sortedDouble = Object.entries(doubleFreq).sort((a,b)=>b[1]-a[1]);
-        let d1 = sortedDouble[0]?.[0] || '大双', d2 = sortedDouble[1]?.[0] || '大单';
-        if(d1 === d2) d2 = (d1 === '大双'?'大单':'大双');
-        const tripleCands = [...w.triple, ...m.triple, ...c.triple];
-        const tripleFreq = {}; for(let t of tripleCands) if(t !== finalKill) tripleFreq[t] = (tripleFreq[t]||0)+1;
-        const sortedTriple = Object.entries(tripleFreq).sort((a,b)=>b[1]-a[1]);
-        let t1 = sortedTriple[0]?.[0] || '大双', t2 = sortedTriple[1]?.[0] || '大单', t3 = sortedTriple[2]?.[0] || '小双';
-        const tripleSet = [...new Set([t1,t2,t3])];
-        while(tripleSet.length < 3) tripleSet.push(ALL_TYPES.find(t => !tripleSet.includes(t) && t !== finalKill));
-        return { kill: finalKill, double: [d1, d2], triple: tripleSet.slice(0,3) };
-    }
+
     function getCurrentPredictions() {
-        if(currentAlgo === 'weighted') return weightedAlgorithm();
-        if(currentAlgo === 'mix') return mixAlgorithm();
-        if(currentAlgo === 'cross') return crossAlgorithm();
-        return crackFusionAlgorithm();
+        if (currentAlgo === 'dynamic') return dynamicAlgorithm();
+        if (currentAlgo === 'weighted') return weightedAlgorithm();
+        return mixAlgorithm();
     }
 
     function updateAllPredictUI() {
         const pred = getCurrentPredictions();
-        // 三组预测面板
         document.getElementById('killGroup').innerText = pred.kill;
         document.getElementById('triple1').innerText = pred.triple[0];
         document.getElementById('triple2').innerText = pred.triple[1];
         document.getElementById('triple3').innerText = pred.triple[2];
-        // 两组预测面板
         document.getElementById('double1').innerText = pred.double[0];
         document.getElementById('double2').innerText = pred.double[1];
-        document.getElementById('algoHint').innerText = 
-            currentAlgo === 'weighted' ? '加权综合' : currentAlgo === 'mix' ? '冷热混合' : currentAlgo === 'cross' ? '高频交叉' : '凤凰融合';
-        // 准确率
-        if(historyRecords.length){
-            const hitCount = historyRecords.filter(r=>r.hit).length;
-            document.getElementById('killAccuracy').innerHTML = Math.round((hitCount/historyRecords.length)*100)+'%';
+        const algoName = currentAlgo === 'dynamic' ? '动态真预测' : (currentAlgo === 'weighted' ? '加权综合' : '冷热混合');
+        document.getElementById('algoHint').innerText = algoName;
+        if (historyRecords.length) {
+            const hitCount = historyRecords.filter(r => r.hit).length;
+            document.getElementById('killAccuracy').innerHTML = Math.round((hitCount / historyRecords.length) * 100) + '%';
         }
     }
 
     async function addHistoryRecord(issue, numbers, sum, type) {
-        if(historyRecords.some(r=>r.issue===issue)) return false;
+        if (historyRecords.some(r => r.issue === issue)) return false;
         const { kill } = getCurrentPredictions();
         const hit = (kill !== type);
-        historyRecords.unshift({ issue, numbers:[...numbers], sum, type, kill, hit, time:Date.now() });
-        if(historyRecords.length>500) historyRecords.pop();
+        historyRecords.unshift({ issue, numbers: [...numbers], sum, type, kill, hit, time: Date.now() });
+        if (historyRecords.length > 500) historyRecords.pop();
         saveToLocal();
         renderHistoryTable();
         updateMissStats();
@@ -702,48 +726,70 @@
 
     function renderHistoryTable() {
         const tbody = document.getElementById('historyBody');
-        if(historyRecords.length===0){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center; padding:30px;">暂无开奖数据</td></tr>'; return; }
+        if (historyRecords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;">暂无开奖数据</td></tr>';
+            return;
+        }
         let html = '';
         const showList = historyRecords.slice(0, 20);
-        for(let r of showList){
-            const numberHtml = `<div class="history-balls"><span class="history-ball">${r.numbers[0]}</span><span class="history-ball">${r.numbers[1]}</span><span class="history-ball">${r.numbers[2]}</span><span class="history-sum">${r.sum}</span></div>`;
+        for (let r of showList) {
+            const numberHtml = `<div class="history-balls">
+                <span class="history-ball">${r.numbers[0]}</span>
+                <span class="history-ball">${r.numbers[1]}</span>
+                <span class="history-ball">${r.numbers[2]}</span>
+                <span class="history-sum">${r.sum}</span>
+            </div>`;
             const hitClass = r.hit ? 'hit-yes' : 'hit-no';
             const hitText = r.hit ? '✓ 中' : '✗ 错';
-            html += `<tr><td>${r.issue}</td><td>${numberHtml}</td><td>${r.sum}</td><td>${r.type}</td><td><span class="pred-tag">${r.kill}</span></td><td class="${hitClass}">${hitText}</td></tr>`;
+            html += `<tr>
+                <td>${r.issue}</td>
+                <td>${numberHtml}</td>
+                <td>${r.sum}</td>
+                <td>${r.type}</td>
+                <td><span class="pred-tag">${r.kill}</span></td>
+                <td class="${hitClass}">${hitText}</td>
+            </tr>`;
         }
         tbody.innerHTML = html;
     }
 
     function updateMissStats() {
-        if(historyRecords.length===0) return;
-        const lastIdx = { '大双':null,'大单':null,'小双':null,'小单':null };
-        for(let i=0;i<historyRecords.length;i++){ const t=historyRecords[i].type; if(lastIdx[t]==null) lastIdx[t]=i; }
-        document.getElementById('missDaShuang').innerText = lastIdx['大双']!==null?lastIdx['大双']:historyRecords.length;
-        document.getElementById('missDaDan').innerText = lastIdx['大单']!==null?lastIdx['大单']:historyRecords.length;
-        document.getElementById('missXiaoShuang').innerText = lastIdx['小双']!==null?lastIdx['小双']:historyRecords.length;
-        document.getElementById('missXiaoDan').innerText = lastIdx['小单']!==null?lastIdx['小单']:historyRecords.length;
-        let big=null,small=null,odd=null,even=null;
-        for(let i=0;i<historyRecords.length;i++){ const t=historyRecords[i].type;
-            if((t==='大双'||t==='大单') && big===null) big=i;
-            if((t==='小双'||t==='小单') && small===null) small=i;
-            if((t==='大单'||t==='小单') && odd===null) odd=i;
-            if((t==='大双'||t==='小双') && even===null) even=i;
+        if (historyRecords.length === 0) return;
+        const lastIdx = { '大双': null, '大单': null, '小双': null, '小单': null };
+        for (let i = 0; i < historyRecords.length; i++) {
+            const t = historyRecords[i].type;
+            if (lastIdx[t] === null) lastIdx[t] = i;
         }
-        document.getElementById('missBig').innerText = big!==null?big:historyRecords.length;
-        document.getElementById('missSmall').innerText = small!==null?small:historyRecords.length;
-        document.getElementById('missOdd').innerText = odd!==null?odd:historyRecords.length;
-        document.getElementById('missEven').innerText = even!==null?even:historyRecords.length;
+        document.getElementById('missDaShuang').innerText = lastIdx['大双'] !== null ? lastIdx['大双'] : historyRecords.length;
+        document.getElementById('missDaDan').innerText = lastIdx['大单'] !== null ? lastIdx['大单'] : historyRecords.length;
+        document.getElementById('missXiaoShuang').innerText = lastIdx['小双'] !== null ? lastIdx['小双'] : historyRecords.length;
+        document.getElementById('missXiaoDan').innerText = lastIdx['小单'] !== null ? lastIdx['小单'] : historyRecords.length;
+        let big = null, small = null, odd = null, even = null;
+        for (let i = 0; i < historyRecords.length; i++) {
+            const t = historyRecords[i].type;
+            if ((t === '大双' || t === '大单') && big === null) big = i;
+            if ((t === '小双' || t === '小单') && small === null) small = i;
+            if ((t === '大单' || t === '小单') && odd === null) odd = i;
+            if ((t === '大双' || t === '小双') && even === null) even = i;
+        }
+        document.getElementById('missBig').innerText = big !== null ? big : historyRecords.length;
+        document.getElementById('missSmall').innerText = small !== null ? small : historyRecords.length;
+        document.getElementById('missOdd').innerText = odd !== null ? odd : historyRecords.length;
+        document.getElementById('missEven').innerText = even !== null ? even : historyRecords.length;
     }
 
-    function saveToLocal() { localStorage.setItem('pc28_final_v1', JSON.stringify(historyRecords.slice(0,500))); renderHistoryTable(); updateMissStats(); }
+    function saveToLocal() { localStorage.setItem('pc28_dynamic_v3', JSON.stringify(historyRecords.slice(0, 500))); renderHistoryTable(); updateMissStats(); }
     function loadLocalHistory() {
-        const stored = localStorage.getItem('pc28_final_v1');
-        if(stored) try{ historyRecords=JSON.parse(stored); }catch(e){ historyRecords=[]; }
+        const stored = localStorage.getItem('pc28_dynamic_v3');
+        if (stored) try { historyRecords = JSON.parse(stored); } catch(e) { historyRecords = []; }
         renderHistoryTable(); updateMissStats();
-        if(historyRecords.length>0){ const last=historyRecords[0]; updateDisplayAll(last.issue,last.numbers,last.sum,last.type); currentIssue=last.issue; }
+        if (historyRecords.length > 0) {
+            const last = historyRecords[0];
+            updateDisplayAll(last.issue, last.numbers, last.sum, last.type);
+            currentIssue = last.issue;
+        }
     }
     function updateDisplayAll(issue, numbers, sum, type) {
-        // 更新两个面板的开奖信息
         document.getElementById('currentIssue').innerText = issue;
         document.getElementById('ball1').innerText = numbers[0];
         document.getElementById('ball2').innerText = numbers[1];
@@ -752,7 +798,6 @@
         const typeEl = document.getElementById('resultType');
         typeEl.innerText = type;
         typeEl.className = `type-badge ${getTypeClass(type)}`;
-        // 两组预测面板同步
         document.getElementById('currentIssue2').innerText = issue;
         document.getElementById('ball1_2').innerText = numbers[0];
         document.getElementById('ball2_2').innerText = numbers[1];
@@ -766,26 +811,36 @@
     async function refreshAll() {
         const statusSpan = document.getElementById('apiStatus');
         const spinner = document.getElementById('loadingSpinner');
-        if(!isRefreshing){ isRefreshing=true; spinner.style.display='inline-flex'; }
+        if (!isRefreshing) { isRefreshing = true; spinner.style.display = 'inline-flex'; }
         statusSpan.innerText = '同步中...';
-        try{
+        try {
             const draw = await fetchLatestDraw();
-            if(!draw) throw new Error();
+            if (!draw) throw new Error();
             const { issue, numbers, sum, type, countdown } = draw;
-            if(countdown) document.getElementById('countdownText').innerText = countdown;
-            if(issue && issue !== currentIssue){
+            if (countdown) document.getElementById('countdownText').innerText = countdown;
+            if (issue && issue !== currentIssue) {
                 currentIssue = issue;
                 await addHistoryRecord(issue, numbers, sum, type);
                 updateDisplayAll(issue, numbers, sum, type);
                 statusSpan.innerText = `✅ 期号 ${issue}`;
-            } else { statusSpan.innerText = `✅ 最新 ${issue||'--'}`; if(issue) updateDisplayAll(issue, numbers, sum, type); }
+            } else {
+                statusSpan.innerText = `✅ 最新 ${issue || '--'}`;
+                if (issue) updateDisplayAll(issue, numbers, sum, type);
+            }
             updateAllPredictUI();
             renderHistoryTable();
             updateMissStats();
-        } catch(e){ statusSpan.innerText = '⚠️ 重试'; } finally { setTimeout(()=>{ spinner.style.display='none'; isRefreshing=false; },500); }
+        } catch(e) { statusSpan.innerText = '⚠️ 重试'; } finally { setTimeout(() => { spinner.style.display = 'none'; isRefreshing = false; }, 500); }
     }
     async function updateCountdownOnly() {
-        try{ const res = await fetch(`${API_BASE}/api/keno.json?nbr=1`,{cache:"no-store"}); if(res.ok){ const data=await res.json(); if(data.countdown) document.getElementById('countdownText').innerText=data.countdown; if(data.countdown==='00:00:00') refreshAll(); } } catch(e){}
+        try {
+            const res = await fetch(`${API_BASE}/api/keno.json?nbr=1`, { cache: "no-store" });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.countdown) document.getElementById('countdownText').innerText = data.countdown;
+                if (data.countdown === '00:00:00') refreshAll();
+            }
+        } catch(e) {}
     }
 
     function initTabs() {
@@ -795,21 +850,44 @@
             predict2: document.getElementById('predict2Panel'),
             history: document.getElementById('historyPanel')
         };
-        tabs.forEach(tab => { tab.addEventListener('click',()=>{ const target=tab.dataset.panel; tabs.forEach(t=>t.classList.remove('active')); tab.classList.add('active'); Object.values(panels).forEach(p=>p.classList.remove('active')); panels[target].classList.add('active'); }); });
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.panel;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                Object.values(panels).forEach(p => p.classList.remove('active'));
+                panels[target].classList.add('active');
+            });
+        });
     }
     function initAlgoSwitch() {
         const btns = document.querySelectorAll('.algo-btn');
-        btns.forEach(btn => { btn.addEventListener('click',()=>{ btns.forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentAlgo = btn.dataset.algo; updateAllPredictUI(); }); });
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentAlgo = btn.dataset.algo;
+                updateAllPredictUI();
+            });
+        });
     }
 
     function startApp() {
         loadLocalHistory();
         refreshAll();
-        if(pollTimer) clearInterval(pollTimer); pollTimer = setInterval(refreshAll, 18000);
-        if(cdTimer) clearInterval(cdTimer); cdTimer = setInterval(updateCountdownOnly, 1000);
+        if (pollTimer) clearInterval(pollTimer); pollTimer = setInterval(refreshAll, 18000);
+        if (cdTimer) clearInterval(cdTimer); cdTimer = setInterval(updateCountdownOnly, 1000);
         initTabs(); initAlgoSwitch();
         document.getElementById('syncBtn').onclick = () => refreshAll();
-        document.getElementById('clearHistoryBtn').onclick = () => { if(confirm('清空所有历史记录？准确率将重置')){ historyRecords=[]; saveToLocal(); currentIssue=null; updateDisplayAll('------',['--','--','--'],'--','大双'); refreshAll(); } };
+        document.getElementById('clearHistoryBtn').onclick = () => {
+            if (confirm('清空所有历史记录？准确率将重置')) {
+                historyRecords = [];
+                saveToLocal();
+                currentIssue = null;
+                updateDisplayAll('------', ['--', '--', '--'], '--', '大双');
+                refreshAll();
+            }
+        };
     }
 </script>
 </body>
