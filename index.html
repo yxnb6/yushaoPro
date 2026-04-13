@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
-    <title>鱼少PC28 · 自用版</title>
+    <title>鱼少PC28 · 专业版</title>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
@@ -27,8 +27,8 @@
         .segmented-control span.active { background: var(--ios-blue); border-color: var(--ios-blue); color: #fff; font-weight: 500; }
         .algorithm-switch span.active { background: var(--ios-purple); border-color: var(--ios-purple); }
         .status-bar { background: linear-gradient(135deg, var(--ios-blue), #0051D5); color: #fff; padding: 12px 18px; font-size: 15px; font-weight: 500; display: flex; justify-content: space-between; }
-        .card { background: var(--ios-card); border-radius: var(--ios-radius); margin: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: box-shadow 0.3s; }
-        .card.opening-glow { box-shadow: 0 0 0 3px rgba(255,149,0,0.4), 0 8px 20px rgba(0,0,0,0.1); animation: cardPulse 1.2s infinite ease-in-out; }
+        .card { background: var(--ios-card); border-radius: var(--ios-radius); margin: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .card.opening-glow { box-shadow: 0 0 0 3px rgba(255,149,0,0.4); animation: cardPulse 1.2s infinite; }
         @keyframes cardPulse { 0% { box-shadow: 0 0 0 3px rgba(255,149,0,0.2); } 50% { box-shadow: 0 0 0 6px rgba(255,149,0,0.5); } 100% { box-shadow: 0 0 0 3px rgba(255,149,0,0.2); } }
         .card-header { padding: 18px 18px 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid var(--ios-line); }
         .card-title { font-size: 17px; font-weight: 650; }
@@ -40,7 +40,7 @@
         .timer.opening { color: var(--ios-orange); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         .result-balls { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 24px; }
-        .ball { width: 62px; height: 62px; border-radius: 50%; background: var(--ios-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; transition: transform 0.2s; }
+        .ball { width: 62px; height: 62px; border-radius: 50%; background: var(--ios-orange); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; }
         .ball.bouncing { animation: ballBounce 1.2s infinite ease-in-out; }
         .ball.bouncing:nth-child(1) { animation-delay: 0s; } .ball.bouncing:nth-child(2) { animation-delay: 0.15s; } .ball.bouncing:nth-child(3) { animation-delay: 0.3s; } .ball.bouncing.sum { animation-delay: 0.45s; }
         @keyframes ballBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -62,7 +62,6 @@
         td { padding: 14px 6px; font-size: 14px; text-align: center; border-bottom: 0.5px solid var(--ios-line); }
         .ball-sm { display: inline-block; width: 28px; height: 28px; line-height: 28px; border-radius: 50%; background: var(--ios-orange); color: #fff; font-size: 14px; margin: 0 2px; font-weight: 500; }
 
-        /* 预测记录表格 —— 禁止横向滚动，固定列宽 */
         #record-panel .table-wrapper { overflow-x: hidden; width: 100%; }
         #record-panel table { table-layout: fixed; min-width: 0; width: 100%; }
         #record-panel th, #record-panel td { word-break: break-word; padding: 12px 4px; font-size: 13px; }
@@ -87,16 +86,14 @@
         .hit-emoji { font-size: 22px; }
         .double-single-row { display: flex; gap: 16px; margin-top: 8px; }
         .winrate-text { font-size: 16px; font-weight: 600; }
-        .sum-predict-item { background: linear-gradient(145deg, #e8f0fe, #fff); }
-        .trend-card { background: linear-gradient(135deg, #f8f9ff, #fff); border-left: 4px solid var(--ios-blue); }
-        .trend-status { font-size: 24px; font-weight: 700; margin-right: 8px; }
-        .trend-detail { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+        .trend-card { background: linear-gradient(135deg, #f0f4ff, #fff); border-left: 4px solid var(--ios-blue); }
+        .stat-badge { background: #e9ecf3; border-radius: 20px; padding: 4px 12px; font-size: 14px; }
     </style>
 </head>
 <body>
 <div class="wrap">
     <div class="nav-bar">
-        <div class="nav-header"><div class="logo">🐟 鱼少PC28 · 自用版</div><div class="api-status" id="apiTip">⌛ 加载中</div></div>
+        <div class="nav-header"><div class="logo">🐟 鱼少PC28 · 专业版</div><div class="api-status" id="apiTip">⌛ 加载中</div></div>
         <div class="segmented-control" id="tabControl">
             <span class="active" data-panel="history">开奖现场</span>
             <span data-panel="trend">走势分析</span>
@@ -105,7 +102,7 @@
             <span data-panel="record">预测记录</span>
         </div>
     </div>
-    <div class="status-bar"><span>🎯 自用版 · 禁止泄露</span><span id="openTime">--</span></div>
+    <div class="status-bar"><span>🎯 专业版 · 禁止泄露</span><span id="openTime">--</span></div>
 
     <div class="card"><div class="card-content"><div class="issue-info"><div><div class="card-subtitle">当前期号</div><div class="issue-no" id="issue">--</div></div><div><div class="card-subtitle" id="timerLabel">下期开奖倒计时</div><div class="timer" id="count">--:--</div></div></div></div></div>
 
@@ -123,10 +120,10 @@
         </div>
 
         <div class="tab-panel" id="predict-panel">
-            <!-- 当前趋势分析卡片 -->
-            <div class="card trend-card"><div class="card-header"><div class="card-title">📊 当前趋势分析</div></div><div class="card-content" id="trendAnalysis"></div></div>
+            <!-- 专业趋势分析 + 假设检验 + 凯利公式 -->
+            <div class="card trend-card"><div class="card-header"><div class="card-title">📊 专业趋势诊断</div></div><div class="card-content" id="trendAnalysis"></div></div>
             
-            <div class="card sum-predict-item"><div class="card-header"><div class="card-title">🎲 热门和值预测</div></div><div class="card-content"><div id="sumPredict"></div></div></div>
+            <div class="card sum-predict-item"><div class="card-header"><div class="card-title">🎲 和值预测 (移动平均回归)</div></div><div class="card-content"><div id="sumPredict"></div></div></div>
             <div class="card"><div class="card-content">
                 <div class="segmented-control algorithm-switch" id="algorithmControl">
                     <span class="active" data-algo="weighted">权威加权</span>
@@ -135,11 +132,11 @@
                     <span data-algo="bayesian">贝叶斯</span>
                     <span data-algo="ensemble">集成学习</span>
                 </div>
-                <div class="algorithm-panel active" id="weighted-panel"><div class="predict-item"><div class="predict-title">🔥 冷热遗漏加权 (热度60% + 遗漏40%)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="weighted-double"></div></div><div><div>⭐ 单门</div><div id="weighted-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="weighted-bar" style="width:0%"></div></div></div></div>
-                <div class="algorithm-panel" id="markov-panel"><div class="predict-item"><div class="predict-title">🔮 马尔可夫链 (二阶转移+平滑)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="markov-double"></div></div><div><div>⭐ 单门</div><div id="markov-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="markov-bar" style="width:0%"></div></div></div></div>
-                <div class="algorithm-panel" id="montecarlo-panel"><div class="predict-item"><div class="predict-title">🎲 蒙特卡洛 (近期趋势加权)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="montecarlo-double"></div></div><div><div>⭐ 单门</div><div id="montecarlo-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="montecarlo-bar" style="width:0%"></div></div></div></div>
-                <div class="algorithm-panel" id="bayesian-panel"><div class="predict-item"><div class="predict-title">📐 贝叶斯推断 (Dirichlet先验)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="bayesian-double"></div></div><div><div>⭐ 单门</div><div id="bayesian-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="bayesian-bar" style="width:0%"></div></div></div></div>
-                <div class="algorithm-panel" id="ensemble-panel"><div class="predict-item"><div class="predict-title">🤖 集成学习 (动态胜率加权)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="ensemble-double"></div></div><div><div>⭐ 单门</div><div id="ensemble-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="ensemble-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel active" id="weighted-panel"><div class="predict-item"><div class="predict-title">🔥 权威加权 (EWMA热度+标准化遗漏)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="weighted-double"></div></div><div><div>⭐ 单门</div><div id="weighted-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="weighted-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel" id="markov-panel"><div class="predict-item"><div class="predict-title">🔮 马尔可夫链 (三阶+Katz回退)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="markov-double"></div></div><div><div>⭐ 单门</div><div id="markov-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="markov-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel" id="montecarlo-panel"><div class="predict-item"><div class="predict-title">🎲 蒙特卡洛 (Bootstrap置信估计)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="montecarlo-double"></div></div><div><div>⭐ 单门</div><div id="montecarlo-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="montecarlo-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel" id="bayesian-panel"><div class="predict-item"><div class="predict-title">📐 贝叶斯推断 (分层收缩估计)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="bayesian-double"></div></div><div><div>⭐ 单门</div><div id="bayesian-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="bayesian-bar" style="width:0%"></div></div></div></div>
+                <div class="algorithm-panel" id="ensemble-panel"><div class="predict-item"><div class="predict-title">🤖 集成学习 (Stacking元学习)</div><div class="double-single-row"><div><div>🎯 双门</div><div id="ensemble-double"></div></div><div><div>⭐ 单门</div><div id="ensemble-single"></div></div></div><div class="confidence-bar"><div class="confidence-fill" id="ensemble-bar" style="width:0%"></div></div></div></div>
             </div></div>
             <div class="card"><div class="card-header"><div class="card-title">📊 模型胜率对比 (排序)</div></div><div class="card-content"><div id="modelWinrate"></div></div></div>
         </div>
@@ -149,16 +146,16 @@
         <div class="tab-panel" id="record-panel">
             <div class="btn-group"><button class="btn success" onclick="loadPredictHistory()">🔄 刷新</button><button class="btn danger" onclick="clearPredictHistory()">🗑️ 清空</button><button class="btn primary" onclick="exportRecords()">📤 导出TXT</button></div>
             <div class="card"><div class="card-header"><div class="card-title">📋 预测历史</div><div class="card-subtitle" id="recordCount"></div></div><div class="card-content"><div class="record-algo-tabs" id="recordAlgoTabs"></div>
-            <div class="table-wrapper"><table><thead><tr><th>算法</th><th>期号</th><th>开奖(号码/和值)</th><th>组合</th><th>结果</th></tr></thead><tbody id="recordTable"></tbody></table></div>
+            <div class="table-wrapper"><table><thead><tr><th>算法</th><th>期号</th><th>开奖</th><th>组合</th><th>结果</th></tr></thead><tbody id="recordTable"></tbody></table></div>
             <div id="algoWinrateDetail" style="margin-top:16px;"></div></div></div>
         </div>
     </div>
-    <div class="footer">自用版 · 禁止泄露<br>© 2026 鱼少PC28</div>
+    <div class="footer">专业版 · 统计模型 + 假设检验<br>© 2026 鱼少PC28</div>
 </div>
 <script>
 (function(){
     const API_URL = 'https://pc28.ai/api/kj.json?nbr=50';
-    const STORAGE_KEY = 'ys_pc28_predict_v7';
+    const STORAGE_KEY = 'ys_pc28_pro_v1';
     let historyData = [], latestPeriod = '', currentAlgo = 'weighted';
     let countdownSeconds = 210, isOpening = false, timer = null, autoRefresh = null, openingPolling = null;
     const $ = id => document.getElementById(id);
@@ -167,12 +164,149 @@
     function getSumInfo(sum){ return { dx: sum>13?'大':'小', ds: sum%2===0?'双':'单', combo: (sum>13?'大':'小')+(sum%2===0?'双':'单') }; }
 
     const predictions = {
-        weighted: {double:[], single:'', conf:0},
-        markov: {double:[], single:'', conf:0},
-        montecarlo: {double:[], single:'', conf:0},
-        bayesian: {double:[], single:'', conf:0},
-        ensemble: {double:[], single:'', conf:0}
+        weighted: {double:[], single:'', conf:0, prob:0},
+        markov: {double:[], single:'', conf:0, prob:0},
+        montecarlo: {double:[], single:'', conf:0, prob:0},
+        bayesian: {double:[], single:'', conf:0, prob:0},
+        ensemble: {double:[], single:'', conf:0, prob:0}
     };
+
+    // 辅助函数：指数加权移动平均 (遗忘因子 lambda=0.7)
+    function ewma(seq, lambda=0.7) {
+        const weights = seq.map((_, i) => Math.pow(lambda, i));
+        const sumW = weights.reduce((a,b)=>a+b,0);
+        const cnt = {大单:0,大双:0,小单:0,小双:0};
+        seq.forEach((c, i) => cnt[c] += weights[i] / sumW);
+        return cnt;
+    }
+
+    // 三阶马尔可夫 + Katz回退
+    function markov3(seq) {
+        const n = seq.length;
+        if (n < 4) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
+        const context3 = seq[2]+'|'+seq[1]+'|'+seq[0];
+        const trans3 = {}, trans2 = {}, trans1 = {};
+        for (let i=3; i<n; i++) {
+            const ctx = seq[i-3]+'|'+seq[i-2]+'|'+seq[i-1];
+            const cur = seq[i];
+            if (!trans3[ctx]) trans3[ctx] = {大单:0,大双:0,小单:0,小双:0};
+            trans3[ctx][cur]++;
+        }
+        if (trans3[context3]) {
+            let sum = Object.values(trans3[context3]).reduce((a,b)=>a+b,0);
+            if (sum > 0) {
+                const probs = {};
+                combos.forEach(c => probs[c] = (trans3[context3][c] + 0.5) / (sum + 2));
+                return probs;
+            }
+        }
+        // 回退二阶
+        for (let i=2; i<n; i++) {
+            const ctx = seq[i-2]+'|'+seq[i-1];
+            const cur = seq[i];
+            if (!trans2[ctx]) trans2[ctx] = {大单:0,大双:0,小单:0,小双:0};
+            trans2[ctx][cur]++;
+        }
+        const context2 = seq[1]+'|'+seq[0];
+        if (trans2[context2]) {
+            let sum = Object.values(trans2[context2]).reduce((a,b)=>a+b,0);
+            if (sum > 0) {
+                const probs = {};
+                combos.forEach(c => probs[c] = (trans2[context2][c] + 0.5) / (sum + 2));
+                return probs;
+            }
+        }
+        // 回退一阶
+        for (let i=1; i<n; i++) {
+            const ctx = seq[i-1];
+            const cur = seq[i];
+            if (!trans1[ctx]) trans1[ctx] = {大单:0,大双:0,小单:0,小双:0};
+            trans1[ctx][cur]++;
+        }
+        const context1 = seq[0];
+        if (trans1[context1]) {
+            let sum = Object.values(trans1[context1]).reduce((a,b)=>a+b,0);
+            if (sum > 0) {
+                const probs = {};
+                combos.forEach(c => probs[c] = (trans1[context1][c] + 0.5) / (sum + 2));
+                return probs;
+            }
+        }
+        return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
+    }
+
+    // 分层贝叶斯收缩估计
+    function bayesShrinkage(seq, globalMean = 0.25, strength = 5) {
+        const cnt = {大单:0,大双:0,小单:0,小双:0};
+        seq.forEach(c => cnt[c]++);
+        const n = seq.length;
+        const post = {};
+        combos.forEach(c => {
+            const p_mle = cnt[c] / n;
+            post[c] = (cnt[c] + strength * globalMean) / (n + strength);
+        });
+        return post;
+    }
+
+    // Bootstrap 蒙特卡洛
+    function bootstrapMC(seq, B=2000) {
+        const n = seq.length;
+        const bootCnt = {大单:0,大双:0,小单:0,小双:0};
+        for (let b=0; b<B; b++) {
+            const sample = Array.from({length: n}, () => seq[Math.floor(Math.random()*n)]);
+            const cnt = {大单:0,大双:0,小单:0,小双:0};
+            sample.forEach(c => cnt[c]++);
+            const maxCombo = Object.keys(cnt).reduce((a,b) => cnt[a]>cnt[b]?a:b);
+            bootCnt[maxCombo]++;
+        }
+        const probs = {};
+        combos.forEach(c => probs[c] = bootCnt[c] / B);
+        return probs;
+    }
+
+    // 卡方拟合优度检验 (返回 p-value 近似)
+    function chiSquareTest(observed, expectedProb=0.25) {
+        const n = observed.length;
+        const cnt = {大单:0,大双:0,小单:0,小双:0};
+        observed.forEach(c => cnt[c]++);
+        let chi2 = 0;
+        combos.forEach(c => {
+            const exp = n * expectedProb;
+            chi2 += Math.pow(cnt[c] - exp, 2) / exp;
+        });
+        // 自由度为3的卡方分布近似 p-value (简化)
+        if (chi2 > 11.34) return 0.01;
+        if (chi2 > 7.81) return 0.05;
+        if (chi2 > 6.25) return 0.10;
+        return 0.5;
+    }
+
+    // 游程检验 (Wald-Wolfowitz)
+    function runsTest(seq) {
+        const n = seq.length;
+        if (n < 10) return 0;
+        let runs = 1;
+        for (let i=1; i<n; i++) if (seq[i] !== seq[i-1]) runs++;
+        const cnt = {大单:0,大双:0,小单:0,小双:0};
+        seq.forEach(c => cnt[c]++);
+        const n1 = cnt['大']? cnt['大'] : cnt['大单']+cnt['大双'];
+        const n2 = n - n1;
+        if (n1===0 || n2===0) return 0;
+        const meanR = 1 + 2*n1*n2/n;
+        const varR = 2*n1*n2*(2*n1*n2 - n) / (n*n*(n-1));
+        const z = (runs - meanR) / Math.sqrt(varR);
+        return z;
+    }
+
+    // 凯利公式 (赔率默认1.95)
+    function kellyCriterion(prob, odds=1.95) {
+        const b = odds - 1;
+        const p = prob;
+        const q = 1 - p;
+        let f = (b*p - q) / b;
+        f = Math.max(0, Math.min(0.25, f)); // 限制最大25%
+        return f;
+    }
 
     async function loadData(manual=false){
         $('apiTip').innerHTML = manual ? '🔄 强制刷新...' : '🔄 同步中...';
@@ -234,178 +368,106 @@
         $('n1').innerText = n1; $('n2').innerText = n2; $('n3').innerText = n3; $('sum').innerText = sum;
     }
 
-    // 新增：当前趋势分析
     function analyzeTrend(){
-        if(historyData.length < 10) {
-            $('trendAnalysis').innerHTML = `<div>⏳ 数据不足，至少需要10期</div>`;
+        if(historyData.length < 20) {
+            $('trendAnalysis').innerHTML = `<div>⏳ 至少需要20期数据进行分析</div>`;
             return;
         }
-        const recent = historyData.slice(0, 20); // 近20期
-        const comboCount = {大单:0,大双:0,小单:0,小双:0};
-        recent.forEach(d => comboCount[d.combo]++);
+        const recentSeq = historyData.slice(0, 30).map(d=>d.combo).reverse();
+        const pChi = chiSquareTest(recentSeq);
+        const zRuns = runsTest(recentSeq);
         
-        // 计算分布偏差（理想各25%）
-        const total = recent.length;
-        let deviation = 0;
-        combos.forEach(c => { const p = comboCount[c]/total; deviation += Math.abs(p - 0.25); });
-        deviation = deviation / 2; // 归一化到0~1
-        
-        // 遗漏情况
-        const miss = {大单:0,大双:0,小单:0,小双:0};
-        for(let c of combos){
-            let cnt = 0;
-            for(let d of historyData){
-                if(d.combo === c) break;
-                cnt++;
-            }
-            miss[c] = cnt;
-        }
-        const maxMiss = Math.max(...Object.values(miss));
-        const missScore = maxMiss > 15 ? 1 : maxMiss / 15; // 超过15期遗漏为1分
-        
-        // 连号检测（同一组合连续出现）
-        let maxStreak = 0, currentStreak = 1;
-        for(let i=1; i<historyData.length; i++){
-            if(historyData[i].combo === historyData[i-1].combo) currentStreak++;
-            else { maxStreak = Math.max(maxStreak, currentStreak); currentStreak = 1; }
-        }
-        maxStreak = Math.max(maxStreak, currentStreak);
-        const streakScore = maxStreak >= 3 ? 1 : maxStreak / 3;
-        
-        // 综合评分 (越低越好)
-        const healthScore = (deviation * 0.5 + missScore * 0.3 + streakScore * 0.2);
         let status = '', advice = '', color = '';
-        if(healthScore < 0.3) { status = '✅ 优'; advice = '趋势健康，分布均衡，适合跟进'; color = '#34C759'; }
-        else if(healthScore < 0.55) { status = '⚠️ 良'; advice = '稍有偏态，可小注试探，注意止损'; color = '#FF9500'; }
-        else { status = '❌ 差'; advice = '严重偏态或长遗漏，建议观望，暂停投注'; color = '#FF3B30'; }
+        if (pChi < 0.05) { status = '⚠️ 分布显著偏离'; advice = '卡方检验P<0.05，近期分布不随机，可能存在模式'; color = '#FF9500'; }
+        else if (Math.abs(zRuns) > 1.96) { status = '⚠️ 序列非随机'; advice = '游程检验|Z|>1.96，存在趋势或周期性'; color = '#FF9500'; }
+        else { status = '✅ 统计随机'; advice = '未能拒绝随机性假设，走势无明显异常'; color = '#34C759'; }
+        
+        const ensembleProb = predictions.ensemble.prob;
+        const kellyFrac = kellyCriterion(ensembleProb);
         
         let html = `<div style="display:flex; align-items:center; margin-bottom:12px;">
-            <span class="trend-status" style="color:${color};">${status}</span>
-            <span style="font-size:18px; font-weight:600;">趋势健康度 ${((1-healthScore)*100).toFixed(0)}%</span>
+            <span style="font-size:20px; font-weight:700; color:${color};">${status}</span>
+            <span style="margin-left:12px; font-size:14px;">卡方P=${pChi.toFixed(3)} | 游程Z=${zRuns.toFixed(2)}</span>
         </div>`;
         html += `<div style="color:var(--ios-text-secondary); margin-bottom:10px;">💡 ${advice}</div>`;
-        html += `<div class="trend-detail">`;
-        html += `<span class="tag">分布偏差 ${(deviation*100).toFixed(1)}%</span>`;
-        html += `<span class="tag">最大遗漏 ${maxMiss}期</span>`;
-        html += `<span class="tag">最长连号 ${maxStreak}期</span>`;
-        html += `</div>`;
+        html += `<div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <span class="stat-badge">集成预测概率 ${(ensembleProb*100).toFixed(1)}%</span>
+            <span class="stat-badge">凯利投注比例 ${(kellyFrac*100).toFixed(1)}%</span>
+        </div>`;
         $('trendAnalysis').innerHTML = html;
     }
 
     function runAllPredictions(){
-        if(historyData.length<10) {
+        if(historyData.length < 10) {
             for(let k in predictions) {
-                predictions[k] = {double:['大单','大双'], single:'大单', conf:0.3};
+                predictions[k] = {double:['大单','大双'], single:'大单', conf:0.3, prob:0.3};
                 updateUI(k);
             }
             return;
         }
-        const comboSeq = historyData.map(d=>d.combo);
+        const comboSeq = historyData.map(d=>d.combo).reverse();
+        const n = comboSeq.length;
         
-        // 1. 权威加权（相对热度+归一化遗漏）
-        const freq = {大单:0,大双:0,小单:0,小双:0}; 
-        const sampleSize = Math.min(historyData.length, 50);
-        historyData.slice(0, sampleSize).forEach(d=>freq[d.combo]++);
+        // 1. 权威加权 (EWMA)
+        const ewmaFreq = ewma(comboSeq, 0.7);
         const miss = {大单:0,大双:0,小单:0,小双:0};
         for(let c of combos){
             let cnt = 0;
-            for(let d of historyData){ if(d.combo === c) break; cnt++; }
+            for(let d of comboSeq){ if(d === c) break; cnt++; }
             miss[c] = cnt;
         }
-        // 归一化
         const maxMiss = Math.max(...Object.values(miss), 1);
-        const scores = {}; 
-        combos.forEach(c => {
-            const hotScore = freq[c] / sampleSize;
-            const missScore = miss[c] / maxMiss;
-            scores[c] = hotScore * 0.6 + missScore * 0.4;
-        });
+        const scores = {};
+        combos.forEach(c => scores[c] = ewmaFreq[c]*0.6 + (miss[c]/maxMiss)*0.4);
         setPrediction('weighted', scores);
         
-        // 2. 马尔可夫（二阶优先）
-        let probs = {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
-        if(comboSeq.length >= 3) {
-            const trans2 = {};
-            for(let i=2; i<comboSeq.length; i++){
-                const prev2 = comboSeq[i-2]+'|'+comboSeq[i-1];
-                const curr = comboSeq[i];
-                if(!trans2[prev2]) trans2[prev2] = {大单:0,大双:0,小单:0,小双:0};
-                trans2[prev2][curr]++;
-            }
-            const last2 = comboSeq[1]+'|'+comboSeq[0];
-            if(trans2[last2]){
-                let sum = Object.values(trans2[last2]).reduce((a,b)=>a+b,0);
-                if(sum > 0) combos.forEach(c => probs[c] = (trans2[last2][c]+1)/(sum+4));
-            } else {
-                // 降级到一阶
-                const trans1 = {};
-                for(let i=1; i<comboSeq.length; i++){
-                    const p = comboSeq[i-1], c = comboSeq[i];
-                    if(!trans1[p]) trans1[p] = {大单:0,大双:0,小单:0,小双:0};
-                    trans1[p][c]++;
-                }
-                const last1 = comboSeq[0];
-                if(trans1[last1]){
-                    let sum = Object.values(trans1[last1]).reduce((a,b)=>a+b,0);
-                    combos.forEach(c => probs[c] = (trans1[last1][c]+1)/(sum+4));
-                }
-            }
-        }
-        setPrediction('markov', probs);
+        // 2. 马尔可夫 (三阶+Katz)
+        const markovProbs = markov3(comboSeq);
+        setPrediction('markov', markovProbs);
         
-        // 3. 蒙特卡洛（近期趋势加权）
-        const weights = [0.5, 0.3, 0.15, 0.05]; // 越近期权重越高
-        const weightedFreq = {大单:0,大双:0,小单:0,小双:0};
-        historyData.slice(0, weights.length).forEach((d, idx) => {
-            if(idx < weights.length) weightedFreq[d.combo] += weights[idx];
-        });
-        const totalW = weights.slice(0, Math.min(historyData.length, weights.length)).reduce((a,b)=>a+b,0);
-        const simProbs = {};
-        combos.forEach(c => simProbs[c] = weightedFreq[c] / totalW);
-        setPrediction('montecarlo', simProbs);
+        // 3. 贝叶斯收缩
+        const bayesProbs = bayesShrinkage(comboSeq.slice(0,30), 0.25, 8);
+        setPrediction('bayesian', bayesProbs);
         
-        // 4. 贝叶斯（Dirichlet先验 alpha=1）
-        const like = {大单:0,大双:0,小单:0,小双:0};
-        historyData.slice(0, 20).forEach(d=>like[d.combo]++);
-        const post = {};
-        combos.forEach(c => post[c] = (like[c] + 1) / (20 + 4));
-        setPrediction('bayesian', post);
+        // 4. 蒙特卡洛 Bootstrap
+        const mcProbs = bootstrapMC(comboSeq.slice(0,30), 3000);
+        setPrediction('montecarlo', mcProbs);
         
-        // 5. 集成学习（动态胜率加权）
+        // 5. 集成 Stacking (元学习：基于近期胜率的加权平均)
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         const algoWin = {weighted:0.5, markov:0.5, montecarlo:0.5, bayesian:0.5};
         ['weighted','markov','montecarlo','bayesian'].forEach(a => {
-            const recs = records.filter(r=>r.algorithm === a);
+            const recs = records.filter(r=>r.algorithm === a).slice(0,20);
             if(recs.length > 0) {
                 const hits = recs.filter(r=>r.hit).length;
                 algoWin[a] = hits / recs.length;
             }
         });
-        const vote = {大单:0,大双:0,小单:0,小双:0};
+        const totalW = Object.values(algoWin).reduce((a,b)=>a+b,0);
+        const ensembleProbs = {大单:0,大双:0,小单:0,小双:0};
         ['weighted','markov','montecarlo','bayesian'].forEach(a => {
-            const pred = predictions[a];
-            vote[pred.single] += algoWin[a];
+            const w = algoWin[a] / totalW;
+            const probs = predictions[a].prob ? predictions[a] : (()=>{
+                let p = {}; combos.forEach(c=>p[c]=0.25); return p;
+            })();
+            combos.forEach(c => ensembleProbs[c] += w * (probs[c] || 0.25));
         });
-        const sortedVote = Object.entries(vote).sort((a,b)=>b[1]-a[1]);
-        predictions.ensemble.double = sortedVote.slice(0,2).map(c=>c[0]);
-        predictions.ensemble.single = sortedVote[0][0];
-        predictions.ensemble.conf = Math.min(0.95, sortedVote[0][1] / Object.values(algoWin).reduce((a,b)=>a+b,0));
-        updateUI('ensemble');
+        setPrediction('ensemble', ensembleProbs);
         
-        // 和值预测（移动平均回归）
-        const recentSums = historyData.slice(0, 10).map(d=>d.sum);
-        const avgSum = recentSums.reduce((a,b)=>a+b,0) / recentSums.length;
-        const targetSum = Math.round(13.5 + (13.5 - avgSum) * 0.3); // 均值回归
-        const hotSums = [Math.max(0, Math.min(27, targetSum-1)), targetSum, Math.max(0, Math.min(27, targetSum+1))];
-        $('sumPredict').innerHTML = hotSums.map(s=>`<span class="tag orange">${s}</span>`).join(' ');
+        // 和值预测
+        const recentSums = historyData.slice(0,10).map(d=>d.sum);
+        const avg = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
+        const target = Math.round(13.5 + (13.5 - avg)*0.4);
+        const sumCandidates = [Math.max(0,target-1), target, Math.min(27,target+1)];
+        $('sumPredict').innerHTML = sumCandidates.map(s=>`<span class="tag orange">${s}</span>`).join(' ');
     }
 
     function setPrediction(key, weights){
         const sorted = Object.entries(weights).sort((a,b)=>b[1]-a[1]);
-        predictions[key].double = sorted.slice(0,2).map(c=>c[0]); 
+        predictions[key].double = sorted.slice(0,2).map(c=>c[0]);
         predictions[key].single = sorted[0][0];
-        const total = Object.values(weights).reduce((a,b)=>a+b,0);
-        predictions[key].conf = total > 0 ? sorted[0][1] / total : 0.3;
+        predictions[key].prob = sorted[0][1];
+        predictions[key].conf = Math.min(0.95, sorted[0][1] * 1.5);
         updateUI(key);
     }
     function updateUI(key){
@@ -478,9 +540,9 @@
     window.clearPredictHistory = function(){ if(confirm('清空？')){ localStorage.removeItem(STORAGE_KEY); loadPredictHistory(); } };
     window.exportRecords = function(){
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
-        let txt = '鱼少PC28 预测记录 (自用版)\n算法\t期号\t号码\t和值\t组合\t命中\t时间\n';
+        let txt = '鱼少PC28 预测记录 (专业版)\n算法\t期号\t号码\t和值\t组合\t命中\t时间\n';
         records.forEach(r=>{ txt += `${algoMap[r.algorithm]||r.algorithm}\t${r.period}\t${r.numbers}\t${r.sum}\t${r.combo}\t${r.hit?'中':'不中'}\t${r.time}\n`; });
-        const blob = new Blob([txt], {type:'text/plain;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pc28_记录.txt`; a.click();
+        const blob = new Blob([txt], {type:'text/plain;charset=utf-8'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `pc28_pro_records.txt`; a.click();
     };
 
     function updateModelWinrate(){
