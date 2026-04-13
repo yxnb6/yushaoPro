@@ -626,7 +626,7 @@
         const algoMap = {weighted:'权威加权',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',ensemble:'集成'};
         let header = '鱼少PC28 专业版预测记录\n算法\t期号\t号码\t和值\t组合\t命中\t时间\n';
         let lines = records.map(r => 
-            `${algoMap[r.algorithm]||r.algorithm}\t${r.period}\t${r.numbers}\t${r.sum}\t${r.combo}\t${r.hit?'中':'不中'}\t${r.time}`
+            `${algoMap[r.algorithm]||r.algorithm}\t${r.period}\t${r.numbers}\t${r.sum}\t${r.combo}\t${r.hit?'🀄️':'🍉'}\t${r.time}`
         );
         currentExportText = header + lines.join('\n');
         
