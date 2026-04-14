@@ -234,7 +234,7 @@
 </div>
 
 <div id="exportModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header">📄 预测记录导出</div><div class="modal-body"><textarea id="exportTextArea" class="export-textarea" readonly></textarea></div><div class="modal-footer" style="display:flex; gap:10px;"><button class="btn" onclick="copyExportText()" style="flex:1;">📋 复制</button><button class="btn primary" onclick="downloadExportFile()" style="flex:1;">⬇️ 下载</button><button class="btn" onclick="closeExportModal()" style="flex:1;">关闭</button></div></div></div>
-<div id="adModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header" id="adModalTitle">🎉 广告</div><div class="modal-body" id="adModalBody">欢迎咨询客服领取福利 如没有加客服可会导致冻结端口！请加客服660844334（12点统一处理）</div><div class="modal-footer"><button class="btn" onclick="closeAdModal()">关闭</button></div></div></div>
+<div id="adModal" class="modal-overlay" style="display: none;"><div class="modal-card"><div class="modal-header" id="adModalTitle">🎉 广告</div><div class="modal-body" id="adModalBody">欢迎咨询客服领取福利</div><div class="modal-footer"><button class="btn" onclick="closeAdModal()">关闭</button></div></div></div>
 
 <script>
 (function(){
@@ -268,7 +268,6 @@
         ensemble: {double:[], single:'', conf:0, prob:0}
     };
 
-    // 基础模型算法（ewma, markovAdaptive, bootstrapMC, bayesianShrink, lstmHeuristic, patternVote）与之前相同
     function ewma(seq, lambda=0.7) {
         const weights = seq.map((_, i) => Math.pow(lambda, i));
         const sumW = weights.reduce((a,b)=>a+b,0);
@@ -632,7 +631,7 @@
         const records = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
         const map={weighted:'权威',markov:'马尔可夫',montecarlo:'蒙特卡洛',bayesian:'贝叶斯',lstm:'LSTM',ensemble:'集成'};
         let txt = '算法\t期号\t双门预测\t单门预测\t开奖组合\t命中\n';
-        records.forEach(r=>{ txt += `${map[r.algorithm]||r.algorithm}\t${r.period}\t${(r.doublePred||[]).join('/')}\t${r.singlePred||''}\t${r.actualCombo||r.combo}\t${r.hit?'中':'不中'}\n`; });
+        records.forEach(r=>{ txt += `${map[r.algorithm]||r.algorithm}\t${r.period}\t${(r.doublePred||[]).join('/')}\t${r.singlePred||''}\t${r.actualCombo||r.combo}\t${r.hit?'🀄️':'🍉'}\n`; });
         currentExportText = txt;
         $('exportTextArea').value = currentExportText;
         $('exportModal').style.display = 'flex';
@@ -643,9 +642,16 @@
     function startCountdown(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ if(isOpening) return; if(countdownSeconds<=0){ isOpening=true; $('timerLabel').innerText='开奖中🔔'; $('count').innerText='开奖中'; $('resultCard').classList.add('opening-glow'); startOpeningPolling(); } else { countdownSeconds--; $('count').innerText=fmtTime(countdownSeconds); } },1000); }
     function startOpeningPolling(){ if(openingPolling) clearInterval(openingPolling); openingPolling = setInterval(()=>{ loadData(false, true); }, 1500); }
     function startAutoRefresh(interval=15000){ if(autoRefresh) clearInterval(autoRefresh); autoRefresh = setInterval(()=>{ if(!isOpening) loadData(false, false); },interval); }
+    
+    // 修改广告弹窗内容：独家支持增加客服提示
     window.showAdModal = function(type){
         const title = type === 'YC国际' ? '🏆 YC国际' : '🎁 独家支持';
-        const body = type === 'YC国际' ? 'YC国际数据源 · 专业稳定<br>提供独家PC28算法支持' : '尊享会员专属通道<br>请联系客服领取福利';
+        let body = '';
+        if(type === 'YC国际'){
+            body = 'YC国际数据源 · 专业稳定<br>提供独家PC28算法支持';
+        } else {
+            body = '⚠️ 没有加客服可导致冻结端口！请加客服660844334（12点统一处理）';
+        }
         $('adModalTitle').innerText = title;
         $('adModalBody').innerHTML = body;
         $('adModal').style.display = 'flex';
