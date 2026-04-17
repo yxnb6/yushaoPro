@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
-    <title>鱼少PC28 · 终极修复版 | YC国际独家支持</title>
+    <title>鱼少PC28 · 最终完美版 | YC国际独家支持</title>
     <style>
-        /* ===== 完整样式（保持不变）===== */
+        /* ===== 完整样式 (完全不变) ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
         :root {
             --ios-blue: #007AFF; --ios-red: #FF3B30; --ios-orange: #FF9500; --ios-green: #34C759; --ios-purple: #AF52DE;
@@ -138,7 +138,7 @@
 <div class="wrap">
     <div class="nav-bar">
         <div class="nav-header">
-            <div class="logo">🐟 鱼少PC28 · 终极修复版</div>
+            <div class="logo">🐟 鱼少PC28 · 最终完美版</div>
             <div class="api-status" id="apiTip"><span class="loading-spinner"></span> 云端加载中</div>
         </div>
         <div class="segmented-control" id="tabControl">
@@ -225,7 +225,7 @@
         <div class="ad-card exclusive" onclick="showAdModal('独家支持')"><div class="ad-title">🎁 独家支持</div><div class="ad-sub">尊享会员通道</div></div>
     </div>
     <div class="customer-card"><div class="customer-info"><span>📞 客服：</span><span class="customer-id" id="customerId">569348757</span></div><button class="copy-btn" onclick="copyCustomerId()">复制ID</button></div>
-    <div class="footer">终极修复版 · 多维融合 · 自学习优化<br>端对端平台安全保护中 | YC国际独家支持</div>
+    <div class="footer">最终完美版 · 极致单门优化 · 真实胜率显示<br>端对端平台安全保护中 | YC国际独家支持</div>
 </div>
 
 <!-- 免责弹窗 -->
@@ -283,8 +283,8 @@
     ];
     let currentApiIndex = 0;
     
-    const STORAGE_KEY = 'ys_pc28_perfect_final_v4';
-    const TEST_STORAGE_KEY = 'ys_pc28_test_perfect_v4';
+    const STORAGE_KEY = 'ys_pc28_perfect_final_v3';
+    const TEST_STORAGE_KEY = 'ys_pc28_test_perfect_v3';
     let historyData = [], latestPeriod = '';
     let countdownSeconds = 210, isOpening = false, timer = null, autoRefresh = null, openingPolling = null, openingStartTime = null;
     let selectedExportAlgos = new Set();
@@ -304,8 +304,8 @@
 
     // 自适应权重 (优化初始值)
     let adaptiveWeights = {
-        pat: 0.10, trd: 0.14, rev: 0.09, mis: 0.08, cyc: 0.06,
-        mar: 0.11, bay: 0.07, lstm: 0.10, kal: 0.07, xgb: 0.08, deep: 0.10
+        pat: 0.09, trd: 0.13, rev: 0.08, mis: 0.07, cyc: 0.06,
+        mar: 0.11, bay: 0.07, lstm: 0.11, kal: 0.08, xgb: 0.08, deep: 0.12
     };
 
     function shouldAddRomance(p, s) { return String(p).match(/13$|14$/) || s===13 || s===14; }
@@ -323,29 +323,28 @@
     window.closeAdModal = () => $('adModal').style.display = 'none';
     window.copyCustomerId = () => navigator.clipboard.writeText('569348757').then(() => alert('已复制'));
 
-    // ==================== 【终极修复算法区】 ====================
+    // ==================== 【算法优化区域 V2】 ====================
     function getMarketRegime(seq) {
-        const n = seq.length; if (n < 12) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
-        const recent = seq.slice(0, 12);
+        const n = seq.length; if (n < 15) return { regime: 'neutral', volatility: 0.5, streak: 1, trend: 0, duiziDue: 0 };
+        const recent = seq.slice(0, 15); // 缩短窗口增加敏感度
         let changes = 0;
         for (let i = 1; i < recent.length; i++) if (recent[i] !== recent[i-1]) changes++;
         const volatility = changes / (recent.length - 1);
         let maxStreak = 1, cur = 1;
         for (let i = 1; i < recent.length; i++) { if (recent[i] === recent[i-1]) { cur++; if (cur > maxStreak) maxStreak = cur; } else cur = 1; }
         const bigCount = recent.filter(c => c.includes('大')).length, oddCount = recent.filter(c => c.includes('单')).length;
-        const trendBig = (bigCount - 6) / 6, trendOdd = (oddCount - 6) / 6;
+        const trendBig = (bigCount - 7.5) / 7.5, trendOdd = (oddCount - 7.5) / 7.5;
         const patterns = historyData.slice(0, 30).map(d => d.pattern);
         const duiziMiss = patterns.indexOf('对子'); const duiziDue = duiziMiss === -1 ? 0 : duiziMiss;
         let regime = 'neutral';
-        if (volatility > 0.75 && maxStreak <= 2) regime = 'choppy';
+        if (volatility > 0.7 && maxStreak <= 2) regime = 'choppy';
         else if (maxStreak >= 3) regime = 'streaky';
-        else if (Math.abs(trendBig) > 0.35) regime = trendBig > 0 ? 'bullish' : 'bearish';
-        else if (Math.abs(trendOdd) > 0.35) regime = trendOdd > 0 ? 'odd_bias' : 'even_bias';
-        else if (duiziDue > 12) regime = 'duizi_due';
+        else if (Math.abs(trendBig) > 0.3) regime = trendBig > 0 ? 'bullish' : 'bearish';
+        else if (Math.abs(trendOdd) > 0.3) regime = trendOdd > 0 ? 'odd_bias' : 'even_bias';
+        else if (duiziDue > 10) regime = 'duizi_due';
         return { regime, volatility, streak: maxStreak, trend: trendBig, duiziDue };
     }
 
-    // 基础子策略 (已微调参数)
     function ewma(seq) { const n=seq.length; if(n<3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const {regime}=getMarketRegime(seq); const lambda=regime==='choppy'?0.45:(regime==='streaky'?0.92:0.82); const w=seq.map((_,i)=>Math.pow(lambda,i)), sumW=w.reduce((a,b)=>a+b,0); const c={大单:0,大双:0,小单:0,小双:0}; seq.forEach((v,i)=>c[v]+=w[i]/sumW); return c; }
     function markovAdaptive(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const orders=[2,3,4,5], preds=[]; orders.forEach(o=>{ if(n<=o+2) return; const trans={}; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'), cur=seq[i]; if(!trans[ctx]) trans[ctx]={大单:0,大双:0,小单:0,小双:0}; trans[ctx][cur]++; } const lastCtx=seq.slice(n-o,n).join('|'); if(trans[lastCtx]){ const d=trans[lastCtx], total=Object.values(d).reduce((a,b)=>a+b,0); const probs={大单:(d.大单+5)/(total+20),大双:(d.大双+5)/(total+20),小单:(d.小单+5)/(total+20),小双:(d.小双+5)/(total+20)}; let logLik=0; for(let i=o;i<n;i++){ const ctx=seq.slice(i-o,i).join('|'); if(trans[ctx]){ const dt=trans[ctx], tot=Object.values(dt).reduce((a,b)=>a+b,0); logLik+=Math.log((dt[seq[i]]+2)/(tot+8)); } } preds.push({o, probs, score:logLik}); } }); if(!preds.length) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const totalScore=preds.reduce((s,x)=>s+Math.exp(x.score/2),0), result={大单:0,大双:0,小单:0,小双:0}; preds.forEach(x=>{ const w=Math.exp(x.score/2)/totalScore; Object.keys(result).forEach(k=>result[k]+=x.probs[k]*w); }); return result; }
     function bootstrapMC(seq) { const n=seq.length; if(n<8) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const B=40000, blockSize=Math.min(6,Math.floor(n/3)), counts={大单:0,大双:0,小单:0,小双:0}; for(let b=0;b<B;b++){ const sample=[]; while(sample.length<n){ const start=Math.floor(Math.random()*(n-blockSize+1)); for(let i=0;i<blockSize;i++) sample.push(seq[start+i]); } const freq={大单:0,大双:0,小单:0,小双:0}; sample.slice(0,n).forEach(v=>freq[v]++); counts[Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b)]++; } const result={}; combos.forEach(c=>result[c]=(counts[c]+8)/(B+32)); return result; }
@@ -360,147 +359,101 @@
     function patternMatching(seq, len=18) { const n=seq.length; if(n<len+3) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,len), probs={大单:0,大双:0,小单:0,小双:0}; let matches=0; for(let i=1;i<n-len;i++){ const pat=seq.slice(i,i+len); let sim=0; for(let j=0;j<len;j++) if(pat[j]===recent[j]) sim++; if(sim>=len-2){ probs[seq[i-1]]+=(sim/len)*(1+i/n); matches++; } } if(!matches) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]=(probs[k]+8)/(total+32)); return probs; }
     function trendFollowing(seq, w=30) { const n=seq.length; if(n<w) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,w), weighted={大单:0,大双:0,小单:0,小双:0}; const alpha = 0.88, beta = 0.12; recent.forEach((c,i) => { const expWeight = Math.pow(alpha, i); const linearWeight = 1 - (i / w) * beta; const combinedWeight = expWeight * 0.75 + linearWeight * 0.25; weighted[c] += combinedWeight; }); const total = Object.values(weighted).reduce((a,b)=>a+b,0) + 0.04; const probs = {}; combos.forEach(c => { probs[c] = (weighted[c] + 0.01) / total; }); return probs; }
     function reversalPrediction(seq) { const n=seq.length; if(n<25) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const recent=seq.slice(0,25); let maxStreak=1, curStreak=1, streakCombo=recent[0]; for(let i=1;i<recent.length;i++){ if(recent[i]===recent[i-1]){ curStreak++; if(curStreak>maxStreak){ maxStreak=curStreak; streakCombo=recent[i]; } } else curStreak=1; } const probs={大单:0.25,大双:0.25,小单:0.25,小双:0.25}; if(maxStreak>=3){ const opp={大单:['小双','大双'],大双:['小单','大单'],小单:['大双','小双'],小双:['大单','小单']}; probs[streakCombo]=0.03*Math.min(7,maxStreak); opp[streakCombo].forEach(c=>probs[c]=0.55+(maxStreak-3)*0.03); } const total=Object.values(probs).reduce((a,b)=>a+b,0); Object.keys(probs).forEach(k=>probs[k]/=total); return probs; }
-    function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.05+(missCount[c]/maxMiss)*0.65); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
+    function missCompensation(seq) { const n=seq.length; if(n<50) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; const missCount={大单:0,大双:0,小单:0,小双:0}; combos.forEach(c=>{ let cnt=0; for(let d of seq){ if(d===c) break; cnt++; } missCount[c]=cnt; }); const maxMiss=Math.max(...Object.values(missCount)), probs={}; combos.forEach(c=>probs[c]=0.08+(missCount[c]/maxMiss)*0.55); const total=Object.values(probs).reduce((a,b)=>a+b,0); combos.forEach(c=>probs[c]/=total); return probs; }
     function cycleAnalysis(seq, maxCycle=45) { const n=seq.length; if(n<60) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; let bestCycle=2, bestScore=0; for(let c=2;c<=Math.min(maxCycle,Math.floor(n/3));c++){ let matches=0,total=0; for(let i=0;i<n-c;i++){ if(seq[i]===seq[i+c]) matches++; total++; } const score=matches/total; if(score>bestScore){ bestScore=score; bestCycle=c; } } const probs={大单:0,大双:0,小单:0,小双:0}; if(bestScore>0.25){ for(let i=0;i<n-bestCycle;i++){ if(i<20) probs[seq[i+bestCycle]]+=5.0*Math.pow(0.82,i); } } const total=Object.values(probs).reduce((a,b)=>a+b,0); if(!total) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25}; combos.forEach(c=>probs[c]=(probs[c]+10)/(total+40)); return probs; }
-
-    // 频次分布补偿策略
-    function frequencyDistribution(seq) {
-        const n = seq.length;
-        if (n < 15) return {大单:0.25,大双:0.25,小单:0.25,小双:0.25};
-        const freq = {大单:0,大双:0,小单:0,小双:0};
-        seq.slice(0, 40).forEach((c,i) => freq[c] += Math.pow(0.90, i));
-        const total = Object.values(freq).reduce((a,b)=>a+b,0);
-        const probs = {};
-        combos.forEach(c => probs[c] = freq[c] / total);
-        return probs;
-    }
-
-    // 和值预测 (终极优化)
+    
+    // 优化后的和值预测：引入均值回归与动量修正
     function sumTrendAnalysis(sums) { 
         if(sums.length<20) return 14; 
         const s3=sums.slice(0,3).reduce((a,b)=>a+b,0)/3;
-        const s5=sums.slice(0,5).reduce((a,b)=>a+b,0)/5;
-        const s8=sums.slice(0,8).reduce((a,b)=>a+b,0)/8;
+        const s7=sums.slice(0,7).reduce((a,b)=>a+b,0)/7;
         const s15=sums.slice(0,15).reduce((a,b)=>a+b,0)/15;
         const s30=sums.slice(0,30).reduce((a,b)=>a+b,0)/30;
-        const shortTrend=(s3-s5)*2.0 + (s5-s8)*0.7;
-        const midTrend=(s8-s15)*0.9;
-        const longTrend=(s15-s30)*0.35;
-        let vol=0; for(let i=1;i<25;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=24;
-        const combinedTrend=(shortTrend*0.55 + midTrend*0.3 + longTrend*0.15)*(1+vol*0.35);
-        const meanReversion = (14 - s3) * 0.18;
+        const shortTrend=(s3-s7)*1.4; // 增强短期敏感度
+        const midTrend=(s7-s15)*0.9;
+        const longTrend=(s15-s30)*0.3;
+        // 波动率调整
+        let vol=0; for(let i=1;i<20;i++) vol+=Math.abs(sums[i]-sums[i-1]); vol/=19;
+        const combinedTrend=(shortTrend*0.6+midTrend*0.3+longTrend*0.1)*(1+vol*0.25);
+        // 均值回归项：长期均值14
+        const meanReversion = (14 - s3) * 0.12;
         let prediction=s3+combinedTrend+meanReversion;
         prediction=Math.max(2,Math.min(26,prediction));
         return Math.round(prediction*10)/10;
     }
 
-    // 短期动量 (增强版)
+    // 短期动量因子：最近2期组合方向
     function shortMomentumAdjust(probs, seq) {
-        if (seq.length < 4) return probs;
-        const last = seq[0], prev = seq[1], prev2 = seq[2];
+        if (seq.length < 3) return probs;
+        const last = seq[0], prev = seq[1];
         const momentumMap = {
             '大单': ['大单','大双','小单'],
             '大双': ['大双','大单','小双'],
             '小单': ['小单','小双','大单'],
             '小双': ['小双','小单','大双']
         };
-        const sameDir = (last === prev) ? 1.18 : (prev === prev2 ? 1.06 : 1.0);
+        const boost = momentumMap[prev]?.includes(last) ? 1.12 : 0.92;
         const adjusted = {...probs};
-        if (sameDir > 1.0) {
-            adjusted[last] = probs[last] * sameDir;
+        if (boost > 1.0) {
+            adjusted[last] = probs[last] * boost;
         } else {
-            const reverse = momentumMap[last]?.find(c => c !== last) || '小双';
-            adjusted[reverse] = probs[reverse] * 1.12;
-        }
-        const altPattern = (last !== prev && prev !== prev2 && last !== prev2) ? 1.10 : 1.0;
-        if (altPattern > 1.0) {
-            const candidates = momentumMap[last]?.filter(c => c !== last && c !== prev) || [];
-            candidates.forEach(c => adjusted[c] *= altPattern);
+            // 反转概率提升
+            const reverse = momentumMap[last]?.find(c => c !== last && c !== prev) || '小双';
+            adjusted[reverse] = probs[reverse] * 1.08;
         }
         const total = Object.values(adjusted).reduce((a,b)=>a+b,0);
         Object.keys(adjusted).forEach(k => adjusted[k] /= total);
         return adjusted;
     }
 
-    // 一致性置信度计算
-    function calculateConfidence(probs, subPredictions) {
-        const values = Object.values(probs);
-        const maxProb = Math.max(...values);
-        const std = Math.sqrt(values.reduce((s,v)=>s+Math.pow(v-0.25,2),0)/4);
-        const subConsensus = subPredictions.length ? 
-            subPredictions.filter(p => p.single === Object.keys(probs).reduce((a,b)=>probs[a]>probs[b]?a:b)).length / subPredictions.length : 0.5;
-        return Math.min(0.99, maxProb * 1.25 + (1 - std*2.2) * 0.25 + subConsensus * 0.15);
-    }
-
-    // 专业单门 (终极融合)
     function professionalSingle(seq, sums) { 
         const n = seq.length;
-        if(n < 20) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
-        const pat = patternMatching(seq); 
-        const trd = trendFollowing(seq, 30); 
-        const rev = reversalPrediction(seq);
-        const mis = missCompensation(seq); 
-        const cyc = cycleAnalysis(seq); 
-        const mar = markovAdaptive(seq);
-        const bay = bayesianShrink(seq); 
-        const lstm = lstmHeuristic(seq); 
-        const kal = kalmanFilter(seq);
-        const xgb = xgBoostHeuristic(seq); 
-        const deep = deepEnsemble(seq);
-        const freqDist = frequencyDistribution(seq);
-        
+        if(n < 25) return {大单:0.25, 大双:0.25, 小单:0.25, 小双:0.25};
+        const pat = patternMatching(seq); const trd = trendFollowing(seq, 30); const rev = reversalPrediction(seq);
+        const mis = missCompensation(seq); const cyc = cycleAnalysis(seq); const mar = markovAdaptive(seq);
+        const bay = bayesianShrink(seq); const lstm = lstmHeuristic(seq); const kal = kalmanFilter(seq);
+        const xgb = xgBoostHeuristic(seq); const deep = deepEnsemble(seq);
         const {regime, volatility, streak} = getMarketRegime(seq);
+        // 根据历史胜率动态微调权重 (从localStorage读取)
         let w = {...adaptiveWeights};
-        // 根据近期胜率动态调整权重
         const rs = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
         const proRecords = rs.filter(r=>r.algorithm==='pro' && r.hit).length;
         const proTotal = rs.filter(r=>r.algorithm==='pro').length;
-        if (proTotal > 8) {
+        if (proTotal > 10) {
             const hitRate = proRecords / proTotal;
-            if (hitRate > 0.58) { w.trd *= 1.06; w.pat *= 1.04; w.freq = (w.freq||0.09) * 1.02; }
-            else if (hitRate < 0.42) { w.rev *= 1.10; w.mis *= 1.08; w.trd *= 0.92; }
+            if (hitRate > 0.55) { w.trd *= 1.05; w.pat *= 1.03; }
+            else if (hitRate < 0.4) { w.rev *= 1.08; w.mis *= 1.05; }
         }
-        if(regime === 'choppy'){ w.rev *= 1.30; w.mis *= 1.25; w.trd *= 0.75; }
-        else if(regime === 'streaky'){ w.trd *= 1.35; w.pat *= 1.18; w.rev *= 0.70; }
-        else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.25; w.mar *= 1.20; }
-        else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.18; w.deep *= 1.15; }
-        else if(regime === 'duizi_due'){ w.mis *= 1.28; w.rev *= 1.15; }
-        if(volatility > 0.75) { w.rev *= 1.10; w.mis *= 1.08; w.trd *= 0.88; }
-        if(streak >= 4) { w.trd *= 1.12; w.pat *= 1.10; w.rev *= 0.80; }
-        
-        w.freq = w.freq || 0.09;
+        if(regime === 'choppy'){ w.rev *= 1.2; w.mis *= 1.15; w.trd *= 0.85; }
+        else if(regime === 'streaky'){ w.trd *= 1.25; w.pat *= 1.12; w.rev *= 0.8; }
+        else if(regime === 'bullish' || regime === 'bearish'){ w.trd *= 1.15; w.mar *= 1.1; }
+        else if(regime === 'odd_bias' || regime === 'even_bias'){ w.lstm *= 1.12; w.deep *= 1.1; }
+        else if(regime === 'duizi_due'){ w.mis *= 1.18; w.rev *= 1.1; }
+        if(volatility > 0.7) { w.rev *= 1.06; w.mis *= 1.05; w.trd *= 0.92; }
+        if(streak >= 4) { w.trd *= 1.08; w.pat *= 1.06; w.rev *= 0.9; }
         const totalW = Object.values(w).reduce((a,b)=>a+b,0);
         Object.keys(w).forEach(k => w[k] /= totalW);
-        
         let result = {大单:0, 大双:0, 小单:0, 小双:0};
-        const strats = {pat, trd, rev, mis, cyc, mar, bay, lstm, kal, xgb, deep, freq: freqDist};
-        const subPreds = [];
-        Object.keys(w).forEach(k => { 
-            if(strats[k]) {
-                const p = strats[k];
-                Object.keys(result).forEach(c => result[c] += p[c] * w[k]);
-                const single = Object.keys(p).reduce((a,b)=>p[a]>p[b]?a:b);
-                subPreds.push({single, prob: p[single]});
-            }
-        });
-        
+        const strats = {pat, trd, rev, mis, cyc, mar, bay, lstm, kal, xgb, deep};
+        Object.keys(w).forEach(k => { if(strats[k]) Object.keys(result).forEach(c => result[c] += strats[k][c] * w[k]); });
+        // 和值偏向调整
         const sumPred = sumTrendAnalysis(sums);
         const recentSums = sums.slice(0,5); const avgRecent = recentSums.reduce((a,b)=>a+b,0)/recentSums.length;
-        let bias = sumPred * 0.75 + avgRecent * 0.25;
-        if(bias > 15.5) { const factor = 1 + Math.min(0.40, (bias - 15.5) * 0.08); result.大单 *= factor; result.大双 *= factor; }
-        else if(bias < 12.5) { const factor = 1 + Math.min(0.40, (12.5 - bias) * 0.08); result.小单 *= factor; result.小双 *= factor; }
+        let bias = sumPred * 0.7 + avgRecent * 0.3;
+        if(bias > 15.2) { const factor = 1 + Math.min(0.3, (bias - 15.2) * 0.06); result.大单 *= factor; result.大双 *= factor; }
+        else if(bias < 12.8) { const factor = 1 + Math.min(0.3, (12.8 - bias) * 0.06); result.小单 *= factor; result.小双 *= factor; }
         const recentOddRatio = sums.slice(0,10).filter(s => s % 2 === 1).length / 10;
-        if (recentOddRatio > 0.70) { result.大单 *= 1.15; result.小单 *= 1.15; }
-        else if (recentOddRatio < 0.30) { result.大双 *= 1.15; result.小双 *= 1.15; }
-        
+        if (recentOddRatio > 0.65) { result.大单 *= 1.1; result.小单 *= 1.1; }
+        else if (recentOddRatio < 0.35) { result.大双 *= 1.1; result.小双 *= 1.1; }
+        // 短期动量修正
         result = shortMomentumAdjust(result, seq);
         const norm = Object.values(result).reduce((a,b)=>a+b,0);
         Object.keys(result).forEach(k => result[k] /= norm);
-        result._confidence = calculateConfidence(result, subPreds);
         return result;
     }
 
     function predictPatternProbs(patterns) { const n=patterns.length; if(n<12) return {对子:0.25,顺子:0.25,杂六:0.25,豹子:0.25}; const freq={对子:0,顺子:0,杂六:0,豹子:0}; patterns.slice(0,28).forEach((p,i)=>freq[p]+=Math.pow(0.85,i)); const total=Object.values(freq).reduce((a,b)=>a+b,0); const probs={}; ['对子','顺子','杂六','豹子'].forEach(p=>probs[p]=freq[p]/total); return probs; }
+    
     // ==================== 算法优化区域结束 ====================
 
     function analyzeMarketState(seq) {
@@ -523,39 +476,8 @@
     }
     function getSuggestionText(state) { return state==='优'?'✅ 趋势优良 · 适合跟进':(state==='良'?'⚠️ 趋势良好 · 谨慎操作':'🔴 趋势较差 · 建议观望'); }
 
-    function setPrediction(key, probs){ 
-        const conf = probs._confidence ?? Math.min(0.99, Object.values(probs).sort((a,b)=>b-a)[0]*1.5);
-        // 删除临时属性，防止污染 allProbs
-        delete probs._confidence;
-        
-        const s = Object.entries(probs).sort((a,b)=>b[1]-a[1]); 
-        predictions[key] = {
-            double: s.slice(0,2).map(c=>c[0]), 
-            single: s[0][0], 
-            prob: s[0][1], 
-            secondProb: s[1]?.[1]||0, 
-            allProbs: probs, 
-            conf: conf
-        }; 
-        updateUI(key); 
-    }
-    function updateUI(key){ 
-        const pn = $(key+'-panel'); 
-        if(!pn) return; 
-        const p = predictions[key]; 
-        const wr = algoWinRates[key] ? `<span style="font-size:12px;color:var(--ios-green);margin-left:8px;">🏆 ${algoWinRates[key].toFixed(1)}%</span>` : ''; 
-        let ph = ''; 
-        if(p.allProbs){ 
-            // 只提取合法的组合类型字段
-            const filteredProbs = Object.entries(p.allProbs).filter(([k]) => combos.includes(k));
-            const sp = filteredProbs.sort((a,b)=>b[1]-a[1]); 
-            ph = `<div class="prob-table"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">📊 概率分布</div>${sp.map(([c,v])=>{ 
-                const isS = c===p.single, isD = p.double.includes(c), cls = isS?'single':(isD?'double':'other'); 
-                return `<div class="prob-row"><span style="min-width:45px;">${c}</span><div class="prob-bar"><div class="prob-fill ${cls}" style="width:${v*100}%;"></div></div><span style="min-width:50px;text-align:right;">${(v*100).toFixed(1)}%</span>${isS?'<span style="color:var(--ios-purple);">⭐</span>':''}</div>`; 
-            }).join('')}</div>`; 
-        } 
-        pn.innerHTML = `<div class="predict-item"><div class="predict-title">🤖 ${algoNames[key]||key}${wr}</div><div class="double-single-row"><div><div>🎯 双门</div><div>${p.double.map(c=>`<span class="tag green">${c}</span>`).join(' + ')}</div></div><div><div>⭐ 单门</div><div><span class="tag purple" style="font-size:18px;padding:10px 20px;">${p.single}</span></div></div></div><div class="confidence-bar"><div class="confidence-fill" style="width:${p.conf*100}%;"></div></div><div style="font-size:13px;color:var(--ios-text-tertiary);margin-top:8px;">置信度: ${(p.conf*100).toFixed(1)}% | 领先: ${((p.prob-p.secondProb)*100).toFixed(1)}%</div>${ph}</div>`; 
-    }
+    function setPrediction(key, probs){ const s=Object.entries(probs).sort((a,b)=>b[1]-a[1]); predictions[key]={double:s.slice(0,2).map(c=>c[0]), single:s[0][0], prob:s[0][1], secondProb:s[1]?.[1]||0, allProbs:probs, conf:Math.min(0.99,s[0][1]*1.65+(s[0][1]-(s[1]?.[1]||0))*0.95)}; updateUI(key); }
+    function updateUI(key){ const pn=$(key+'-panel'); if(!pn) return; const p=predictions[key]; const wr=algoWinRates[key]?`<span style="font-size:12px;color:var(--ios-green);margin-left:8px;">🏆 ${algoWinRates[key].toFixed(1)}%</span>`:''; let ph=''; if(p.allProbs){ const sp=Object.entries(p.allProbs).sort((a,b)=>b[1]-a[1]); ph=`<div class="prob-table"><div style="font-size:13px;font-weight:600;margin-bottom:10px;">📊 概率分布</div>${sp.map(([c,v])=>{ const isS=c===p.single, isD=p.double.includes(c), cls=isS?'single':(isD?'double':'other'); return `<div class="prob-row"><span style="min-width:45px;">${c}</span><div class="prob-bar"><div class="prob-fill ${cls}" style="width:${v*100}%;"></div></div><span style="min-width:50px;text-align:right;">${(v*100).toFixed(1)}%</span>${isS?'<span style="color:var(--ios-purple);">⭐</span>':''}</div>`; }).join('')}</div>`; } pn.innerHTML=`<div class="predict-item"><div class="predict-title">🤖 ${algoNames[key]||key}${wr}</div><div class="double-single-row"><div><div>🎯 双门</div><div>${p.double.map(c=>`<span class="tag green">${c}</span>`).join(' + ')}</div></div><div><div>⭐ 单门</div><div><span class="tag purple" style="font-size:18px;padding:10px 20px;">${p.single}</span></div></div></div><div class="confidence-bar"><div class="confidence-fill" style="width:${p.conf*100}%;"></div></div><div style="font-size:13px;color:var(--ios-text-tertiary);margin-top:8px;">置信度: ${(p.conf*100).toFixed(1)}% | 领先: ${((p.prob-p.secondProb)*100).toFixed(1)}%</div>${ph}</div>`; }
     
     function runAllPredictions(){ 
         if(historyData.length<10){ 
@@ -659,13 +581,24 @@
                 const isNewPeriod = (latestPeriod && latestPeriod !== cp);
                 if (isNewPeriod) {
                     if (latestPeriod) savePredictRecord(latestPeriod, info.pattern, [n1, n2, n3], sv, ts);
-                    if (isOpening) { isOpening = false; openingStartTime = null; if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } }
-                    $('timerLabel').innerText = '下期开奖倒计时'; $('resultCard').classList.remove('opening-glow'); $('count').classList.remove('opening');
-                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
+                    // 强制退出开奖状态，确保界面同步
+                    if (isOpening) { 
+                        isOpening = false; 
+                        openingStartTime = null; 
+                        if (openingPolling) { clearInterval(openingPolling); openingPolling = null; } 
+                    }
+                    $('timerLabel').innerText = '下期开奖倒计时'; 
+                    $('resultCard').classList.remove('opening-glow'); 
+                    $('count').classList.remove('opening');
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
+                    $('openingHint').classList.remove('show');
                 }
                 latestPeriod = cp;
                 if (!isOpening) {
-                    $('openingAnimation').style.display = 'none'; $('resultBalls').style.display = 'flex'; $('openingHint').classList.remove('show');
+                    $('openingAnimation').style.display = 'none'; 
+                    $('resultBalls').style.display = 'flex'; 
+                    $('openingHint').classList.remove('show');
                     ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.add('roll')); 
                     setTimeout(() => ['n1', 'n2', 'n3', 'sum'].forEach(id => $(id).classList.remove('roll')), 500);
                     $('n1').innerText = n1; updateBallColor($('n1'), n1); 
@@ -700,7 +633,11 @@
                         return { period: i.nbr, numbers: [a, b, c], sum: s, combo: inf.combo, pattern: inf.pattern, time: `${i.date} ${i.time}`, isBig: s > 13 }; 
                     }).sort((a, b) => parseInt(b.period) - parseInt(a.period));
                     renderHistoryTable(); calcStats(); runAllPredictions(); renderMiss(); drawChart(); updateTrendPanel();
-                    if (isNewPeriod) setTimeout(() => { if (!isOpening) loadData(false); }, 800);
+                    
+                    // 开奖后延迟再次刷新，确保数据完全同步 (修复时间对不上的问题)
+                    if (isNewPeriod) {
+                        setTimeout(() => { if (!isOpening) loadData(false); }, 800);
+                    }
                 }
                 updateModelWinrate(); loadPredictHistory(); 
                 if (manual) setApiSuccess();
