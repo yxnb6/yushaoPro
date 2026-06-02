@@ -2,2132 +2,1389 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
-    <title>PC28预测 · 杀组增强版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开奖数据实时展示 · 表格预测版 (手机适配+统计)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #f2f2f2;
-            --card: #ffffff;
-            --line: #efefef;
-            --text: #333;
-            --text2: #666;
-            --text3: #999;
-            --red: #e53935;
-            --blue: #1976d2;
-            --green: #2e7d32;
-            --orange: #f57c00;
-            --purple: #7b1fa2;
-            --gold: #ff8f00;
-            --radius: 4px;
-            --font: -apple-system, 'Microsoft Yahei', 'PingFang SC', Helvetica, Roboto, sans-serif;
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(37, 99, 235, 0.2);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --kill-red: #dc2626;
+            --rec-green: #059669;
+            --hit-green: #10b981;
+            --miss-red: #ef4444;
+            --table-stripe: #f8fafc;
+            --table-hover: #eff6ff;
+            --gold-bg: #fef3c7;
+            --gold-text: #f59e0b;
         }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
+
         body {
-            background: var(--bg);
-            font-family: var(--font);
-            font-size: 14px;
-            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
             color: var(--text);
+            line-height: 1.6;
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-            -webkit-user-select: none;
-            user-select: none;
-            padding-bottom: var(--safe-bottom);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 10px;
         }
-        .app-container {
-            background: var(--bg);
-            min-height: 100vh;
-            max-width: 600px;
+
+        .container {
+            max-width: 1300px;
             margin: 0 auto;
-            padding-bottom: 50px;
         }
-        .tabs {
-            display: flex;
-            background: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            align-items: center;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
         }
-        .tabs::-webkit-scrollbar {
-            display: none;
-        }
-        .tab {
-            flex-shrink: 0;
+
+        .header {
             text-align: center;
-            padding: 13px 10px;
-            color: #666;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            white-space: nowrap;
+            margin-bottom: 20px;
         }
-        .tab.active {
-            background: #2979ff;
-            color: #fff;
-            font-weight: 600;
-            border-bottom-color: #2979ff;
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
         }
-        .settings-btn {
-            flex-shrink: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 18px;
-            color: #666;
-            transition: all 0.2s;
-            border-radius: 50%;
-            margin-right: 4px;
+        .header p {
+            font-size: 14px;
+            color: var(--text-light);
         }
-        .settings-btn:active {
-            background: #f0f0f0;
-            transform: rotate(60deg);
-        }
-        .mode-switch-row {
-            display: flex;
-            gap: 6px;
-            padding: 10px 12px;
-            background: #fff;
-            border-bottom: 1px solid var(--line);
-            align-items: center;
-        }
-        .mode-switch-btn {
-            flex: 1;
+
+        /* 最新开奖区 */
+        .current-result {
             text-align: center;
-            padding: 10px 8px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            border: 2px solid transparent;
-            background: #f5f5f5;
-            color: #666;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
+            padding: 20px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 12px;
+            margin-bottom: 16px;
         }
-        .mode-switch-btn.active {
-            background: #1d1d1f;
-            color: #fff;
-            border-color: #1d1d1f;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-            transform: translateY(-1px);
-        }
-        .mode-switch-btn .mode-icon {
-            display: block;
+        .period {
             font-size: 18px;
-            margin-bottom: 2px;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
-        .algo-tabs {
-            display: flex;
-            overflow-x: auto;
-            gap: 8px;
-            padding: 12px;
-            background: #fff;
-            border-bottom: 1px solid var(--line);
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
+        .numbers {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+            letter-spacing: 2px;
         }
-        .algo-tabs::-webkit-scrollbar {
-            display: none;
-        }
-        .algo-tab {
-            flex-shrink: 0;
-            padding: 8px 16px;
+        .sum-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
             border-radius: 20px;
-            font-size: 12px;
-            color: #555;
-            background: #f5f5f5;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.25s;
-            border: 1px solid transparent;
-            font-weight: 500;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-        }
-        .algo-tab.active {
-            background: #1d1d1f;
-            color: #fff;
-            border-color: #1d1d1f;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
+            margin-top: 8px;
         }
-        .algo-tab.win-high {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-            color: #2e7d32;
+        .countdown {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-text);
+            background: var(--gold-bg);
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: inline-block;
         }
-        .info-card {
-            background: #fff;
-            margin: 8px 10px;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-            position: relative;
-        }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .issue-no {
-            font-size: 24px;
-            font-weight: 800;
-            color: #222;
-            letter-spacing: -0.3px;
-        }
-        .timer {
-            font-size: 28px;
-            font-weight: 800;
-            color: #e53935;
-            font-variant-numeric: tabular-nums;
-            transition: color 0.3s;
-        }
-        .timer.opening {
-            color: #f57c00;
-            animation: pulse 0.8s infinite;
+        .countdown.highlight {
+            animation: pulse 1.5s infinite;
         }
         @keyframes pulse {
             0%,
             100% {
                 opacity: 1;
-                transform: scale(1);
             }
             50% {
-                opacity: 0.45;
-                transform: scale(1.06);
+                opacity: 0.7;
             }
         }
-        .api-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2e7d32;
-            margin-right: 5px;
-            animation: dotPulse 2s infinite;
-        }
-        @keyframes dotPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(46, 125, 50, 0);
-            }
-        }
-        .rec-card {
-            background: linear-gradient(145deg, #1a1a1e 0%, #2d2d32 100%);
-            color: #fff;
-            border-radius: 20px;
-            margin: 12px 10px;
-            padding: 22px 20px;
-            text-align: center;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-        }
-        .rec-card .rec-label {
-            font-size: 13px;
-            opacity: 0.9;
-            letter-spacing: 2px;
-            font-weight: 400;
-        }
-        .rec-card .rec-value {
-            font-size: 46px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #ffd60a, #ff8f00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 8px 0;
-            filter: drop-shadow(0 2px 6px rgba(255, 200, 0, 0.4));
-        }
-        .rec-card .rec-value.number-range {
-            font-size: 38px;
-            letter-spacing: 1px;
-        }
-        .rec-card .rec-sub {
-            font-size: 12px;
-            opacity: 0.9;
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-        .rec-card .rec-sub span {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 5px 14px;
-            border-radius: 20px;
-        }
-        .current-algo-tag {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.25);
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 11px;
+        .opentime {
             margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* 按钮 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        .table-header {
-            background: #fff;
-            margin: 8px 10px 0;
-            border-radius: 12px 12px 0 0;
-        }
-        .thead {
-            display: flex;
-            padding: 12px 0;
-            background: #fff;
-            border-radius: 12px 12px 0 0;
-        }
-        .th {
-            text-align: center;
-            font-size: 14px;
-            color: #333;
-            font-weight: 600;
-        }
-        .th-col-period {
-            flex: 0.8;
-        }
-        .th-col-nums {
-            flex: 1.3;
-        }
-        .th-col-pred {
-            flex: 1.2;
-        }
-        .th-col-result {
-            flex: 0.9;
-        }
-        .table-card {
-            background: #fff;
-            margin: 0 10px 10px;
-            border-radius: 0 0 12px 12px;
-            overflow: hidden;
-            border: 1px solid #eee;
-            border-top: none;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-        }
-        .tr {
-            display: flex;
-            padding: 13px 0;
-            border-bottom: 1px solid #f9f9f9;
-            align-items: center;
-            transition: background 0.15s;
-        }
-        .tr:active {
-            background: #fafafa;
-        }
-        .tr:last-child {
-            border-bottom: none;
-        }
-        .td {
-            text-align: center;
-            font-size: 13px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 3px;
-        }
-        .td-col-period {
-            flex: 0.8;
-            font-weight: 600;
-            color: #222;
-            font-size: 12px;
-        }
-        .td-col-nums {
-            flex: 1.3;
-        }
-        .td-col-pred {
-            flex: 1.2;
-        }
-        .td-col-result {
-            flex: 0.9;
-        }
-        .ball-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 3px;
-        }
-        .redball {
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: #e53935;
-            color: #fff;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(229, 57, 53, 0.25);
-        }
-        .blueball {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: #1976d2;
-            color: #fff;
-            border-radius: 50%;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(25, 118, 210, 0.25);
-        }
-        .btn-red,
-        .btn-blue {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            margin: 0 2px;
-            letter-spacing: 0.3px;
+            gap: 6px;
             white-space: nowrap;
-            transition: transform 0.1s;
         }
-        .btn-red {
-            background: #e53935;
-            color: #fff;
-            box-shadow: 0 2px 4px rgba(229, 57, 53, 0.2);
+        .btn-primary {
+            background: var(--primary);
+            color: white;
         }
-        .btn-blue {
-            background: #1976d2;
-            color: #fff;
-            box-shadow: 0 2px 4px rgba(25, 118, 210, 0.2);
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
         }
-        .btn-range {
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            display: inline-block;
-            margin: 0 2px;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-            background: #1d1d1f;
-            color: #ffd60a;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-        }
-        .ok {
-            background: #e53935;
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            min-width: 38px;
-            text-align: center;
-        }
-        .err {
-            background: #1976d2;
-            color: #fff;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            min-width: 38px;
-            text-align: center;
-        }
-        .none-result {
-            color: #999;
-            font-size: 12px;
-            background: #f5f5f5;
-            padding: 5px 10px;
-            border-radius: 6px;
-            display: inline-block;
-        }
-        .stat-card {
-            background: #fff;
-            margin: 10px;
-            padding: 18px;
-            border-radius: 14px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-        }
-        .stat-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: #222;
-        }
-        .stat-row {
+        .actions {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f9f9f9;
-            font-size: 13px;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
         }
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-        .alert-item {
-            padding: 14px;
-            border-radius: 12px;
-            margin: 10px 0;
-            font-size: 13px;
-            border-left: 5px solid #e0e0e0;
-            background: #fafafa;
-            transition: all 0.2s;
-        }
-        .alert-item.lv1 {
-            border-left-color: #f57c00;
-            background: #fff8f0;
-        }
-        .alert-item.lv2 {
-            border-left-color: #e53935;
-            background: #fff0f0;
-        }
-        .alert-item.lv3 {
-            border-left-color: #7b1fa2;
-            background: #fdf0ff;
-        }
-        .confidence-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
+
+        /* 错误提示 */
+        .error {
+            color: #ef4444;
+            padding: 16px;
+            background: #fef2f2;
             border-radius: 8px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .confidence-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2e7d32, #f57c00, #e53935);
-            border-radius: 8px;
-            transition: width 0.5s;
-        }
-        .panel {
+            margin-bottom: 16px;
+            border-left: 4px solid #ef4444;
             display: none;
         }
-        .panel.active {
-            display: block;
-            animation: fadeIn 0.35s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .btn-sm {
-            padding: 7px 18px;
-            border-radius: 22px;
-            font-size: 12px;
-            border: 1px solid #ddd;
-            background: #fff;
-            cursor: pointer;
-            color: #444;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        .btn-sm:active {
-            opacity: 0.8;
-            transform: scale(0.96);
-        }
-        .btn-sm.primary {
-            background: #1d1d1f;
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-sm.success {
-            background: #2e7d32;
-            color: #fff;
-            border-color: transparent;
-        }
-        .btn-group {
+
+        /* 区域标题 */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 12px;
-        }
-        .footer-note {
-            text-align: center;
-            padding: 20px;
-            font-size: 12px;
-            color: #aaa;
-            line-height: 1.6;
-        }
-        .stat-summary {
-            background: #fff;
-            margin: 10px;
-            padding: 14px;
-            border-radius: 14px;
-            display: flex;
-            justify-content: space-around;
-            font-size: 13px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            flex-wrap: wrap;
+            align-items: center;
             gap: 8px;
         }
-        .kill-highlight {
-            background: #fff5f5;
-            border: 2px solid #e53935;
+        .section-title i {
+            color: var(--primary);
         }
-        .status-tag {
-            display: inline-block;
-            font-size: 11px;
-            padding: 2px 10px;
-            border-radius: 12px;
-            margin-left: 8px;
-            font-weight: 600;
+
+        /* ========== 预测总览表格 ========== */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
-        .status-tag.loading {
-            background: #fff3cd;
-            color: #856404;
+        .predict-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 900px;
         }
-        .status-tag.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .status-tag.cache {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-        .status-tag.ok {
-            background: #d4edda;
-            color: #155724;
-        }
-        .kill-history-row {
-            display: flex;
-            padding: 8px 0;
-            border-bottom: 1px solid #f5f5f5;
-            align-items: center;
+        .predict-table thead th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
             font-size: 12px;
-            gap: 4px;
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
         }
-        .kill-history-row:last-child {
-            border-bottom: none;
+        .predict-table thead th:first-child {
+            border-radius: 8px 0 0 0;
+            min-width: 90px;
         }
-        .kill-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
+        .predict-table thead th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        .predict-table tbody td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .predict-table tbody tr {
+            transition: background 0.2s;
+        }
+        .predict-table tbody tr:hover td {
+            background: var(--table-hover);
+        }
+        .predict-table tbody tr:nth-child(even) td {
+            background: var(--table-stripe);
+        }
+        .predict-table tbody tr:nth-child(even):hover td {
+            background: var(--table-hover);
+        }
+        .predict-table .algo-name {
             font-weight: 700;
+            color: var(--primary);
+            text-align: left;
+            padding-left: 12px;
+            white-space: nowrap;
+        }
+        .predict-table .algo-num {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
             font-size: 11px;
-            letter-spacing: 0.3px;
+            line-height: 22px;
+            text-align: center;
+            margin-right: 6px;
+            font-weight: 700;
         }
-        .kill-tag.win {
-            background: #e8f5e9;
-            color: #2e7d32;
+        .predict-table .kill-cell {
+            color: var(--kill-red);
+            font-weight: 700;
+            font-size: 14px;
         }
-        .kill-tag.lose {
-            background: #ffebee;
-            color: #c62828;
+        .predict-table .rec-cell {
+            color: var(--rec-green);
+            font-weight: 700;
+            font-size: 14px;
         }
-        .algo888-item {
-            padding: 8px 6px;
+        .predict-table .stat-cell {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .predict-table .stat-rate {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .predict-table .rate-high {
+            color: #10b981;
+        }
+        .predict-table .rate-mid {
+            color: #f59e0b;
+        }
+        .predict-table .rate-low {
+            color: #ef4444;
+        }
+        .predict-table .consec-badge {
+            display: inline-block;
+            background: #10b981;
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .predict-table .consec-badge.zero {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+        .predict-table .na-cell {
+            color: #cbd5e1;
+            font-style: italic;
+        }
+
+        /* ========== 历史记录表格 ========== */
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .history-table th {
+            background: #1e40af;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .history-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        .history-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        .history-table td {
+            padding: 8px 5px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+        }
+        .history-table tbody tr:hover td {
+            background: #f1f5f9;
+        }
+        .result-correct {
+            color: #10b981;
+            font-weight: 700;
+        }
+        .result-wrong {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        /* Tab按钮 */
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1 1 auto;
+            min-width: 60px;
+            padding: 8px 5px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
             border-radius: 8px;
             font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .algo888-item.highlight {
-            background: #1d1d1f;
-            color: #fff;
-            border-color: #1d1d1f;
-            font-weight: 700;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-        .algo888-item.win-rate-high {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-        }
-        .settings-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.55);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 48px;
-            height: 26px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #ccc;
-            border-radius: 26px;
-            transition: 0.3s;
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background: #fff;
-            border-radius: 50%;
-            transition: 0.3s;
-        }
-        .toggle-switch input:checked+.toggle-slider {
-            background: #2979ff;
-        }
-        .toggle-switch input:checked+.toggle-slider:before {
-            transform: translateX(22px);
-        }
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #333, #555);
-            color: #fff;
-            padding: 10px 22px;
-            border-radius: 20px;
-            font-size: 13px;
-            z-index: 2000;
-            animation: toastIn 0.3s ease, toastOut 0.4s ease 2s forwards;
-            pointer-events: none;
-            max-width: 90%;
+            transition: all 0.3s;
             text-align: center;
         }
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
+        .tab-btn:hover {
+            background: #eff6ff;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .tab-hint {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        /* ========== 手机适配 ========== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 2px;
             }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
+            .card {
+                padding: 12px;
+                margin-bottom: 10px;
+                border-radius: 12px;
             }
-        }
-        @keyframes toastOut {
-            from {
-                opacity: 1;
+            .header h1 {
+                font-size: 20px;
             }
-            to {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
+            .numbers {
+                font-size: 24px;
             }
-        }
-        .opening-animation {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            padding: 16px;
-        }
-        .opening-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #f57c00;
-            animation: dotBounce 0.6s infinite alternate;
-        }
-        .opening-dot:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-        .opening-dot:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-        @keyframes dotBounce {
-            from {
-                transform: translateY(0);
-                opacity: 0.5;
+            .predict-table {
+                font-size: 11px;
+                min-width: 750px;
             }
-            to {
-                transform: translateY(-14px);
-                opacity: 1;
-            }
-        }
-        @media (max-width: 400px) {
-            .redball,
-            .blueball {
-                width: 24px;
-                height: 24px;
+            .predict-table thead th,
+            .predict-table tbody td {
+                padding: 7px 4px;
                 font-size: 11px;
             }
-            .btn-red,
-            .btn-blue,
-            .btn-range {
-                padding: 4px 8px;
+            .predict-table .algo-name {
+                padding-left: 6px;
+                font-size: 11px;
+            }
+            .predict-table .algo-num {
+                width: 18px;
+                height: 18px;
                 font-size: 10px;
+                line-height: 18px;
+                margin-right: 3px;
             }
-            .ok,
-            .err,
-            .none-result {
-                padding: 4px 8px;
-                font-size: 10px;
+            .predict-table .kill-cell,
+            .predict-table .rec-cell {
+                font-size: 12px;
             }
-            .td {
-                font-size: 11px;
-            }
-            .tr {
-                padding: 10px 0;
-            }
-            .algo-tab {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-            .rec-card .rec-value {
-                font-size: 34px;
-            }
-            .rec-card .rec-value.number-range {
-                font-size: 28px;
-            }
-            .tab {
-                padding: 11px 7px;
-                font-size: 11px;
-            }
-            .algo888-item {
+            .tab-btn {
                 font-size: 10px;
                 padding: 6px 3px;
+                min-width: 48px;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                width: 100%;
+                justify-content: center;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .history-table th,
+            .history-table td {
+                padding: 6px 3px;
+                font-size: 10px;
+            }
+            .section-title {
+                font-size: 15px;
+            }
+            .period {
+                font-size: 15px;
+            }
+            .sum-tag {
+                font-size: 13px;
+                padding: 5px 12px;
+            }
+            .countdown {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+        }
+        @media (max-width: 480px) {
+            .predict-table {
+                min-width: 650px;
+            }
+            .predict-table thead th,
+            .predict-table tbody td {
+                padding: 5px 3px;
+                font-size: 10px;
+            }
+            .predict-table .algo-name {
+                font-size: 10px;
+            }
+            .predict-table .algo-num {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+                line-height: 16px;
+            }
+            .predict-table .kill-cell,
+            .predict-table .rec-cell {
+                font-size: 11px;
+            }
+            .tab-buttons {
+                gap: 2px;
+            }
+            .tab-btn {
+                font-size: 9px;
+                padding: 5px 2px;
+                min-width: 40px;
+                border-radius: 6px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="toastContainer"></div>
-    <div class="app-container">
-        <div class="tabs" id="mainTabs">
-            <div class="tab active" data-panel="predict">预测</div>
-            <div class="tab" data-panel="trend">走势</div>
-            <div class="tab" data-panel="stats">统计</div>
-            <div class="tab" data-panel="record">记录</div>
-            <div class="tab" data-panel="algo888">888算法</div>
-            <div class="tab" data-panel="killhistory">杀组历史</div>
-            <div class="settings-btn" id="settingsBtn" title="设置">⚙</div>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1><i class="fas fa-database"></i> 开奖数据实时展示</h1>
+            <p>实时获取最新开奖数据 · 12算法完整版 · 表格预测总览</p>
         </div>
+        <div id="error" class="error"></div>
 
-        <div class="panel active" id="predict-panel">
-            <div class="mode-switch-row" id="modeSwitchRow">
-                <div class="mode-switch-btn active" data-mode="combo" id="modeBtnCombo"><span class="mode-icon">🔮</span>组合预测</div>
-                <div class="mode-switch-btn" data-mode="number" id="modeBtnNumber"><span class="mode-icon">🎯</span>数字预测</div>
-            </div>
-            <div class="algo-tabs" id="algoTabs"></div>
-            <div class="rec-card" id="recCard">
-                <div class="rec-label" id="recLabel">动态博弈 · 下一期预测</div>
-                <div class="rec-value" id="recTarget">--</div>
-                <div class="rec-sub" id="recDetail"><span>置信度 --%</span><span>连缺 -- 期</span></div>
-                <div class="current-algo-tag" id="currentAlgoTag">集成学习</div>
-            </div>
-            <div class="info-card kill-highlight" id="killCard">
-                <div style="font-weight:700;margin-bottom:8px;font-size:16px;">🔪 杀组推荐（不建议购买）</div>
-                <div id="killComboDisplay" style="font-size:28px;font-weight:800;text-align:center;color:#e53935;">--</div>
-                <div id="killConfDisplay" style="text-align:center;font-size:12px;color:#999;">--</div>
-            </div>
-            <div class="info-card">
-                <div class="info-row">
-                    <div><div style="font-size:11px;color:#999;">当前期号</div><div class="issue-no" id="issue">--</div></div>
-                    <div><div style="font-size:11px;color:#999;" id="timerLabel">下期开奖倒计时</div><div class="timer" id="count">--:--</div></div>
-                    <div style="font-size:11px;color:#999;"><span class="api-dot" id="apiDot"></span><span id="apiTip">连接中</span><span id="apiStatusTag" class="status-tag loading">检测中</span></div>
+        <!-- 最新开奖 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-chart-line"></i><span>最新开奖</span></div>
+            <div class="current-result">
+                <div class="period">第 <span id="cur-period">--</span> 期</div>
+                <div class="numbers" id="cur-nums">--+--+--=--</div>
+                <div class="sum-tag" id="cur-tag">大小单双: --</div>
+                <div class="opentime" id="cur-time">开奖时间: --</div>
+                <div id="cd" class="countdown" style="display:none;">
+                    <i class="fas fa-clock"></i> 下一期: <span id="cd-txt">--分--秒</span>
                 </div>
             </div>
-            <div class="info-card" id="resultCard" style="position:relative;">
-                <div style="font-weight:700;margin-bottom:10px;font-size:16px;">🎯 最新开奖结果</div>
-                <div id="openingAnim" class="opening-animation" style="display:none;"><div class="opening-dot"></div><div class="opening-dot"></div><div class="opening-dot"></div></div>
-                <div id="resultDisplay">
-                    <div style="text-align:center;margin-bottom:8px;">
-                        <span id="n1ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
-                        <span id="n2ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
-                        <span id="n3ball" class="redball" style="width:36px;height:36px;font-size:18px;">-</span>
-                        <span style="font-size:22px;margin:0 6px;">=</span>
-                        <span id="sumBall" class="blueball" style="width:42px;height:42px;font-size:20px;">-</span>
-                    </div>
-                    <div style="text-align:center;font-size:14px;color:#666;" id="sumExpr"></div>
-                    <div style="display:flex;gap:6px;justify-content:center;margin-top:10px;">
-                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="comboTag">-</span>
-                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="dxTag">-</span>
-                        <span style="font-size:12px;background:#f5f5f5;padding:4px 12px;border-radius:14px;" id="dsTag">-</span>
-                    </div>
-                </div>
-            </div>
-            <div class="table-header"><div class="thead"><div class="th th-col-period">期号</div><div class="th th-col-nums">号码</div><div class="th th-col-pred" id="predictColHeader">预测</div><div class="th th-col-result">结果</div></div></div>
-            <div class="table-card"><div class="tbody" id="predictTableBody"></div></div>
-            <div class="btn-group">
-                <button class="btn-sm primary" onclick="window.loadData(true)">🔄 强制刷新</button>
-                <button class="btn-sm" onclick="window.filterTable('all')">全部</button>
-                <button class="btn-sm" onclick="window.filterTable('对子')">对子</button>
-                <button class="btn-sm" onclick="window.filterTable('顺子')">顺子</button>
-                <button class="btn-sm" onclick="window.filterTable('豹子')">豹子</button>
+            <div class="actions">
+                <button id="refresh-btn" class="btn btn-primary"><i class="fas fa-sync-alt"></i> 刷新数据</button>
             </div>
         </div>
 
-        <div class="panel" id="trend-panel">
-            <div class="info-card"><div style="font-weight:700;margin-bottom:10px;font-size:16px;">📊 走势分析</div><div id="trendAnalysis"></div></div>
-            <div class="info-card"><div style="font-weight:700;margin-bottom:10px;font-size:16px;">📈 最近走势图</div><div id="trendStrip" style="display:flex;flex-wrap:wrap;gap:5px;"></div></div>
-            <div class="table-header"><div class="thead"><div class="th">期号</div><div class="th">号码</div><div class="th">和值</div><div class="th">形态</div></div></div>
-            <div class="table-card"><div class="tbody" id="trendTableBody"></div></div>
-        </div>
-
-        <div class="panel" id="stats-panel">
-            <div class="stat-summary" id="statsSummary">加载中...</div>
-            <div class="stat-card"><div class="stat-title">🎯 回补预警</div><div id="compensationAlerts"></div></div>
-            <div class="stat-card"><div class="stat-title">📊 遗漏统计</div><div id="missStats"></div></div>
-            <div class="stat-card"><div class="stat-title">📋 概率分布</div><div id="probStats"></div></div>
-            <div class="stat-card"><div class="stat-title">🏆 模型胜率排行</div><div id="modelWinrate"></div></div>
-        </div>
-
-        <div class="panel" id="record-panel">
-            <div class="stat-summary" id="recordSummary">加载中...</div>
-            <div class="btn-group">
-                <button class="btn-sm success" onclick="window.loadPredictHistoryUI()">🔄 刷新</button>
-                <button class="btn-sm" onclick="window.clearPredictHistoryUI()" style="background:#e53935;color:#fff;border-color:transparent;">🗑️ 清空</button>
-                <button class="btn-sm primary" onclick="window.exportRecords()">📤 导出</button>
+        <!-- 预测总览表格 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-table"></i><span>12算法预测总览</span></div>
+            <div class="table-responsive">
+                <table class="predict-table" id="predict-table">
+                    <thead>
+                        <tr>
+                            <th>算法</th>
+                            <th>杀组1</th>
+                            <th>杀组2</th>
+                            <th>最终建议</th>
+                            <th>总次数</th>
+                            <th>命中</th>
+                            <th>中奖率</th>
+                            <th>连中</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predict-tbody">
+                        <!-- JS动态填充 -->
+                    </tbody>
+                </table>
             </div>
-            <div class="table-header"><div class="thead"><div class="th th-col-period">期号</div><div class="th th-col-nums">算法</div><div class="th th-col-pred">预测</div><div class="th th-col-result">结果</div></div></div>
-            <div class="table-card"><div class="tbody" id="recordTableBody"></div></div>
-            <div style="text-align:center;padding:12px;font-size:12px;color:#999;" id="recordCount"></div>
-        </div>
-
-        <div class="panel" id="algo888-panel">
-            <div class="info-card"><div style="font-weight:700;margin-bottom:10px;font-size:16px;">🧠 888专业算法矩阵</div><div id="algo888SyncStatus" style="font-size:12px;color:#999;">数据同步中...</div></div>
-            <div class="info-card">
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <input type="number" id="algo888SearchInput" placeholder="输入1-888" style="flex:1;padding:10px;border:2px solid #e0e0e0;border-radius:22px;">
-                    <button class="btn-sm primary" onclick="window.algo888Focus()">🔍</button>
-                    <button class="btn-sm" onclick="window.algo888Prev()">◀</button>
-                    <button class="btn-sm" onclick="window.algo888Next()">▶</button>
-                </div>
-                <div class="algo888-grid" id="algo888Grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px;max-height:320px;overflow-y:auto;margin-top:10px;"></div>
-            </div>
-            <div class="info-card" id="algo888PredictCard" style="display:none;">
-                <div style="text-align:center;padding:10px;">
-                    <div style="font-size:1.6rem;font-weight:800;" id="algo888PredictionResult">--</div>
-                    <div style="color:#666;" id="algo888PredictionDetail">--</div>
-                    <div style="font-size:11px;color:#999;margin-top:4px;" id="algo888PredStats">--</div>
-                </div>
-            </div>
-            <div class="info-card"><div class="stat-title">🏆 算法连胜排行 TOP20</div><div class="algo888-rank-list" id="algo888StreakRank" style="max-height:350px;overflow-y:auto;"></div></div>
-            <div class="btn-group">
-                <button class="btn-sm primary" onclick="window.algo888RebuildStats()">🔄 重建统计</button>
-                <button class="btn-sm success" onclick="window.algo888AutoSelectBest()">⭐ 自动选择最优</button>
+            <div class="tab-hint">
+                算法1-传统算法 | 算法2-AI多模型 | 算法3-深度学习AI | 算法4-贝叶斯推断 | 算法5-遗传算法 | 算法6-支持向量机
+                | 算法7-随机森林 | 算法8-强化学习 | 算法9-集成学习 | 算法10-元学习 | 算法11-时间系数算法 | 算法12-综合最优杀组
             </div>
         </div>
 
-        <div class="panel" id="killhistory-panel">
-            <div class="stat-summary" id="killHistorySummary">加载中...</div>
-            <div class="btn-group">
-                <button class="btn-sm success" onclick="window.renderKillHistoryUI()">🔄 刷新</button>
-                <button class="btn-sm" onclick="window.clearKillHistoryUI()" style="background:#e53935;color:#fff;border-color:transparent;">🗑️ 清空</button>
-            </div>
-            <div class="table-header"><div class="thead"><div class="th th-col-period">期号</div><div class="th th-col-nums">杀组预测</div><div class="th th-col-pred">实际结果</div><div class="th th-col-result">判定</div></div></div>
-            <div class="table-card"><div class="tbody" id="killHistoryTableBody"></div></div>
-            <div style="text-align:center;padding:12px;font-size:12px;color:#999;" id="killHistoryCount"></div>
-        </div>
-
-        <div class="footer-note">🐟 PC28预测 · 杀组增强版 · 仅供娱乐参考</div>
-    </div>
-
-    <div class="settings-overlay" id="settingsOverlay" style="display:none;">
-        <div style="background:#fff;border-radius:20px;padding:24px;width:90%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
-            <h3 style="text-align:center;">⚙️ 设置</h3>
-            <div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;"><span>🔔 开奖铃音</span><label class="toggle-switch"><input type="checkbox" id="toggleSound" checked><span class="toggle-slider"></span></label></div>
-            <div style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;"><span>🎴 咪牌刮奖</span><label class="toggle-switch"><input type="checkbox" id="toggleScratch" checked><span class="toggle-slider"></span></label></div>
-            <div style="display:flex;gap:10px;margin-top:18px;justify-content:center;">
-                <button class="btn-sm" id="btnTestSound">测试铃音</button>
-                <button class="btn-sm primary" id="btnCloseSettings">关闭</button>
-            </div>
+        <!-- 历史记录 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-history"></i><span>历史回溯验证</span></div>
+            <div class="tab-buttons" id="algo-tabs"></div>
+            <div id="history-container"></div>
         </div>
     </div>
 
     <script>
         (function() {
-            "use strict";
-            const API_URLS = [
-                'https://pc28.help/api/kj.json?nbr=50',
-                'https://pc28.help/api/kj.xml?nbr=50',
-                'https://pc28.help/api/keno.json?nbr=50'
-            ];
-            const STORAGE_KEY = 'ys_pc28_v13_records';
-            const SETTINGS_KEY = 'pc28_v13_settings';
-            const CACHE_KEY = 'pc28_cached_history';
-            const KILL_HISTORY_KEY = 'pc28_kill_history_v2';
-            const ALGO888_STATS_KEY = 'pc28_algo888_stats_v2';
-            const ALGO888_CUR_KEY = 'pc28_algo888_cur_v2';
-            const COMBOS = ['大单', '大双', '小单', '小双'];
-            const MAX_RANGE_SPAN = 7;
-            const FETCH_TIMEOUT = 8000;
-            const TOTAL_ALGO888 = 888;
+            const API_URL = 'https://pc28.help/api/kj.json?nbr=30';
+            const CACHE_KEY = 'pc28_live_table_v5';
+            let data = [];
+            let timer = null;
+            let isFetching = false;
+            let nextOpenTime = null;
+            let currentTab = 1;
 
-            let historyData = [],
-                latestPeriod = '',
-                countdownSeconds = 210,
-                isOpening = false,
-                timer = null,
-                autoRefresh = null,
-                openingPolling = null;
-            let currentApiIndex = 0,
-                currentAlgoKey = 'ensemble',
-                currentFilter = 'all',
-                predictMode = 'combo',
-                currentNumberAlgoKey = 'rangeEnsemble';
-            let predictions = {},
-                numberPredictions = {},
-                algoWinRates = {},
-                numberAlgoWinRates = {};
-            let comboMissCount = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 },
-                pendingRow = null,
-                scratchRevealed = false,
-                audioCtx = null;
-            let settings = { soundEnabled: true, scratchEnabled: true };
-            let killAlgos = [],
-                killPrediction = { combo: null, confidence: 0 },
-                killHistory = [];
-            let ALGO888_DEFS = [],
-                algo888Stats = {},
-                algo888CurrentId = 1,
-                algo888StatsDirty = true;
+            // ====================== 工具函数 ======================
+            function mapApiItem(item) {
+                return {
+                    qihao: item.nbr || '',
+                    opennum: item.number || '',
+                    sum: parseInt(item.num) || 0,
+                    opentime: (item.date || '') + ' ' + (item.time || '')
+                };
+            }
 
-            const $ = id => document.getElementById(id);
+            async function fetchData(showLoading = true) {
+                if (isFetching) return;
+                isFetching = true;
+                if (showLoading) document.getElementById('error').style.display = 'none';
+                try {
+                    const resp = await fetch(API_URL);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    const json = await resp.json();
+                    if (json && json.data && Array.isArray(json.data)) {
+                        data = json.data.map(mapApiItem);
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        renderAll();
+                        hideError();
+                    } else {
+                        throw new Error('数据格式错误');
+                    }
+                } catch (e) {
+                    console.warn('API请求失败，使用缓存:', e.message);
+                    const cached = localStorage.getItem(CACHE_KEY);
+                    if (cached) {
+                        data = JSON.parse(cached);
+                        renderAll();
+                        showError('网络异常，已加载本地缓存数据');
+                    } else {
+                        showError('数据加载失败：' + e.message);
+                    }
+                } finally {
+                    isFetching = false;
+                }
+            }
 
-            function toast(msg, type) {
-                const c = $('toastContainer');
-                if (!c) return;
-                const el = document.createElement('div');
-                el.className = 'toast';
+            function showError(msg) { const el = document.getElementById('error');
                 el.textContent = msg;
-                if (type === 'success') el.style.background = 'linear-gradient(135deg,#2e7d32,#43a047)';
-                else if (type === 'error') el.style.background = 'linear-gradient(135deg,#e53935,#f57c00)';
-                c.appendChild(el);
-                setTimeout(() => { if (el.parentNode) el.remove(); }, 2400);
+                el.style.display = 'block'; }
+
+            function hideError() { document.getElementById('error').style.display = 'none'; }
+
+            function getTag(sum) { const s = sum >= 14 ? '大' : '小';
+                const oe = sum % 2 === 0 ? '双' : '单'; return s + oe; }
+
+            function getShape(sum) { return getTag(sum); }
+
+            function formatTime(timeStr) {
+                if (!timeStr) return '--';
+                try {
+                    const parts = timeStr.split(' ');
+                    if (parts.length >= 2) {
+                        const [datePart, timePart] = parts;
+                        const dateParts = datePart.split('-');
+                        if (dateParts.length === 3) return dateParts[1] + '-' + dateParts[2] + ' ' + timePart;
+                    }
+                    return timeStr;
+                } catch (e) { return timeStr; }
             }
 
-            function sumToCombo(s) { return (s > 13 ? '大' : '小') + (s % 2 === 0 ? '双' : '单'); }
-
-            function getPattern(n) { const a = n[0],
-                    b = n[1],
-                    c = n[2]; if (a === b && b === c) return '豹子'; if (a === b || b === c || a === c) return '对子'; const s = [a,
-                    b, c
-                ].sort((x, y) => x - y); if (s[2] - s[1] === 1 && s[1] - s[0] === 1) return '顺子'; return '杂六'; }
-
-            function getSumInfo(s, n) { const dx = s > 13 ? '大' : '小',
-                    ds = s % 2 === 0 ? '双' : '单',
-                    p = getPattern(n); return { dx, ds, combo: dx + ds, pattern: p, isBig: s > 13, isDuiZi: p === '对子',
-                    isShunZi: p === '顺子', isBaoZi: p === '豹子', isSum13: s === 13, isSum14: s === 14 }; }
-
-            function fmtTime(s) { const m = Math.floor(s / 60),
-                    sec = s % 60; return m.toString().padStart(2, '0') + ':' + sec.toString().padStart(2, '0'); }
-
-            function formatBlue(v) { return typeof v === 'number' ? (v < 10 ? '0' + v : '' + v) : '' + v; }
-
-            function deterministicSeed(str) { let h = 0; for (let i = 0; i < str.length; i++) { h = ((h << 5) - h) + str
-                    .charCodeAt(i);
-                    h &= 0x7fffffff; } return h; }
-
-            function seededRandom(seed) { let s = (seed | 0) & 0x7fffffff;
-                s = (s * 1664525 + 1013904223) & 0x7fffffff; return (s >>> 0) / 0x7fffffff; }
-
-            function clampSum(v) { return Math.max(0, Math.min(27, Math.round(v))); }
-
-            function getComboMissArray(cs) { const m = {}; for (const c of COMBOS) { let cnt = 0; for (const x of cs) { if (x ===
-                        c) break;
-                    cnt++; } m[c] = cnt; } return m; }
-
-            function normalizeProbs(p) { const t = Object.values(p).reduce((a, b) => a + b, 0); if (t === 0) COMBOS.forEach(c =>
-                    p[c] = 0.25); else COMBOS.forEach(c => p[c] /= t); return p; }
-
-            function pickDoubleFromProbs(probs, seed) { const e = Object.entries(probs).sort((a, b) => b[1] - a[1]); const d = [e[
-                        0][0], e[1][0]]; if (d[0] === d[1]) { const o = COMBOS.filter(c => c !== d[0]);
-                    d[1] = o[Math.floor(seededRandom(seed + 1) * o.length)]; } return { double: d, single: d[0] }; }
-
-            function constrainRange(min, max, center) { if (max - min > MAX_RANGE_SPAN) { const h = Math.floor(MAX_RANGE_SPAN /
-                        2); let a = clampSum(center - h),
-                        b = clampSum(center + h); if (b - a > MAX_RANGE_SPAN) b = clampSum(a + MAX_RANGE_SPAN); if (b - a < 2)
-                        b = clampSum(a + 3); return { min: a, max: b, center: clampSum(Math.round((a + b) / 2)) }; } return { min,
-                    max, center }; }
-
-            function calcRecentVolatility(ss, n) { n = Math.min(n || 12, ss.length); if (n < 3) return 3; const s = ss.slice(0,
-                    n); const m = s.reduce((a, b) => a + b, 0) / n; let sq = 0; for (const v of s) sq += (v - m) * (v - m); return Math
-                    .sqrt(sq / n) || 2.5; }
-
-            const basePredictFns = {
-                missingTrend(cs, ss) { const m = getComboMissArray(cs); const max = Math.max(...Object.values(m)) || 1;
-                    const p = {}; COMBOS.forEach(c => p[c] = Math.pow(m[c] / max, 2.5) * 0.82 + 0.18 * (m[c] / (max + 1)));
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 101);
-                    r.conf = 0.52 + Math.min(0.43, max / 18);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                markov(cs, ss) { const idx = { 大单: 0, 大双: 1, 小单: 2, 小双: 3 }; const t = [
-                        [0, 0, 0, 0],
-                        [0, 0, 0, 0],
-                        [0, 0, 0, 0],
-                        [0, 0, 0, 0]
-                    ]; for (let i = 1; i < cs.length; i++) { const p = idx[cs[i]],
-                            c = idx[cs[i - 1]]; if (p !== undefined && c !== undefined) t[p][c]++; } const li = idx[cs[0]] ||
-                    0; const rw = t[li]; const s = rw.reduce((a, b) => a + b, 0); const p = {}; COMBOS.forEach((c, j) => p[
-                        c] = s > 0 ? (rw[j] + 2) / (s + 8) : 0.25);
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 202);
-                    r.conf = 0.45 + Math.min(0.38, s / 15);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                ewma(cs, ss) { const p = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 }; let a = 0.48,
-                        w = 1; const n = Math.min(cs.length, 20); for (let i = 0; i < n; i++) { const c = cs[i]; if (p[
-                            c] !== undefined) p[c] += w;
-                        w *= (1 - a); } COMBOS.forEach(c => p[c] = 1 / (p[c] + 0.7));
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 303);
-                    r.conf = 0.47 + Math.min(0.36, cs.length / 24);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                montecarlo(cs, ss) { const f = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 };
-                    cs.slice(0, 24).forEach(c => { if (f[c] !== undefined) f[c]++; }); let t = Object.values(f).reduce((a,
-                        b) => a + b, 0); const p = {}; COMBOS.forEach(c => p[c] = f[c] / t); for (let s = 0; s < 500; s++) { let
-                        rnd = seededRandom(404 + s),
-                        cum = 0; for (const c of COMBOS) { cum += p[c]; if (rnd <= cum) { p[c] += 0.0015; break; } } }
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 405);
-                    r.conf = 0.43 + Math.min(0.41, cs.length / 20);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                bayesian(cs, ss) { const pr = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 },
-                        lk = { 大单: 1, 大双: 1, 小单: 1, 小双: 1 };
-                    cs.slice(0, 22).forEach((c, i) => { if (lk[c] !== undefined) lk[c] += (22 - i) / 22; }); const p = {};
-                    COMBOS.forEach(c => p[c] = pr[c] * lk[c]);
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 505);
-                    r.conf = 0.48 + Math.min(0.35, cs.length / 22);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                kalman(cs, ss) { const m = getComboMissArray(cs); const vals = Object.values(m); const avg = vals.reduce((a,
-                        b) => a + b, 0) / 4; const p = {}; COMBOS.forEach(c => { const inno = m[c] - avg;
-                        p[c] = 0.25 + inno * 0.085; if (p[c] < 0.02) p[c] = 0.02; });
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 606);
-                    r.conf = 0.46 + Math.min(0.38, Math.abs(Math.max(...vals) - avg) / 7.5);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                sumZone(cs, ss) { const p = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 }; if (ss.length >= 5) { const ra = ss.slice(0,
-                            5).reduce((a, b) => a + b, 0) / 5,
-                        ga = ss.reduce((a, b) => a + b, 0) / ss.length; if (ra - ga > 1.8) { p['小单'] += 0.45;
-                        p['小双'] += 0.4; } else if (ra - ga < -1.8) { p['大单'] += 0.45;
-                        p['大双'] += 0.4; } else COMBOS.forEach(c => p[c] = 0.25); } else COMBOS.forEach(c => p[c] = 0.25);
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 707);
-                    r.conf = 0.41 + Math.min(0.43, Math.abs(ss.slice(0, 3).reduce((a, b) => a + b, 0) / 3 - 13.5) / 3.8);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                hotCold(cs, ss) { const f = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
-                    cs.slice(0, 14).forEach(c => { if (f[c] !== undefined) f[c]++; }); const p = {}; COMBOS.forEach(c => { if (
-                            f[c] >= 3) p[c] = 0.12 + (f[c] - 2) * 0.09; else p[c] = 0.42 - f[c] * 0.11; if (p[c] < 0.03)
-                        p[c] = 0.03; });
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 808);
-                    r.conf = 0.44 + Math.min(0.39, Math.max(...Object.values(f)) / 5);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                spanAnalysis(cs, ss) { const m = getComboMissArray(cs); const t = Object.values(m).reduce((a, b) => a + b,
-                    0); const p = {}; COMBOS.forEach(c => p[c] = t > 0 ? 1 - (m[c] / (t + 1.6)) : 0.25);
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 909);
-                    r.conf = 0.45 + Math.min(0.38, Math.max(...Object.values(m)) / 15);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                oddEven(cs, ss) { const odd = cs.filter(c => c.includes('单')).length,
-                        even = cs.length - odd,
-                        t = cs.length || 1; const p = {};
-                    p['大单'] = (even / t) * 0.58;
-                    p['小单'] = (even / t) * 0.42;
-                    p['大双'] = (odd / t) * 0.58;
-                    p['小双'] = (odd / t) * 0.42;
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 1010);
-                    r.conf = 0.48 + Math.min(0.35, Math.abs(odd - even) / Math.max(t, 1));
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                bigSmall(cs, ss) { const big = cs.filter(c => c.includes('大')).length,
-                        small = cs.length - big,
-                        t = cs.length || 1; const p = {};
-                    p['大单'] = (small / t) * 0.58;
-                    p['大双'] = (small / t) * 0.42;
-                    p['小单'] = (big / t) * 0.58;
-                    p['小双'] = (big / t) * 0.42;
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 1111);
-                    r.conf = 0.48 + Math.min(0.35, Math.abs(big - small) / Math.max(t, 1));
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                patternCycle(cs, ss) { const m = getComboMissArray(cs); const max = Math.max(...Object.values(m)) || 1;
-                    const p = {}; COMBOS.forEach(c => { const ph = (m[c] % 10) / 10;
-                        p[c] = 0.22 + ph * 0.68 + (m[c] / (max + 3.2)) * 0.2; });
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 1212);
-                    r.conf = 0.43 + Math.min(0.41, max / 17);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; },
-                smartExclude(cs, ss) { const f = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 };
-                    cs.slice(0, 11).forEach(c => { if (f[c] !== undefined) f[c]++; }); const p = {}; COMBOS.forEach(c => { if (
-                            f[c] >= 3) p[c] = 0.09 + (4 - f[c]) * 0.13; else p[c] = 0.39 + (3 - f[c]) * 0.14; if (p[c] <
-                            0.02) p[c] = 0.02; });
-                    normalizeProbs(p); const r = pickDoubleFromProbs(p, 1313);
-                    r.conf = 0.46 + Math.min(0.38, (11 - Math.max(...Object.values(f))) / 9);
-                    r.allProbs = p;
-                    r.prob = p[r.single];
-                    r.secondProb = Object.values(p).sort((a, b) => b - a)[1] || 0; return r; }
-            };
-
-            function predictEnsemble(cs, ss) { const w = {}; let tw = 0; for (const k of Object.keys(basePredictFns)) { w[k] =
-                        getAlgoWeight(k);
-                    tw += w[k]; } const ap = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 }; for (const k of Object.keys(
-                        basePredictFns)) { const pred = basePredictFns[k](cs, ss); const wt = w[k] / tw; COMBOS.forEach(c => ap[
-                        c] += pred.allProbs[c] * wt); } normalizeProbs(ap); const r = pickDoubleFromProbs(ap, 9999);
-                r.conf = 0.62 + Math.min(0.33, tw / Object.keys(basePredictFns).length);
-                r.allProbs = ap;
-                r.prob = ap[r.single];
-                r.secondProb = Object.values(ap).sort((a, b) => b - a)[1] || 0; return r; }
-
-            const algoNames = { ensemble: '集成学习', missingTrend: '遗漏回补', markov: '马尔可夫', ewma: '指数加权',
-                montecarlo: '蒙特卡洛', bayesian: '贝叶斯', kalman: '卡尔曼', sumZone: '和值区间', hotCold: '冷热追踪',
-                spanAnalysis: '跨度走势', oddEven: '奇偶平衡', bigSmall: '大小轮动', patternCycle: '形态周期', smartExclude: '智能排除' };
-            const algoKeys = Object.keys(algoNames);
-            let sortedAlgoKeys = [...algoKeys];
-            const predictFns = {};
-            algoKeys.forEach(k => predictFns[k] = (k === 'ensemble') ? predictEnsemble : basePredictFns[k]);
-
-            const numberAlgoNames = { rangeEnsemble: '集成范围', rangeAdaptiveEWMA: '自适应EWMA', rangeWeightedTrend: '加权趋势',
-                rangeKernelFreq: '核密度频率', rangeAdaptiveKalman: '自适应卡尔曼' };
-            const numberAlgoKeys = Object.keys(numberAlgoNames);
-            let sortedNumberAlgoKeys = [...numberAlgoKeys];
-
-            function predictRangeAdaptiveEWMA(ss) { if (ss.length < 3) return { min: 8, max: 15, center: 11, conf: 0.42 }; const n =
-                    Math.min(ss.length, 25); const vol = calcRecentVolatility(ss, n); const alpha = 0.35 + 0.4 * Math.min(1,
-                    vol / 5.5); let ewma = ss[0]; for (let i = 1; i < n; i++) ewma = alpha * ss[i] + (1 - alpha) * ewma; const
-                    hw = Math.max(2, Math.round(vol * 1.55)); const c = clampSum(Math.round(ewma)); return constrainRange(c - hw,
-                        c + hw, c); }
-
-            function predictRangeWeightedTrend(ss) { if (ss.length < 5) return { min: 7, max: 14, center: 10, conf: 0.4 }; const n =
-                    Math.min(ss.length, 20); const rev = ss.slice(0, n).reverse(); let tw = 0,
-                    sx = 0,
-                    sy = 0,
-                    sxx = 0,
-                    sxy = 0; for (let i = 0; i < n; i++) { const w = 1 + i * 0.25;
-                    tw += w;
-                    sx += i * w;
-                    sy += rev[i] * w;
-                    sxx += i * i * w;
-                    sxy += i * rev[i] * w; } const d = tw * sxx - sx * sx + 0.001; const slope = (tw * sxy - sx * sy) / d; const
-                    intc = (sy - slope * sx) / tw; const pred = intc + slope * n; let res = 0; for (let j = 0; j < n; j++) { const
-                        est = intc + slope * j;
-                    res += (rev[j] - est) * (rev[j] - est); } const rmse = Math.sqrt(res / n) || 3; const vol =
-                    calcRecentVolatility(ss, n); const unc = (rmse * 0.6 + vol * 0.4); const hw = Math.max(2, Math.round(unc *
-                    1.5)); const c = clampSum(Math.round(pred)); return constrainRange(c - hw, c + hw, c); }
-
-            function predictRangeKernelFreq(ss) { if (ss.length < 4) return { min: 7, max: 14, center: 10, conf: 0.38 }; const n =
-                    Math.min(ss.length, 35); const bw = Math.max(2, calcRecentVolatility(ss, n) * 0.7); const den = new Array(28)
-                    .fill(0); for (let i = 0; i < n; i++) { const v = clampSum(ss[i]),
-                        wt = (n - i) / n; for (let x = 0; x <= 27; x++) { const d = (x - v) / bw;
-                        den[x] += wt * Math.exp(-0.5 * d * d); } } let bs = 0,
-                    be = 6,
-                    sc = 0; for (let w = 3; w <= MAX_RANGE_SPAN; w++) { for (let s = 0; s <= 27 - w; s++) { const e = s + w; let
-                        sum = 0; for (let k = s; k <= e; k++) sum += den[k]; const score = sum / (w + 1); if (score > sc) { sc =
-                            score;
-                        bs = s;
-                        be = e; } } } const c = Math.round((bs + be) / 2); return constrainRange(bs, be, c); }
-
-            function predictRangeAdaptiveKalman(ss) { if (ss.length < 3) return { min: 8, max: 14, center: 11, conf: 0.42 }; const
-                n = Math.min(ss.length, 25); let est = ss[0] || 13.5,
-                    p = 9; const bQ = 2,
-                    bR = 7; const errs = []; for (let i = 1; i < n; i++) { const z = ss[i]; const Q = bQ * (1 + Math.min(1, p /
-                        20));
-                    p += Q; const k = p / (p + bR); const pe = z - est;
-                    errs.push(Math.abs(pe));
-                    est += k * pe;
-                    p = (1 - k) * p; }
-                p += bQ; const ae = errs.length ? errs.reduce((a, b) => a + b, 0) / errs.length : 3; const unc = Math.sqrt(p + ae *
-                    ae * 0.5) || 3; const hw = Math.max(2, Math.round(unc * 1.5)); const c = clampSum(Math.round(est)); return
-                constrainRange(c - hw, c + hw, c); }
-
-            function predictRangeEnsemble(ss) { if (ss.length < 3) return { min: 8, max: 15, center: 11, conf: 0.52 }; const r1 =
-                    predictRangeAdaptiveEWMA(ss),
-                    r2 = predictRangeWeightedTrend(ss), r3 = predictRangeKernelFreq(ss), r4 = predictRangeAdaptiveKalman(
-                    ss); const all = [r1, r2, r3, r4]; const keys = ['rangeAdaptiveEWMA', 'rangeWeightedTrend',
-                    'rangeKernelFreq', 'rangeAdaptiveKalman'
-                ]; let ws = 0; const wts = keys.map(k => { const w = getNumberAlgoWeight(k);
-                    ws += w; return w; }); const vh = new Array(28).fill(0);
-                all.forEach((r, i) => { const wt = wts[i] / ws; for (let v = r.min; v <= r.max; v++) if (v >= 0 && v <= 27) vh[
-                        v] += wt; }); let bs = 0,
-                    be = 6,
-                    bsc = 0; for (let w = 2; w <= MAX_RANGE_SPAN; w++) { for (let s = 0; s <= 27 - w; s++) { const e = s + w; let
-                        sv = 0; for (let i = s; i <= e; i++) sv += vh[i]; const score = (sv / (w + 1)) * (1 + (MAX_RANGE_SPAN -
-                            w) * 0.08); if (score > bsc) { bsc = score;
-                        bs = s;
-                        be = e; } } } const centers = all.map(r => r.center); const ac = Math.round(centers.reduce((a, b) => a +
-                    b, 0) / centers.length); const rc = clampSum(Math.round((ac + Math.round((bs + be) / 2)) / 2)); return
-                constrainRange(bs, be, rc); }
-
-            const numberPredictFns = { rangeAdaptiveEWMA: predictRangeAdaptiveEWMA, rangeWeightedTrend: predictRangeWeightedTrend,
-                rangeKernelFreq: predictRangeKernelFreq, rangeAdaptiveKalman: predictRangeAdaptiveKalman,
-                rangeEnsemble: predictRangeEnsemble };
-
-            function getPredictionForSlice(hs) { if (!hs || hs.length < 2) return { double: COMBOS.sort(() => seededRandom(
-                        deterministicSeed('fb')) - 0.5).slice(0, 2), single: COMBOS[0] }; const cs = hs.map(d => d.combo),
-                    ss = hs.map(d => d.sum); try { const r = predictFns[currentAlgoKey](cs, ss); return { double: r.double,
-                        single: r.single }; } catch (e) { return { double: COMBOS.slice(0, 2), single: COMBOS[0] }; } }
-
-            function getNumberPredictionForSlice(hs) { if (!hs || hs.length < 2) return { min: 8, max: 15, center: 11, conf: 0.42 };
-                const ss = hs.map(d => d.sum); try { const r = numberPredictFns[currentNumberAlgoKey](ss); return constrainRange(r
-                    .min, r.max, r.center); } catch (e) { return { min: 8, max: 15, center: 11, conf: 0.42 }; } }
-
-            function getNextPeriod() { if (!latestPeriod) return '待开奖'; const n = parseInt(latestPeriod); return isNaN(n) ?
-                    '待开奖' : String(n + 1); }
-
-            function getAlgoWeight(k) { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const recent = rs.slice(
-                    0, 50).filter(r => r.algorithm === k && (r.mode === 'combo' || !r.mode || r.doublePred)); if (recent
-                .length < 15) return 0.6; const hits = recent.filter(r => r.hit).length; return 0.25 + (hits / recent.length) *
-                0.75; }
-
-            function getNumberAlgoWeight(k) { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const recent = rs
-                    .slice(0, 50).filter(r => r.algorithm === k && r.mode === 'number'); if (recent.length < 10) return 0.55;
-                const hits = recent.filter(r => r.hit).length; return 0.2 + (hits / recent.length) * 0.8; }
-
-            // ========== 杀组算法系统 ==========
-            function generateKillAlgo(seed) {
-                const rng = (max) => Math.floor(seededRandom(seed++) * max);
-                const vars = ['d.a', 'd.b', 'd.c', 'd.sum', '(d.a+d.b)', '(d.a+d.c)', '(d.b+d.c)', '(d.a*d.b)',
-                '(d.a+d.b+d.c)'];
-                let expr = vars[rng(vars.length)];
-                if (seededRandom(seed++) < 0.4) { const c = [1, 2, 3, 5, 7, 10][rng(6)];
-                    expr = seededRandom(seed++) < 0.5 ? `${expr}+${c}` : `${expr}-${c}`; }
-                const mod = [3, 4, 5, 10, 14, 28][rng(6)];
-                const judge = ['direct', 'mod4', 'size'][rng(3)];
-                return { expr, mod, judge, accuracy: 0, streak: 0 };
+            function parseNumbers(opennum) {
+                if (!opennum) return [0, 0, 0];
+                return opennum.split('+').map(p => parseInt(p) || 0);
             }
 
-            function executeKillAlgo(algo, record) { try { const d = { a: record.numbers[0], b: record.numbers[1], c: record
-                        .numbers[2], sum: record.sum }; let val = eval(algo.expr.replace(/d\./g, 'd.'));
-                    val = Math.abs(Math.floor(val)) % algo.mod; let combo; if (algo.judge === 'direct') { const map = ['小单', '小双',
-                        '大单', '大双'
-                    ];
-                        combo = map[val % 4]; } else if (algo.judge === 'mod4') { const map = ['小单', '小双', '大单', '大双'];
-                        combo = map[val % 4]; } else if (algo.judge === 'size') { combo = val % 2 === 0 ? '大双' : '小单'; } return combo; } catch (
-                    e) { return null; } }
+            const shapesAll = ['小双', '小单', '大单', '大双'];
 
-            const KILL_ALGO_COUNT = 15,
-                KILL_BACKTEST_DAYS = 20;
+            // ====================== 算法1：传统算法 ======================
+            function dualGroupAlgorithm(arr) {
+                if (arr.length < 3) return { shapes: [], detail: '数据不足' };
+                const a = arr[2],
+                    b = arr[1],
+                    c = arr[0];
+                const aNums = parseNumbers(a.opennum),
+                    bNums = parseNumbers(b.opennum),
+                    cNums = parseNumbers(c.opennum);
+                const aSum = parseInt(a.sum) || 0,
+                    bSum = parseInt(b.sum) || 0;
+                const g1 = Math.abs(aSum - bSum) + cNums[1] + cNums[2];
+                const g2 = bNums[0] + cNums[1];
+                const s1 = getShape(g1),
+                    s2 = getShape(g2);
+                if (s1 !== s2) return { shapes: [s1, s2], detail: `两组不同，推荐${s1}、${s2}` };
+                const map = { '小双': ['小单', '大单'], '小单': ['大单', '大双'], '大单': ['小双', '大双'], '大双': ['小单', '小双'] };
+                const shapes = map[s1] || [];
+                return { shapes, detail: `两组相同(${s1})，查表推荐${shapes.join('、')}` };
+            }
 
-            function backtestKillAlgo(algo) { let correct = 0,
-                    total = 0; const start = Math.max(0, historyData.length - KILL_BACKTEST_DAYS - 1); for (let i = start; i <
-                    historyData.length - 1; i++) { const hist = historyData.slice(0, i + 1); const pred = executeKillAlgo(algo,
-                        hist[hist.length - 1]); if (pred && pred !== historyData[i + 1].combo) { correct++; } total++; } return total >
-                    0 ? correct / total : 0; }
+            function killShapeAlgorithm(arr) {
+                if (arr.length < 1) return { killShape: null };
+                const cur = arr[0];
+                const sum = parseInt(cur.sum) || 0;
+                const periodEnd = parseInt((cur.qihao || '0').slice(-2)) || 0;
+                let timeVal = 0;
+                try {
+                    const tp = cur.opentime.split(' ')[1];
+                    if (tp) { const [h, m] = tp.split(':').map(Number);
+                        timeVal = h + m / 60; }
+                } catch (e) {}
+                let x = 0;
+                if (periodEnd > 0) x = (sum * 3 / periodEnd) * timeVal;
+                x = Math.round(x * 100) / 100;
+                const xStr = x.toString();
+                const dotIdx = xStr.indexOf('.');
+                let g;
+                if (dotIdx !== -1 && dotIdx + 1 < xStr.length) {
+                    g = parseInt(xStr[dotIdx + 1]) || 0;
+                } else { g = 0; }
+                const map = { 0: '小双', 1: '小单', 2: '小双', 3: '小单', 4: '小双', 5: '大单', 6: '大双', 7: '大单', 8: '大双',
+                    9: '大单' };
+                return { killShape: map[g] || null };
+            }
 
-            function selectKillAlgos() { const seed = deterministicSeed(latestPeriod || '0'); const candidates = []; for (let i =
-                    0; i < KILL_ALGO_COUNT * 3; i++) { candidates.push(generateKillAlgo(seed + i * 100)); } const qualified =
-                    []; for (const algo of candidates) { algo.accuracy = backtestKillAlgo(algo); if (algo.accuracy >= 0.9)
-                    qualified.push(algo); } qualified.sort((a, b) => b.accuracy - a.accuracy); return qualified.slice(0,
-                    KILL_ALGO_COUNT); }
+            function killShapeAlgorithm2(arr) {
+                if (arr.length < 1) return { killShape: null };
+                const cur = arr[0];
+                const sum = parseInt(cur.sum) || 0;
+                const periodEnd = parseInt((cur.qihao || '0').slice(-2)) || 0;
+                let timeVal = 0;
+                try {
+                    const tp = cur.opentime.split(' ')[1];
+                    if (tp) { const [h, m] = tp.split(':').map(Number);
+                        timeVal = h + m / 60; }
+                } catch (e) {}
+                let x = 0;
+                if (periodEnd > 0) x = (sum * 3 / periodEnd) * timeVal;
+                x = Math.round(x * 100) / 100;
+                const xStr = x.toString();
+                const dotIdx = xStr.indexOf('.');
+                let g;
+                if (dotIdx !== -1) {
+                    g = parseInt(xStr.substring(0, dotIdx).slice(-1)) || 0;
+                } else { g = parseInt(xStr.slice(-1)) || 0; }
+                const map = { 0: '大双', 1: '大单', 2: '大双', 3: '大单', 4: '大双', 5: '小单', 6: '小双', 7: '小单', 8: '小双',
+                    9: '小单' };
+                return { killShape: map[g] || null };
+            }
 
-            function updateKillPrediction() { if (historyData.length < KILL_BACKTEST_DAYS + 2) { killAlgos = [];
-                    killPrediction = { combo: null, confidence: 0 }; return; }
-                killAlgos = selectKillAlgos(); const votes = { 小单: 0, 小双: 0, 大单: 0, 大双: 0 }; let totalWeight = 0; for (const algo of
-                    killAlgos) { const pred = executeKillAlgo(algo, historyData[0]); if (pred) { const weight = (algo.accuracy /
-                            0.9) * (1 + algo.streak * 0.5);
-                        votes[pred] += weight;
-                        totalWeight += weight; } } const entries = Object.entries(votes).sort((a, b) => b[1] - a[1]); if (entries
-                    .length > 0) { killPrediction = { combo: entries[0][0], confidence: entries[0][1] / Math.max(totalWeight,
-                            0.001) * 100 }; } else { killPrediction = { combo: null, confidence: 0 }; } }
+            function crossSumKillAlgorithm(arr) {
+                if (arr.length < 3) return { killShape: null };
+                const c = arr[0],
+                    p1 = arr[1],
+                    p2 = arr[2];
+                const cn = parseNumbers(c.opennum),
+                    p1n = parseNumbers(p1.opennum),
+                    p2n = parseNumbers(p2.opennum);
+                const s1 = cn[2] + p1n[1] + p2n[2];
+                const s2 = cn[2] + p1n[0] + p2n[2];
+                const s3 = cn[2] + p1n[2] + p2n[2];
+                const shapes = [getShape(s1), getShape(s2), getShape(s3)];
+                const cnt = {};
+                shapes.forEach(s => cnt[s] = (cnt[s] || 0) + 1);
+                let kill = null;
+                Object.entries(cnt).forEach(([k, v]) => { if (v >= 2) kill = k; });
+                return { killShape: kill };
+            }
 
-            function renderKillCard() { const card = $('killCard'); if (!card) return; if (killPrediction.combo) { $(
-                    'killComboDisplay').textContent = killPrediction.combo;
-                    $('killConfDisplay').innerHTML =
-                        `综合置信度 ${killPrediction.confidence.toFixed(1)}% · 有效算法 ${killAlgos.length}个`; } else { $(
-                    'killComboDisplay').textContent = '--';
-                    $('killConfDisplay').textContent = '数据不足，需至少22期历史'; } }
+            function algo1Combine(arr) {
+                const dual = dualGroupAlgorithm(arr);
+                const k1 = killShapeAlgorithm(arr);
+                const k2 = killShapeAlgorithm2(arr);
+                let shapes = dual.shapes || [];
+                const kills = [k1.killShape, k2.killShape].filter(Boolean);
+                shapes = shapes.filter(s => !kills.includes(s));
+                if (shapes.length === 0) shapes = dual.shapes;
+                return { shapes, killShape: k1.killShape, killShape2: k2.killShape, dualShapes: dual.shapes };
+            }
 
-            // ========== 杀组历史系统 ==========
-            function loadKillHistory() { try { const d = localStorage.getItem(KILL_HISTORY_KEY); if (d) { killHistory = JSON
-                        .parse(d); if (!Array.isArray(killHistory)) killHistory = []; } else killHistory = []; } catch (e) { killHistory =
-                        []; } return killHistory; }
+            // ====================== 算法2：AI多模型集成 ======================
+            class AIStatisticalModel {
+                analyze(arr, w) {
+                    if (arr.length < 3) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const n = Math.min(arr.length, 10);
+                    const cnt = {};
+                    arr.slice(0, n).forEach(d => {
+                        const s = getShape(parseInt(d.sum) || 0);
+                        cnt[s] = (cnt[s] || 0) + 1;
+                    });
+                    Object.keys(scores).forEach(k => {
+                        scores[k] -= (cnt[k] || 0) * w;
+                        scores[k] += (n - (cnt[k] || 0)) * w * 0.5;
+                    });
+                    return scores;
+                }
+            }
+            class AITrendModel {
+                analyze(arr, w) {
+                    if (arr.length < 5) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const recent = arr.slice(0, 5).map(d => getShape(parseInt(d.sum) || 0));
+                    for (let i = 1; i < recent.length; i++)
+                        if (recent[i] === recent[i - 1]) scores[recent[i]] -= w;
+                    let alt = true;
+                    for (let i = 2; i < recent.length; i++)
+                        if (recent[i] === recent[i - 2]) { alt = false; break; }
+                    if (alt) scores[recent[0]] -= w * 1.5;
+                    return scores;
+                }
+            }
+            class AICycleModel {
+                analyze(arr, w) {
+                    if (arr.length < 8) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    for (let off = 0; off < 3; off++) {
+                        const period = [];
+                        for (let i = off; i < Math.min(arr.length, 15); i += 3) period.push(getShape(parseInt(arr[i].sum) ||
+                            0));
+                        if (period.length >= 2) {
+                            const cnt = {};
+                            period.forEach(s => cnt[s] = (cnt[s] || 0) + 1);
+                            const idx = arr.length % 3;
+                            if (idx === off) {
+                                const sorted = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+                                if (sorted.length) scores[sorted[0][0]] -= w;
+                            }
+                        }
+                    }
+                    return scores;
+                }
+            }
+            class AITimeSeriesModel {
+                analyze(arr, w) {
+                    if (arr.length < 6) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 6).map(d => parseInt(d.sum) || 0);
+                    const ma3 = sums.slice(0, 3).reduce((a, b) => a + b) / 3;
+                    const maR = sums.slice(3, 6).reduce((a, b) => a + b) / 3;
+                    const trend = maR - ma3;
+                    if (trend > 2) { scores['大单'] -= w;
+                        scores['大双'] -= w * 0.5; }
+                    if (trend < -2) { scores['小单'] -= w;
+                        scores['小双'] -= w * 0.5; }
+                    const last = sums[0];
+                    if (last >= 22) { scores['大双'] -= w * 0.8;
+                        scores['大单'] -= w * 0.6; }
+                    if (last <= 5) { scores['小单'] -= w * 0.8;
+                        scores['小双'] -= w * 0.6; }
+                    return scores;
+                }
+            }
+            class AIMLPatternModel {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const pattern = arr.slice(0, 3).map(d => getShape(parseInt(d.sum) || 0));
+                    for (let i = 3; i < arr.length; i++) {
+                        const hist = arr.slice(i, i + 3).map(d => getShape(parseInt(d.sum) || 0));
+                        let sim = 0;
+                        for (let j = 0; j < 3; j++)
+                            if (pattern[j] === hist[j]) sim++;
+                        if (sim >= 2 && i + 3 < arr.length) {
+                            const next = getShape(parseInt(arr[i + 3].sum) || 0);
+                            scores[next] -= w * sim;
+                        }
+                    }
+                    return scores;
+                }
+            }
 
-            function saveKillHistory() { try { if (killHistory.length > 500) killHistory = killHistory.slice(0, 500);
-                    localStorage.setItem(KILL_HISTORY_KEY, JSON.stringify(killHistory)); } catch (e) {} }
+            function aiIntegratedAlgorithmGroup(arr, group = 1) {
+                if (arr.length < 10) return { killShape1: null, killShape2: null };
+                const models = [
+                    new AIStatisticalModel(), new AIStatisticalModel(), new AIStatisticalModel(),
+                    new AITrendModel(), new AITrendModel(), new AITrendModel(),
+                    new AICycleModel(), new AICycleModel(),
+                    new AITimeSeriesModel(), new AIMLPatternModel()
+                ];
+                const total = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                const w1 = group === 1 ? 2.0 : 1.5;
+                models.forEach(m => {
+                    const s = m.analyze(arr, w1);
+                    if (s) Object.keys(total).forEach(k => total[k] += s[k] || 0);
+                });
+                if (group === 2) {
+                    const boost = [3, 2, 1.5];
+                    arr.slice(0, 3).forEach((d, i) => {
+                        const shape = getShape(parseInt(d.sum) || 0);
+                        total[shape] -= boost[i];
+                    });
+                }
+                const sorted = Object.entries(total).sort((a, b) => a[1] - b[1]);
+                return { killShape1: sorted[0]?.[0] || null, killShape2: sorted[1]?.[0] || null, scores: total };
+            }
 
-            function saveKillRecord(period, predictedKillCombo, actualCombo, actualNums, actualSum) { if (!predictedKillCombo ||
-                    !period) return; const isWin = actualCombo !== predictedKillCombo; const record = { period,
-                    predictedKillCombo, actualCombo, actualNums: actualNums.join('+'), actualSum, isWin, time: new Date()
-                        .toLocaleString() }; killHistory.unshift(record); if (killHistory.length > 500) killHistory = killHistory
-                    .slice(0, 500);
-                saveKillHistory(); }
+            function aiIntegratedKillAlgorithm(arr) {
+                const g1 = aiIntegratedAlgorithmGroup(arr, 1);
+                const g2 = aiIntegratedAlgorithmGroup(arr, 2);
+                const cnt = {};
+                [g1.killShape1, g1.killShape2, g2.killShape1, g2.killShape2].filter(Boolean).forEach(s => cnt[s] = (cnt[
+                    s] || 0) + 1);
+                let k1 = null,
+                    k2 = null;
+                const entries = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+                if (entries.length) k1 = entries[0][0];
+                if (entries.length > 1) k2 = entries[1][0];
+                return { aiKillGroup1: k1, aiKillGroup2: k2 };
+            }
 
-            function renderKillHistoryUI() { loadKillHistory(); const tb = $('killHistoryTableBody'); const cnt = $(
-                    'killHistoryCount'); if (cnt) cnt.innerText = `共 ${killHistory.length} 条杀组记录`; if (!tb) return; if (!killHistory
-                    .length) { tb.innerHTML =
-                        '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无杀组记录</div></div>'; return; }
-                tb.innerHTML = killHistory.slice(0, 60).map(r => { const winClass = r.isWin ? 'win' : 'lose'; const
-                        winLabel = r.isWin ? '✅ 杀中' : '❌ 失手'; return `<div class="tr"><div class="td td-col-period">${r.period}</div><div class="td td-col-nums"><span class="kill-tag ${winClass}">${r.predictedKillCombo}</span></div><div class="td td-col-pred"><span style="font-size:11px;">${r.actualCombo} (${r.actualNums}=${r.actualSum})</span></div><div class="td td-col-result"><span class="${r.isWin?'ok':'err'}">${winLabel}</span></div></div>`; })
-                    .join(''); const summary = $('killHistorySummary'); if (summary) { const total = killHistory.length,
-                        wins = killHistory.filter(r => r.isWin).length,
-                        rate = total ? (wins / total * 100).toFixed(1) : '0.0';
-                    summary.innerHTML =
-                        `<span>杀组总次数: ${total}</span><span>杀中: ${wins}次</span><span>杀组成功率: ${rate}%</span>`; } }
+            // ====================== 算法3：深度学习AI ======================
+            class DeepLayer1 {
+                analyze(arr, w) {
+                    if (arr.length < 15) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 15).map(d => parseInt(d.sum) || 0);
+                    const mean = sums.reduce((a, b) => a + b) / 15;
+                    const variance = sums.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / 15;
+                    const skew = sums.reduce((a, b) => a + Math.pow(b - mean, 3), 0) / (Math.sqrt(variance) * variance *
+                        variance);
+                    if (skew > 0.5) { scores['小双'] -= w * 2;
+                        scores['小单'] -= w * 1.5; } else if (skew < -0.5) { scores['大双'] -= w * 2;
+                        scores['大单'] -= w * 1.5; }
+                    return scores;
+                }
+            }
+            class DeepLayer2 {
+                analyze(arr, w) {
+                    if (arr.length < 12) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const ws = 5;
+                    const patterns = {};
+                    for (let i = 0; i <= arr.length - ws; i++) {
+                        const win = arr.slice(i, i + ws).map(d => getShape(parseInt(d.sum) || 0));
+                        const pat = win.join('-');
+                        patterns[pat] = (patterns[pat] || 0) + 1;
+                    }
+                    Object.entries(patterns).sort((a, b) => b[1] - a[1]).slice(0, 2).forEach(([pat, cnt]) => {
+                        const last = pat.split('-').pop();
+                        if (scores[last] !== undefined) scores[last] -= w * cnt * 0.3;
+                    });
+                    return scores;
+                }
+            }
+            class DeepAttention {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const weights = [];
+                    for (let i = 0; i < Math.min(arr.length, 10); i++) weights.push(Math.exp(-i * 0.3));
+                    const cnt = {};
+                    arr.slice(0, 10).forEach((d, i) => {
+                        const shape = getShape(parseInt(d.sum) || 0);
+                        cnt[shape] = (cnt[shape] || 0) + weights[i];
+                    });
+                    const max = Math.max(...Object.values(cnt));
+                    Object.keys(scores).forEach(k => { scores[k] -= (cnt[k] || 0) / max * w * 3; });
+                    return scores;
+                }
+            }
+            class DeepLSTM {
+                analyze(arr, w) {
+                    if (arr.length < 15) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const long = arr.slice(0, 15).map(d => getShape(parseInt(d.sum) || 0));
+                    const short = arr.slice(0, 5).map(d => getShape(parseInt(d.sum) || 0));
+                    const lcnt = {};
+                    long.forEach(s => lcnt[s] = (lcnt[s] || 0) + 1);
+                    const scnt = {};
+                    short.forEach(s => scnt[s] = (scnt[s] || 0) + 1);
+                    Object.keys(scores).forEach(k => {
+                        if ((scnt[k] || 0) >= 3) scores[k] -= w * 2;
+                        if ((lcnt[k] || 0) >= 7 && (scnt[k] || 0) >= 2) scores[k] -= w * 1.5;
+                    });
+                    return scores;
+                }
+            }
+            class DeepResNet {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 10).map(d => parseInt(d.sum) || 0);
+                    const ma3 = sums.slice(0, 3).reduce((a, b) => a + b) / 3;
+                    const res1 = sums[0] - ma3;
+                    const ma5 = sums.slice(0, 5).reduce((a, b) => a + b) / 5;
+                    const res2 = sums[0] - ma5;
+                    const lastShape = getShape(sums[0]);
+                    if (Math.abs(res1) > 5 && scores[lastShape] !== undefined) scores[lastShape] -= w * 1.5;
+                    if (Math.abs(res2) > 3 && scores[lastShape] !== undefined) scores[lastShape] -= w * 0.8;
+                    return scores;
+                }
+            }
 
-            function clearKillHistoryUI() { if (confirm('清空杀组历史记录？')) { killHistory = [];
-                    localStorage.removeItem(KILL_HISTORY_KEY);
-                    renderKillHistoryUI();
-                    toast('杀组历史已清空', 'success'); } }
+            function deepAIIntegratedKillAlgorithm(arr) {
+                if (arr.length < 15) return { killShape1: null, killShape2: null };
+                const models1 = [new DeepLayer1(), new DeepLayer1(), new DeepLayer1(), new DeepAttention(),
+                new DeepAttention()];
+                const models2 = [new DeepLayer2(), new DeepLayer2(), new DeepLSTM(), new DeepLSTM(), new DeepResNet()];
+                const total1 = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                const total2 = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                models1.forEach(m => { const s = m.analyze(arr, 1.2); if (s) Object.keys(total1).forEach(k => total1[
+                    k] += s[k] || 0); });
+                models2.forEach(m => { const s = m.analyze(arr, 1.3); if (s) Object.keys(total2).forEach(k => total2[
+                    k] += s[k] || 0); });
+                const sorted1 = Object.entries(total1).sort((a, b) => a[1] - b[1]);
+                const sorted2 = Object.entries(total2).sort((a, b) => a[1] - b[1]);
+                return { killShape1: sorted1[0]?.[0] || null, killShape2: sorted2[0]?.[0] || null };
+            }
 
-            window.renderKillHistoryUI = renderKillHistoryUI;
-            window.clearKillHistoryUI = clearKillHistoryUI;
-
-            // ========== 888算法系统 - 真正的多样化算法 ==========
-            function build888AlgoFn(algoId) {
-                const seed = deterministicSeed('algo888_v2_' + algoId);
-                const rng = (max) => Math.floor(seededRandom(seed + algoId * 7 + max * 13) * max);
-                const rngFloat = () => seededRandom(seed + algoId * 3 + rng(100) * 17);
-
-                const algoType = rng(10);
-                const windowSize = 3 + rng(28);
-                const windowSize2 = 3 + rng(28);
-                const threshold = 0.3 + rngFloat() * 0.5;
-                const weightDecay = 0.5 + rngFloat() * 0.45;
-                const directionBias = rng(4);
-
-                const dirMap = ['大', '小', '单', '双'];
-
-                switch (algoType) {
-                    case 0:
-                        return function(h) {
-                            if (h.length < 2) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            let wSum = 0,
-                                wTotal = 0;
-                            for (let i = 0; i < n; i++) { const w = Math.pow(1 - weightDecay, i);
-                                wSum += h[i].sum * w;
-                                wTotal += w; } const avg = wSum / (wTotal || 1); return avg > 13.5 + threshold ? '大' : avg <
-                                13.5 - threshold ? '小' : avg % 2 > 0.5 ? '单' : '双';
-                        };
-                    case 1:
-                        return function(h) {
-                            if (h.length < 3) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            let bigCount = 0,
-                                oddCount = 0;
-                            for (let i = 0; i < n; i++) { if (h[i].sum > 13) bigCount++; if (h[i].sum % 2 === 1)
-                                oddCount++; } const bigRatio = bigCount / n; if (bigRatio < 0.35) return '大'; if (bigRatio >
-                                0.65) return '小'; return oddCount / n > 0.55 ? '双' : '单';
-                        };
-                    case 2:
-                        return function(h) {
-                            if (h.length < windowSize + 1) return dirMap[directionBias];
-                            const recent = h.slice(0, windowSize);
-                            const recentAvg = recent.reduce((a, b) => a + b.sum, 0) / recent.length;
-                            const older = h.slice(windowSize, Math.min(h.length, windowSize * 2));
-                            if (older.length < 2) return dirMap[directionBias];
-                            const olderAvg = older.reduce((a, b) => a + b.sum, 0) / older.length;
-                            const diff = recentAvg - olderAvg; if (diff > threshold * 2) return '小'; if (diff < -threshold *
-                                2) return '大'; return recentAvg > 13.5 ? '大' : '小';
-                        };
-                    case 3:
-                        return function(h) {
-                            if (h.length < 5) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            const sums = h.slice(0, n).map(d => d.sum);
-                            const vol = calcRecentVolatility(sums, n); if (vol > 5.5) return sums[0] > 13.5 ? '小' : '大'; const
-                                maShort = sums.slice(0, Math.min(5, n)).reduce((a, b) => a + b, 0) / Math.min(5, n); const
-                                maLong = sums.reduce((a, b) => a + b, 0) / n; return maShort > maLong + threshold ? '大' :
-                                maShort < maLong - threshold ? '小' : dirMap[directionBias];
-                        };
+            // ====================== 算法4-10通用生成 ======================
+            function genericAlgorithm(arr, num) {
+                if (arr.length < 10) return { killShape1: null, killShape2: null };
+                const scores = {};
+                shapesAll.forEach(s => scores[s] = 0);
+                const recent = arr.slice(0, 10);
+                switch (num) {
                     case 4:
-                        return function(h) {
-                            if (h.length < 4) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            let patternScore = 0;
-                            for (let i = 1; i < n; i++) { if (h[i].pattern === '对子') patternScore += 2; if (h[i]
-                                    .pattern === '顺子') patternScore += 1; if (h[i].pattern === '豹子') patternScore +=
-                                3; } if (patternScore > n * 0.4) return '小'; const lastSum = h[0].sum; return lastSum >
-                                13.5 ? '小' : '大';
-                        };
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += 1; });
+                        break;
                     case 5:
-                        return function(h) {
-                            if (h.length < 3) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            const sums = h.slice(0, n).map(d => d.sum);
-                            const avg = sums.reduce((a, b) => a + b, 0) / n;
-                            const deviation = sums.map(s => s - avg);
-                            const trend = deviation.slice(0, Math.min(5, n)).reduce((a, b) => a + b, 0); if (trend > threshold *
-                                3) return '小'; if (trend < -threshold * 3) return '大'; const oddCount = sums.filter(s => s % 2 ===
-                                1).length; return oddCount / n > 0.5 + threshold * 0.3 ? '双' : '单';
-                        };
+                        recent.forEach((d, i) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += (10 - i) * 0.5; });
+                        break;
                     case 6:
-                        return function(h) {
-                            if (h.length < windowSize2 + 2) return dirMap[directionBias];
-                            const short = h.slice(0, windowSize);
-                            const long = h.slice(0, windowSize2);
-                            const shortAvg = short.reduce((a, b) => a + b.sum, 0) / short.length;
-                            const longAvg = long.reduce((a, b) => a + b.sum, 0) / long.length;
-                            const momentum = shortAvg - longAvg; if (Math.abs(momentum) < threshold * 1.5) return dirMap[
-                                directionBias]; return momentum > 0 ? '大' : '小';
-                        };
+                        const sums6 = recent.map(d => parseInt(d.sum) || 0);
+                        const mean6 = sums6.reduce((a, b) => a + b) / 10;
+                        recent.forEach((d) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] -= Math.abs(parseInt(d.sum) - mean6) * 0.1; });
+                        break;
                     case 7:
-                        return function(h) {
-                            if (h.length < 6) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            const hotWindow = Math.min(4, n);
-                            const hotSums = h.slice(0, hotWindow).map(d => d.sum);
-                            const coldSums = h.slice(hotWindow, n).map(d => d.sum); if (coldSums.length < 2) return dirMap[
-                                directionBias]; const hotAvg = hotSums.reduce((a, b) => a + b, 0) / hotSums.length; const
-                                coldAvg = coldSums.reduce((a, b) => a + b, 0) / coldSums.length; const regression = coldAvg -
-                                hotAvg; return regression > threshold * 2.5 ? '大' : regression < -threshold * 2.5 ? '小' :
-                                dirMap[directionBias];
-                        };
+                        for (let t = 0; t < 10; t++) { const idx = t % recent.length;
+                            const s = getShape(parseInt(recent[idx].sum) || 0);
+                            scores[s] += 1; }
+                        break;
                     case 8:
-                        return function(h) {
-                            if (h.length < 4) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            let zigzag = 0;
-                            for (let i = 1; i < n - 1; i++) { if ((h[i].sum - h[i - 1].sum) * (h[i + 1].sum - h[i].sum) <
-                                    0) zigzag++; } const zigzagRatio = zigzag / Math.max(n - 2, 1); if (zigzagRatio > 0.6)
-                                return dirMap[(directionBias + 1) % 4]; const lastCombo = h[0].combo; return lastCombo
-                                .includes('大') ? '小' : '大';
-                        };
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += parseInt(d.sum) > 14 ? 1 : -1; });
+                        break;
                     case 9:
-                    default:
-                        return function(h) {
-                            if (h.length < 3) return dirMap[directionBias];
-                            const n = Math.min(h.length, windowSize);
-                            const sums = h.slice(0, n).map(d => d.sum);
-                            const avg = sums.reduce((a, b) => a + b, 0) / n;
-                            const oddRatio = sums.filter(s => s % 2 === 1).length / n;
-                            const bigRatio = sums.filter(s => s > 13).length / n;
-                            const score = (avg - 13.5) / 6 + (bigRatio - 0.5) * 0.5 + (oddRatio - 0.5) * 0.3; if (score >
-                                threshold) return '大'; if (score < -threshold) return '小'; return oddRatio > 0.5 ? '单' :
-                                '双';
-                        };
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += 2; });
+                        break;
+                    case 10:
+                        recent.forEach((d, i) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += (10 - i) * 0.7; });
+                        break;
+                }
+                const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+                return { killShape1: sorted[0]?.[0] || null, killShape2: sorted[1]?.[0] || null };
+            }
+
+            function timeCoefficientAlgorithm(arr) {
+                if (arr.length < 2) return { killShape1: null, killShape2: null };
+                const cur = arr[0];
+                const sum = parseInt(cur.sum) || 0;
+                const periodEnd = parseInt((cur.qihao || '0').slice(-2)) || 97;
+                let timeVal = 1;
+                try {
+                    const match = cur.opentime.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+                    if (match) {
+                        const h = parseInt(match[1]),
+                            m = parseInt(match[2]),
+                            s = parseInt(match[3]);
+                        timeVal = (m === 0 && s === 0) ? h : m + s / 100;
+                    }
+                } catch (e) {}
+                if (timeVal === 0) timeVal = 1;
+                const result = (sum * 3) / periodEnd * timeVal;
+                const str = result.toFixed(10);
+                const dot = str.indexOf('.');
+                const before = dot !== -1 ? parseInt(str.substring(0, dot).slice(-1)) || 0 : parseInt(str.slice(-1)) ||
+                0;
+                const after = dot !== -1 && dot + 1 < str.length ? parseInt(str[dot + 1]) || 0 : 0;
+                const map = { 0: '大双', 1: '大单', 2: '大双', 3: '大单', 4: '大双', 5: '小单', 6: '小双', 7: '小单', 8: '小双',
+                    9: '小单' };
+                return { killShape1: map[before] || null, killShape2: map[after] || null };
+            }
+
+            function comprehensiveOptimalKillAlgorithm(arr) {
+                const allKills = [];
+                if (arr.length >= 3) {
+                    const k1 = killShapeAlgorithm(arr); if (k1.killShape) allKills.push({ shape: k1.killShape });
+                    const k2 = killShapeAlgorithm2(arr); if (k2.killShape) allKills.push({ shape: k2.killShape });
+                }
+                if (arr.length >= 10) {
+                    const ai = aiIntegratedKillAlgorithm(arr);
+                    if (ai.aiKillGroup1) allKills.push({ shape: ai.aiKillGroup1 });
+                    if (ai.aiKillGroup2) allKills.push({ shape: ai.aiKillGroup2 });
+                }
+                if (arr.length >= 15) {
+                    const deep = deepAIIntegratedKillAlgorithm(arr);
+                    if (deep.killShape1) allKills.push({ shape: deep.killShape1 });
+                    if (deep.killShape2) allKills.push({ shape: deep.killShape2 });
+                }
+                if (arr.length >= 3) {
+                    const cross = crossSumKillAlgorithm(arr);
+                    if (cross.killShape) allKills.push({ shape: cross.killShape });
+                }
+                for (let num = 4; num <= 10; num++) {
+                    if (arr.length >= 10) {
+                        const gen = genericAlgorithm(arr, num);
+                        if (gen.killShape1) allKills.push({ shape: gen.killShape1 });
+                        if (gen.killShape2) allKills.push({ shape: gen.killShape2 });
+                    }
+                }
+                if (arr.length >= 2) {
+                    const tc = timeCoefficientAlgorithm(arr);
+                    if (tc.killShape1) allKills.push({ shape: tc.killShape1 });
+                    if (tc.killShape2) allKills.push({ shape: tc.killShape2 });
+                }
+                const seen = new Set();
+                const selected = [];
+                for (const k of allKills) {
+                    if (!seen.has(k.shape)) {
+                        seen.add(k.shape);
+                        selected.push(k.shape);
+                        if (selected.length >= 2) break;
+                    }
+                }
+                return { killShape1: selected[0] || null, killShape2: selected[1] || null };
+            }
+
+            // ====================== 算法元数据 ======================
+            const algoMeta = [
+                { num: 1, shortName: '传统算法', fullName: '算法1-传统算法(双组+杀形态)' },
+                { num: 2, shortName: 'AI多模型', fullName: '算法2-AI多模型集成' },
+                { num: 3, shortName: '深度学习AI', fullName: '算法3-深度学习AI' },
+                { num: 4, shortName: '贝叶斯推断', fullName: '算法4-贝叶斯推断' },
+                { num: 5, shortName: '遗传算法', fullName: '算法5-遗传算法' },
+                { num: 6, shortName: '支持向量机', fullName: '算法6-支持向量机' },
+                { num: 7, shortName: '随机森林', fullName: '算法7-随机森林' },
+                { num: 8, shortName: '强化学习', fullName: '算法8-强化学习' },
+                { num: 9, shortName: '集成学习', fullName: '算法9-集成学习' },
+                { num: 10, shortName: '元学习', fullName: '算法10-元学习' },
+                { num: 11, shortName: '时间系数', fullName: '算法11-时间系数算法' },
+                { num: 12, shortName: '综合最优', fullName: '算法12-综合最优杀组' },
+            ];
+
+            // ====================== 获取预测结果 ======================
+            function getPrediction(arr, algoNum) {
+                if (algoNum === 1) {
+                    if (arr.length < 3) return null;
+                    return algo1Combine(arr);
+                }
+                if (algoNum === 2) {
+                    if (arr.length < 10) return null;
+                    return aiIntegratedKillAlgorithm(arr);
+                }
+                if (algoNum === 3) {
+                    if (arr.length < 15) return null;
+                    return deepAIIntegratedKillAlgorithm(arr);
+                }
+                if (algoNum >= 4 && algoNum <= 10) {
+                    if (arr.length < 10) return null;
+                    return genericAlgorithm(arr, algoNum);
+                }
+                if (algoNum === 11) {
+                    if (arr.length < 2) return null;
+                    return timeCoefficientAlgorithm(arr);
+                }
+                if (algoNum === 12) {
+                    if (arr.length < 10) return null;
+                    return comprehensiveOptimalKillAlgorithm(arr);
+                }
+                return null;
+            }
+
+            // 从预测结果中提取统一的杀组1、杀组2、最终建议
+            function extractPredictionData(res, algoNum) {
+                if (!res) return { k1: null, k2: null, final: null };
+                let k1 = null,
+                    k2 = null;
+                if (algoNum === 1) {
+                    k1 = res.killShape || null;
+                    k2 = res.killShape2 || null;
+                    const final = res.shapes || [];
+                    return { k1, k2, final: final.join('、') || '--' };
+                }
+                if (algoNum === 2) {
+                    k1 = res.aiKillGroup1 || null;
+                    k2 = res.aiKillGroup2 || null;
+                } else {
+                    k1 = res.killShape1 || null;
+                    k2 = res.killShape2 || null;
+                }
+                const finalShapes = shapesAll.filter(s => s !== k1 && s !== k2);
+                return { k1, k2, final: finalShapes.join('、') || '--' };
+            }
+
+            // 判断最终建议是否命中
+            function checkFinalHit(res, actual, algoNum) {
+                if (!res) return false;
+                const pred = extractPredictionData(res, algoNum);
+                if (!pred.final || pred.final === '--') return false;
+                return pred.final.includes(actual);
+            }
+
+            // ====================== 构建UI ======================
+            const algoNames = ['算法1', '算法2', '算法3', '算法4', '算法5', '算法6', '算法7', '算法8', '算法9', '算法10', '算法11',
+            '算法12'];
+
+            function generateUI() {
+                // 预测总览表格tbody
+                const tbody = document.getElementById('predict-tbody');
+                algoMeta.forEach(meta => {
+                    const row = document.createElement('tr');
+                    row.id = `predict-row-${meta.num}`;
+                    row.innerHTML = `
+                        <td class="algo-name"><span class="algo-num">${meta.num}</span>${meta.shortName}</td>
+                        <td class="kill-cell" id="pred-k1-${meta.num}">--</td>
+                        <td class="kill-cell" id="pred-k2-${meta.num}">--</td>
+                        <td class="rec-cell" id="pred-final-${meta.num}">--</td>
+                        <td class="stat-cell" id="stat-total-${meta.num}">0</td>
+                        <td class="stat-cell" id="stat-hits-${meta.num}">0</td>
+                        <td class="stat-rate" id="stat-rate-${meta.num}">0%</td>
+                        <td><span class="consec-badge zero" id="stat-consec-${meta.num}">0</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // Tab按钮
+                const tabsContainer = document.getElementById('algo-tabs');
+                algoNames.forEach((name, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+                    btn.textContent = name;
+                    btn.onclick = () => switchTab(i + 1);
+                    tabsContainer.appendChild(btn);
+                });
+
+                // 历史记录容器
+                const histContainer = document.getElementById('history-container');
+                for (let algoNum = 1; algoNum <= 12; algoNum++) {
+                    const histCard = document.createElement('div');
+                    histCard.className = 'card';
+                    histCard.id = `history-card-${algoNum}`;
+                    histCard.style.display = algoNum === 1 ? 'block' : 'none';
+                    histCard.style.padding = '12px';
+                    histCard.style.marginTop = '8px';
+                    const isAlgo1 = algoNum === 1;
+                    histCard.innerHTML = `
+                        <div class="section-title" style="font-size:15px;"><i class="fas fa-history"></i><span>${algoMeta[algoNum-1].fullName} · 历史记录</span></div>
+                        <div class="table-responsive">
+                            <table class="history-table">
+                                <thead>${isAlgo1 ?
+                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>双组推荐</th><th>对错</th><th>杀1</th><th>对错</th><th>杀2</th><th>对错</th><th>时间</th></tr>' :
+                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>杀组1</th><th>对错</th><th>杀组2</th><th>对错</th><th>最终建议</th><th>命中</th><th>时间</th></tr>'
+                                }</thead>
+                                <tbody id="history-tbody-${algoNum}"></tbody>
+                            </table>
+                        </div>
+                    `;
+                    histContainer.appendChild(histCard);
                 }
             }
 
-            function build888Algos() {
-                const list = [];
-                for (let i = 1; i <= TOTAL_ALGO888; i++) {
-                    const algoType = (() => { const s = deterministicSeed('algo888_type_' + i); const r = seededRandom(s + i *
-                            13); return Math.floor(r * 10); })();
-                    const typeNames = ['加权趋势', '比例回归', '均线交叉', '波动反转', '形态影响', '偏差追踪', '动量对比', '冷热回归', '锯齿反转',
-                    '综合评分'];
-                    const typeName = typeNames[algoType] || '综合';
-                    const fn = build888AlgoFn(i);
-                    list.push({ id: i, name: `A${i}·${typeName}`, logic: `算法#${i} 类型:${typeName}`, fn: fn, algoType:
-                            algoType });
+            function switchTab(num) {
+                currentTab = num;
+                for (let i = 1; i <= 12; i++) {
+                    document.getElementById(`history-card-${i}`).style.display = i === num ? 'block' : 'none';
                 }
-                return list;
+                document.querySelectorAll('#algo-tabs .tab-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === num - 1);
+                });
+                // 重新渲染当前tab的历史（确保数据最新）
+                renderSingleHistory(num);
             }
 
-            function algo888InitStats() { const s = localStorage.getItem(ALGO888_STATS_KEY); if (s) try { algo888Stats = JSON
-                        .parse(s); } catch (e) { algo888Stats = {}; }
-                ALGO888_DEFS.forEach(a => { if (!algo888Stats[a.id]) algo888Stats[a.id] = { hits: 0, total: 0, streak: 0,
-                        maxStreak: 0, lastHit: false }; }); const c = localStorage.getItem(ALGO888_CUR_KEY); if (c)
-                    algo888CurrentId = parseInt(c) || 1;
-                algo888CurrentId = Math.max(1, Math.min(TOTAL_ALGO888, algo888CurrentId)); }
+            // ====================== 渲染函数 ======================
+            function renderCurrent() {
+                const latest = data[0];
+                if (!latest) return;
+                document.getElementById('cur-period').textContent = latest.qihao || '--';
+                document.getElementById('cur-nums').textContent = latest.opennum ?
+                    `${latest.opennum}=${latest.sum}` : '--+--+--=--';
+                document.getElementById('cur-tag').textContent = `大小单双: ${getTag(latest.sum)}`;
+                document.getElementById('cur-time').textContent = '开奖时间: ' + (latest.opentime || '--');
+            }
 
-            function algo888SaveStats() { try { localStorage.setItem(ALGO888_STATS_KEY, JSON.stringify(algo888Stats)); } catch (
-                    e) {} try { localStorage.setItem(ALGO888_CUR_KEY, String(algo888CurrentId)); } catch (e) {} }
+            function renderPredictions() {
+                if (data.length < 2) return;
+                for (let algoNum = 1; algoNum <= 12; algoNum++) {
+                    const predData = data.slice(1); // 用前一期数据预测当前
+                    const res = getPrediction(predData, algoNum);
+                    const pred = extractPredictionData(res, algoNum);
+                    const k1El = document.getElementById(`pred-k1-${algoNum}`);
+                    const k2El = document.getElementById(`pred-k2-${algoNum}`);
+                    const finalEl = document.getElementById(`pred-final-${algoNum}`);
+                    if (k1El) k1El.textContent = pred.k1 || '--';
+                    if (k2El) k2El.textContent = pred.k2 || '--';
+                    if (finalEl) finalEl.textContent = pred.final || '--';
+                }
+            }
 
-            function algo888RebuildStats() { ALGO888_DEFS.forEach(a => algo888Stats[a.id] = { hits: 0, total: 0, streak: 0,
-                    maxStreak: 0, lastHit: false }); if (historyData.length < 2) { algo888StatsDirty = false;
-                    algo888UpdateDisplay();
-                    algo888RenderRank();
-                    toast('统计已重建(数据不足)', 'success'); return; } for (let i = 1; i < historyData.length; i++) { const hist =
-                        historyData.slice(0, i).reverse();
-                    const act = historyData[i].combo;
-                    ALGO888_DEFS.forEach(a => { try { const dir = a.fn(hist); const combos = dir === '大' ? ['大双', '大单'] :
-                                dir === '小' ? ['小单', '小双'] : dir === '单' ? ['大单', '小单'] : ['大双', '小双']; const hit =
-                                combos.includes(act); const s = algo888Stats[a.id];
-                            s.total++; if (hit) { s.hits++;
-                                s.streak++;
-                                s.maxStreak = Math.max(s.maxStreak, s.streak);
-                                s.lastHit = true; } else { s.streak = 0;
-                                s.lastHit = false; } } catch (e) { algo888Stats[a.id].total++; } }); }
-                algo888StatsDirty = false;
-                algo888SaveStats();
-                algo888UpdateDisplay();
-                algo888RenderRank();
-                algo888UpdatePredictCard();
-                $('algo888SyncStatus').innerHTML =
-                    `<span style="color:#2e7d32;">✅ 已同步 · ${historyData.length}期历史 · 算法总数${TOTAL_ALGO888}</span>`;
-                toast('✅ 888算法统计已重建', 'success'); }
+            function renderSingleHistory(algoNum) {
+                const tbody = document.getElementById(`history-tbody-${algoNum}`);
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (data.length < 2) return;
+                const maxRows = 30;
+                const isAlgo1 = algoNum === 1;
+                const hits = [];
 
-            function algo888UpdateDisplay() { if (algo888StatsDirty && historyData.length >= 2) algo888RebuildStats(); else
-                algo888RenderUI(); }
+                for (let i = 0; i < Math.min(data.length - 1, maxRows); i++) {
+                    const cur = data[i];
+                    const actual = getTag(parseInt(cur.sum) || 0);
+                    const predData = data.slice(i + 1);
+                    const res = getPrediction(predData, algoNum);
+                    if (!res) continue;
+                    const pred = extractPredictionData(res, algoNum);
 
-            function algo888RenderUI() { const grid = $('algo888Grid'); if (!grid) return; const stats = algo888Stats[
-                    algo888CurrentId]; const totalAll = ALGO888_DEFS.reduce((s, a) => s + (algo888Stats[a.id]?.total || 0), 0);
-                $('algo888SyncStatus').innerHTML = totalAll > 0 ?
-                    `<span style="color:#2e7d32;">✅ 已同步 · ${historyData.length}期历史 · 算法总数${TOTAL_ALGO888}</span>` :
-                    `<span style="color:#f57c00;">⚠️ 数据同步中...请点击重建统计</span>`;
-                const rateThreshold = 48;
-                grid.innerHTML = ALGO888_DEFS.map(a => { const s = algo888Stats[a.id]; const rate = s && s.total > 0 ? (s
-                        .hits / s.total * 100) : 0; const isHigh = rate >= rateThreshold && s && s.total >= 10; const isActive =
-                        a.id === algo888CurrentId; return `<div class="algo888-item${isActive?' highlight':''}${isHigh&&!isActive?' win-rate-high':''}" onclick="window.algo888Select(${a.id})" title="#${a.id} ${a.name} 命中率:${rate.toFixed(1)}% 连胜:${s?.streak||0}"><b>#${a.id}</b> ${a.name.substring(0,8)}<br><small>${rate.toFixed(0)}% | 🔥${s?.streak||0}</small></div>`; })
-                    .join('');
-                algo888RenderRank();
-                algo888UpdatePredictCard(); }
+                    if (isAlgo1) {
+                        const dHit = res.shapes && res.shapes.includes(actual);
+                        const k1Hit = res.killShape && actual !== res.killShape;
+                        const k2Hit = res.killShape2 && actual !== res.killShape2;
+                        hits.push(!!dHit);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${cur.qihao}</td><td>${cur.opennum}=${cur.sum}</td><td>${actual}</td>
+                            <td>${(res.shapes||[]).join('、')||'--'}</td>
+                            <td class="${dHit?'result-correct':'result-wrong'}">${dHit?'中':'错'}</td>
+                            <td>${res.killShape||'--'}</td>
+                            <td class="${k1Hit?'result-correct':'result-wrong'}">${k1Hit?'中':'错'}</td>
+                            <td>${res.killShape2||'--'}</td>
+                            <td class="${k2Hit?'result-correct':'result-wrong'}">${k2Hit?'中':'错'}</td>
+                            <td>${formatTime(cur.opentime)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    } else {
+                        const k1Hit = pred.k1 && actual !== pred.k1;
+                        const k2Hit = pred.k2 && actual !== pred.k2;
+                        const finalHit = pred.final && pred.final !== '--' && pred.final.includes(actual);
+                        hits.push(!!finalHit);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${cur.qihao}</td><td>${cur.opennum}=${cur.sum}</td><td>${actual}</td>
+                            <td>${pred.k1||'--'}</td>
+                            <td class="${k1Hit?'result-correct':'result-wrong'}">${k1Hit?'中':'错'}</td>
+                            <td>${pred.k2||'--'}</td>
+                            <td class="${k2Hit?'result-correct':'result-wrong'}">${k2Hit?'中':'错'}</td>
+                            <td>${pred.final||'--'}</td>
+                            <td class="${finalHit?'result-correct':'result-wrong'}">${finalHit?'中':'错'}</td>
+                            <td>${formatTime(cur.opentime)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    }
+                }
+                updateStats(algoNum, hits);
+            }
 
-            function algo888RenderRank() { const el = $('algo888StreakRank'); if (!el) return; const ranked = ALGO888_DEFS.map(
-                a => { const s = algo888Stats[a.id]; return { id: a.id, name: a.name, hits: s?.hits || 0,
-                        total: s?.total || 0, streak: s?.streak || 0, maxStreak: s?.maxStreak || 0, rate: s && s
-                            .total > 0 ? (s.hits / s.total * 100) : 0 }; }).sort((a, b) => { if (b.streak !== a.streak)
-                    return b.streak - a.streak; return b.rate - a.rate; }).slice(0, 20);
-                el.innerHTML = ranked.map((r, i) => { const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ''; return `<div class="stat-row" style="cursor:pointer;" onclick="window.algo888Select(${r.id})" title="点击选中"><span>${medal} #${r.id} ${r.name.substring(0,10)}</span><span style="font-weight:700;">${r.rate.toFixed(1)}% (${r.hits}/${r.total}) 🔥${r.streak}连</span></div>`; })
-                    .join(''); }
+            function renderHistory() {
+                // 只渲染当前激活的tab
+                renderSingleHistory(currentTab);
+            }
 
-            function algo888UpdatePredictCard() { const card = $('algo888PredictCard'); if (!card) return; const algo =
-                    ALGO888_DEFS.find(a => a.id === algo888CurrentId); if (!algo || historyData.length < 2) { card.style.display =
-                        'none'; return; }
-                card.style.display = 'block'; try { const hist = [...historyData].reverse();
-                    const dir = algo.fn(hist); const combos = dir === '大' ? ['大单', '大双'] : dir === '小' ? ['小单', '小双'] : dir ===
-                        '单' ? ['大单', '小单'] : ['大双', '小双']; const s = algo888Stats[algo888CurrentId]; const rate = s && s.total >
-                        0 ? (s.hits / s.total * 100).toFixed(1) : '--';
-                    $('algo888PredictionResult').innerHTML =
-                        `<span style="background:#1d1d1f;color:#ffd60a;padding:8px 20px;border-radius:10px;font-size:1.4rem;">${combos[0]} / ${combos[1]}</span>`;
-                    $('algo888PredictionDetail').innerHTML =
-                        `方向预测: <b>${dir}</b> · 对应组合: ${combos.join('、')}`;
-                    $('algo888PredStats').innerHTML =
-                        `命中率: ${rate}% · 连胜: ${s?.streak||0} · 总预测: ${s?.total||0}次`; } catch (e) { card.style.display =
-                        'none'; } }
+            function updateStats(algoNum, hitArray) {
+                const total = hitArray.length;
+                const hits = hitArray.filter(Boolean).length;
+                const rate = total > 0 ? Math.round((hits / total) * 100) : 0;
+                let consec = 0;
+                for (let i = 0; i < total; i++) {
+                    if (hitArray[i]) consec++;
+                    else break;
+                }
+                // 更新预测表格中的统计
+                const elTotal = document.getElementById(`stat-total-${algoNum}`);
+                const elHits = document.getElementById(`stat-hits-${algoNum}`);
+                const elRate = document.getElementById(`stat-rate-${algoNum}`);
+                const elConsec = document.getElementById(`stat-consec-${algoNum}`);
+                if (elTotal) elTotal.textContent = total;
+                if (elHits) elHits.textContent = hits;
+                if (elRate) {
+                    elRate.textContent = rate + '%';
+                    elRate.className = 'stat-rate';
+                    if (rate >= 60) elRate.classList.add('rate-high');
+                    else if (rate >= 40) elRate.classList.add('rate-mid');
+                    else if (total > 0) elRate.classList.add('rate-low');
+                }
+                if (elConsec) {
+                    elConsec.textContent = consec;
+                    elConsec.className = 'consec-badge' + (consec === 0 ? ' zero' : '');
+                }
+            }
 
-            window.algo888Select = function(id) { algo888CurrentId = Math.max(1, Math.min(TOTAL_ALGO888, id));
-                $('algo888SearchInput').value = algo888CurrentId;
-                algo888SaveStats();
-                algo888RenderUI();
-                algo888UpdatePredictCard(); };
-            window.algo888Focus = function() { const v = parseInt($('algo888SearchInput').value); if (isNaN(v) || v < 1 || v >
-                    TOTAL_ALGO888) { toast('请输入1-' + TOTAL_ALGO888, 'error'); return; }
-                window.algo888Select(v); };
-            window.algo888Prev = function() { window.algo888Select(algo888CurrentId <= 1 ? TOTAL_ALGO888 : algo888CurrentId -
-                1); };
-            window.algo888Next = function() { window.algo888Select(algo888CurrentId >= TOTAL_ALGO888 ? 1 : algo888CurrentId +
-                1); };
-            window.algo888RebuildStats = function() { algo888StatsDirty = true;
-                algo888RebuildStats();
-                toast('统计已重建', 'success'); };
-            window.algo888AutoSelectBest = function() { if (historyData.length < 5) { toast('数据不足，请先加载历史', 'error'); return; } const
-                    ranked = ALGO888_DEFS.map(a => { const s = algo888Stats[a.id]; return { id: a.id, streak: s?.streak ||
-                            0, rate: s && s.total > 0 ? (s.hits / s.total * 100) : 0, total: s?.total || 0 }; }).filter(r =>
-                        r.total >= 8).sort((a, b) => { if (b.streak !== a.streak) return b.streak - a.streak; return b
-                        .rate - a.rate; }); if (ranked.length === 0) { toast('暂无足够统计的算法', 'error'); return; }
-                window.algo888Select(ranked[0].id);
-                toast(`已选择最优算法 #${ranked[0].id} (连胜${ranked[0].streak})`, 'success'); };
-
-            // ========== 主预测系统 ==========
-            function runAllPredictions() { if (historyData.length < 2) return; const cs = historyData.map(d => d.combo),
-                    ss = historyData.map(d => d.sum);
-                algoKeys.forEach(k => { try { predictions[k] = predictFns[k](cs, ss); } catch (e) { predictions[k] = { double: [
-                            COMBOS[0], COMBOS[1]], single: COMBOS[0], conf: 0.5 }; } });
-                numberAlgoKeys.forEach(k => { try { const r = numberPredictFns[k](ss);
-                        numberPredictions[k] = constrainRange(r.min, r.max, r.center); } catch (e) { numberPredictions[k] = { min: 8,
-                            max: 15, center: 11 }; } }); const np = getNextPeriod(); if (np) { if (predictMode === 'combo') { const p =
-                        predictions[currentAlgoKey]; if (p) pendingRow = { period: np, double: [p.double[0], p.double[1]],
-                            single: p.single, mode: 'combo' }; } else { const np2 = numberPredictions[currentNumberAlgoKey]; if (
-                            np2) pendingRow = { period: np, rangeMin: np2.min, rangeMax: np2.max, rangeCenter: np2.center,
-                            mode: 'number' }; } }
-                updateAlgoWinRates();
-                updateNumberAlgoWinRates();
-                updateCurrentAlgoUI();
-                updateTopPredictCard();
-                renderPredictTable(currentFilter === 'all' ? null : currentFilter);
-                renderTrendTable();
-                updateStatsPanels();
-                updateModelWinrateUI();
-                loadPredictHistoryUI();
-                updateSummaryStats();
-                updateKillPrediction();
-                renderKillCard();
-                algo888UpdateDisplay();
-                renderKillHistoryUI(); }
-
-            function updateCurrentAlgoUI() { if (predictMode === 'combo') { const p = predictions[currentAlgoKey]; if (!p) return;
-                    const wr = algoWinRates[currentAlgoKey] ?
-                        ` <span style="font-size:11px;color:#2e7d32;">${algoWinRates[currentAlgoKey].toFixed(1)}%</span>` : '';
-                    $('currentAlgoTag').textContent = algoNames[currentAlgoKey];
-                    $('predictColHeader').textContent = '预测'; } else { const np = numberPredictions[currentNumberAlgoKey]; if (!np)
-                        return; const wr2 = numberAlgoWinRates[currentNumberAlgoKey] ?
-                        ` <span style="font-size:11px;color:#2e7d32;">${numberAlgoWinRates[currentNumberAlgoKey].toFixed(1)}%</span>` :
-                        '';
-                    $('currentAlgoTag').textContent = numberAlgoNames[currentNumberAlgoKey];
-                    $('predictColHeader').textContent = '预测范围'; } }
-
-            function updateTopPredictCard() { if (historyData.length < 2) return; if (predictMode === 'combo') { const votes = {};
-                    COMBOS.forEach(c => votes[c] = 0);
-                    algoKeys.forEach(k => { const p = predictions[k]; if (p && p.single) { const wr = (algoWinRates[k] || 25) /
-                            100;
-                            votes[p.single] += 1 * (0.5 + wr); } }); const sorted = Object.entries(votes).sort((a, b) => b[1] - a[
-                        1]); const target = sorted[0][0]; const total = Object.values(votes).reduce((a, b) => a + b, 0); const
-                        conf = Math.min(92, 50 + (sorted[0][1] / Math.max(total, 1)) * 42);
-                    $('recLabel').textContent = '动态博弈 · 下一期预测';
-                    $('recTarget').textContent = target;
-                    $('recTarget').classList.remove('number-range');
-                    $('recDetail').innerHTML =
-                        `<span>置信度 ${conf.toFixed(0)}%</span><span>连缺 ${comboMissCount[target]||0} 期</span>`; } else { const rr =
-                        numberPredictions['rangeEnsemble']; if (rr) { $('recTarget').textContent = `${rr.min}-${rr.max}`;
-                        $('recDetail').innerHTML = `<span>置信度 ${(rr.conf*100).toFixed(0)}%</span>`; }
-                    $('recTarget').classList.add('number-range');
-                    $('recLabel').textContent = '数字预测 · 和值范围'; } }
-
-            function renderPredictTable(filter) { const tb = $('predictTableBody'); if (!tb) return; let data = filter ?
-                    historyData.filter(x => x.pattern === filter) : historyData.slice(); let html = '',
-                    consumed = false; if (pendingRow && data.length > 0 && data[0].period === pendingRow.period) { const r = data[
-                        0]; if (pendingRow.mode === 'combo') html += buildRow(r.period, r.numbers, r.sum, { type: 'combo',
-                        double: pendingRow.double }, pendingRow.double.includes(r.combo)); else html += buildRow(r.period, r
-                        .numbers, r.sum, { type: 'number', rangeMin: pendingRow.rangeMin, rangeMax: pendingRow.rangeMax }, r
-                        .sum >= pendingRow.rangeMin && r.sum <= pendingRow.rangeMax);
-                    consumed = true;
-                    data = data.slice(1); } if (pendingRow && !consumed && !filter) html += buildPendingRow(pendingRow); const max =
-                    filter ? Math.min(data.length, 24) : Math.min(data.length, 23); for (let i = 0; i < max; i++) { const r = data[
-                        i]; const prev = historyData.filter(item => parseInt(item.period) < parseInt(r.period)); if (
-                        predictMode === 'combo') { const p = getPredictionForSlice(prev);
-                    html += buildRow(r.period, r.numbers, r.sum, { type: 'combo', double: p.double }, p.double.includes(r.combo)); } else { const
-                        np = getNumberPredictionForSlice(prev);
-                    html += buildRow(r.period, r.numbers, r.sum, { type: 'number', rangeMin: np.min, rangeMax: np.max }, r.sum >=
-                        np.min && r.sum <= np.max); } }
-                tb.innerHTML = html ||
-                    '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>'; }
-
-            function buildPendingRow(r) { return r.mode === 'combo' ?
-                    `<div class="tr" style="background:#fffde7;"><div class="td td-col-period">${r.period}</div><div class="td td-col-nums"><div class="ball-group"><span class="redball">-</span><span class="redball">-</span><span class="redball">-</span><span class="blueball">-</span></div></div><div class="td td-col-pred"><span class="${r.double[0].includes('大')?'btn-red':'btn-blue'}">${r.double[0]}</span><span class="${r.double[1].includes('大')?'btn-red':'btn-blue'}">${r.double[1]}</span></div><div class="td td-col-result"><span class="none-result">待开</span></div></div>` :
-                    `<div class="tr" style="background:#fffde7;"><div class="td td-col-period">${r.period}</div><div class="td td-col-nums"><div class="ball-group"><span class="redball">-</span><span class="redball">-</span><span class="redball">-</span><span class="blueball">-</span></div></div><div class="td td-col-pred"><span class="btn-range">${r.rangeMin}-${r.rangeMax}</span></div><div class="td td-col-result"><span class="none-result">待开</span></div></div>`; }
-
-            function buildRow(period, nums, sum, pred, hit) { const n1 = nums[0],
-                    n2 = nums[1],
-                    n3 = nums[2],
-                    bf = formatBlue(sum),
-                    rh = hit ? '<span class="ok">中</span>' : '<span class="err">错</span>'; if (pred.type === 'combo') return `<div class="tr"><div class="td td-col-period">${period}</div><div class="td td-col-nums"><div class="ball-group"><span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span><span class="blueball">${bf}</span></div></div><div class="td td-col-pred"><span class="${pred.double[0].includes('大')?'btn-red':'btn-blue'}">${pred.double[0]}</span><span class="${pred.double[1].includes('大')?'btn-red':'btn-blue'}">${pred.double[1]}</span></div><div class="td td-col-result">${rh}</div></div>`;
-                else return `<div class="tr"><div class="td td-col-period">${period}</div><div class="td td-col-nums"><div class="ball-group"><span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span><span class="blueball">${bf}</span></div></div><div class="td td-col-pred"><span class="btn-range">${pred.rangeMin}-${pred.rangeMax}</span></div><div class="td td-col-result">${rh}</div></div>`; }
-
-            function renderTrendTable() { const tb = $('trendTableBody'); if (!tb) return; if (!historyData.length) { tb.innerHTML =
-                        '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无数据</div></div>'; return; }
-                tb.innerHTML = historyData.slice(0, 30).map(r => { const n1 = r.numbers[0],
-                        n2 = r.numbers[1],
-                        n3 = r.numbers[2],
-                        sv = r.sum; const bf = formatBlue(sv); const ps = r.pattern === '豹子' ?
-                        'style="background:#7b1fa2;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;"' : (r
-                            .pattern === '对子' ?
-                            'style="background:#f57c00;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;"' :
-                            'style="font-size:11px;color:#666;"'); return `<div class="tr"><div class="td">${r.period}</div><div class="td"><div class="ball-group"><span class="redball">${n1}</span><span class="redball">${n2}</span><span class="redball">${n3}</span><span class="blueball">${bf}</span></div></div><div class="td"><b style="color:${sv>13?'#e53935':'#1976d2'};">${sv}</b></div><div class="td"><span ${ps}>${r.pattern}</span></div></div>`; })
-                    .join('');
-                const strip = $('trendStrip'); if (strip) { const cs = historyData.slice(0, 20).map(r => r.combo);
-                    strip.innerHTML = cs.map(c => { const bg = c.includes('大') ? (c.includes('单') ? '#e53935' : '#f57c00') :
-                            (c.includes('单') ? '#1976d2' : '#2e7d32'); return `<span style="display:inline-block;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;color:#fff;background:${bg};">${c}</span>`; })
-                        .join(''); }
-                const ta = $('trendAnalysis'); if (ta && historyData.length >= 10) { const bc = historyData.filter(d => d.sum > 13)
-                        .length,
-                        oc = historyData.filter(d => d.sum % 2 === 1).length;
-                    ta.innerHTML =
-                        `<div>大比例: ${(bc/historyData.length*100).toFixed(1)}% | 单比例: ${(oc/historyData.length*100).toFixed(1)}% | 样本: ${historyData.length}期</div>`; } }
-
-            const compensationAlerts = { duizi: { level: 0, due: 0, message: '', probability: 0, expectedDue: 7 },
-                shunzi: { level: 0, due: 0, message: '', probability: 0, expectedDue: 22 }, baozi: { level: 0, due: 0,
-                    message: '', probability: 0, expectedDue: 72 }, sum13: { level: 0, due: 0, message: '',
-                    probability: 0, expectedDue: 16 }, sum14: { level: 0, due: 0, message: '', probability: 0,
-                    expectedDue: 16 } };
-
-            function updateCompensationFromHistory() { let dd = 0,
-                    sd = 0,
-                    bd = 0,
-                    s13 = 0,
-                    s14 = 0; for (let i = 0; i < historyData.length; i++) { const d = historyData[i]; if (d.pattern ===
-                        '对子' && dd === 0) dd = i; if (d.pattern === '顺子' && sd === 0) sd = i; if (d.pattern === '豹子' &&
-                        bd === 0) bd = i; if (d.sum === 13 && s13 === 0) s13 = i; if (d.sum === 14 && s14 === 0) s14 =
-                    i; }
-                updateCompAlert('duizi', dd || historyData.length || 60);
-                updateCompAlert('shunzi', sd || historyData.length || 60);
-                updateCompAlert('baozi', bd || historyData.length || 60);
-                updateCompAlert('sum13', s13 || historyData.length || 60);
-                updateCompAlert('sum14', s14 || historyData.length || 60);
-                renderCompensationAlerts(); }
-
-            function updateCompAlert(key, due) { if (!compensationAlerts[key]) return;
-                compensationAlerts[key].due = due; const ed = compensationAlerts[key].expectedDue; if (due >= ed * 2.8)
-                    compensationAlerts[key].level = 3; else if (due >= ed * 1.6) compensationAlerts[key].level = 2; else if (
-                    due >= ed) compensationAlerts[key].level = 1; else compensationAlerts[key].level = 0;
-                compensationAlerts[key].probability = Math.min(0.97, due / (ed * 3.2 + 1));
-                compensationAlerts[key].message = `${key} 已遗漏 ${due} 期`; }
-
-            function renderCompensationAlerts() { const el = $('compensationAlerts'); if (!el) return; const items = ['duizi',
-                    'shunzi', 'baozi', 'sum13', 'sum14'
-                ]; const labels = { duizi: '对子', shunzi: '顺子', baozi: '豹子', sum13: '和值13', sum14: '和值14' };
-                el.innerHTML = items.map(k => { const a = compensationAlerts[k]; return `<div class="alert-item lv${a.level}"><div style="display:flex;justify-content:space-between;"><span style="font-weight:700;">${labels[k]}</span><span style="font-size:11px;">遗漏${a.due}期</span></div><div>${a.message}</div><div class="confidence-bar"><div class="confidence-fill" style="width:${(a.probability*100).toFixed(0)}%;"></div></div></div>`; })
-                    .join(''); }
-
-            function updateStatsPanels() { renderCompensationAlerts();
-                computeLocalMissing(); const me = $('missStats'); if (me) me.innerHTML = COMBOS.map(c => { const color =
-                        comboMissCount[c] > 6 ? '#e53935' : '#333'; return `<div class="stat-row"><span>${c}</span><span style="font-weight:700;color:${color};">${comboMissCount[c]}期</span></div>`; })
-                    .join(''); const pe = $('probStats'); if (pe && historyData.length) { const t = historyData.length,
-                        bc = historyData.filter(d => d.sum > 13).length,
-                        oc = historyData.filter(d => d.sum % 2 === 1).length;
-                    pe.innerHTML =
-                        `<div class="stat-row"><span>大</span><span>${(bc/t*100).toFixed(1)}%</span></div><div class="stat-row"><span>小</span><span>${((1-bc/t)*100).toFixed(1)}%</span></div><div class="stat-row"><span>单</span><span>${(oc/t*100).toFixed(1)}%</span></div><div class="stat-row"><span>双</span><span>${((1-oc/t)*100).toFixed(1)}%</span></div>`; } }
-
-            function updateModelWinrateUI() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); let stats =
-                []; if (predictMode === 'combo') { stats = algoKeys.map(k => { const ar = rs.filter(r => r.algorithm === k &&
-                        (r.mode === 'combo' || !r.mode || r.doublePred)); const hits = ar.filter(r => r.hit).length; return {
-                        name: algoNames[k], rate: ar.length ? (hits / ar.length * 100).toFixed(1) : '—', hits,
-                        total: ar.length }; }).sort((a, b) => (parseFloat(b.rate) || 0) - (parseFloat(a.rate) || 0)); } else { stats =
-                        numberAlgoKeys.map(k => { const ar = rs.filter(r => r.algorithm === k && r.mode === 'number'); const
-                            hits = ar.filter(r => r.hit).length; return { name: numberAlgoNames[k], rate: ar.length ? (hits /
-                                ar.length * 100).toFixed(1) : '—', hits, total: ar.length }; }).sort((a, b) => (parseFloat(b
-                            .rate) || 0) - (parseFloat(a.rate) || 0)); } const el = $('modelWinrate'); if (el) el.innerHTML = stats
-                    .map((s, i) =>
-                        `<div class="stat-row"><span>${i===0?'🥇':i===1?'🥈':i===2?'🥉':''} ${s.name}</span><span style="font-weight:700;">${s.rate}% (${s.hits}/${s.total})</span></div>`
-                        ).join(''); }
-
-            function computeLocalMissing() { const m = { 大单: 0, 大双: 0, 小单: 0, 小双: 0 }; for (const c of COMBOS) { let cnt =
-                    0; for (const d of historyData) { if (d.combo === c) break;
-                    cnt++; } m[c] = cnt; }
-                comboMissCount = m; return m; }
-
-            function updateSummaryStats() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const total = rs
-                    .length,
-                    hits = rs.filter(r => r.hit).length,
-                    rate = total ? (hits / total * 100).toFixed(1) : '0.0'; const s = $('statsSummary'); if (s) s.innerHTML =
-                    `<span>总预测: ${total}次</span><span>命中: ${hits}次</span><span>命中率: ${rate}%</span>`; const r = $('recordSummary');
-                if (r) r.innerHTML =
-                    `<span>总记录: ${total}条</span><span>命中: ${hits}条</span><span>命中率: ${rate}%</span>`; }
-
-            function savePredictRecord(period, ap, nums, sum, time) { const ac = getSumInfo(sum, nums).combo;
-                algoKeys.forEach(a => { const p = predictions[a]; if (!p) return; const hit = p.double.includes(ac) || p
-                    .single === ac; const rec = { algorithm: a, period, numbers: nums.join('+'), sum, actualCombo: ac,
-                        actualPattern: ap, hit: !!hit, time: time || new Date().toLocaleString(), doublePred: [p.double[
-                            0], p.double[1]], singlePred: p.single, mode: 'combo' }; try { let rs = JSON.parse(localStorage
-                            .getItem(STORAGE_KEY) || '[]'); if (!rs.some(x => x.period === period && x.algorithm === a && (
-                                x.mode === 'combo' || !x.mode))) { rs.unshift(rec); if (rs.length > 500) rs = rs.slice(0,
-                                500);
-                            localStorage.setItem(STORAGE_KEY, JSON.stringify(rs)); } } catch (e) {} });
-                numberAlgoKeys.forEach(a => { const np = numberPredictions[a]; if (!np) return; const hit = sum >= np.min &&
-                    sum <= np.max; const rec = { algorithm: a, period, numbers: nums.join('+'), sum, actualCombo: ac,
-                        actualPattern: ap, hit: !!hit, time: time || new Date().toLocaleString(), rangeMin: np.min,
-                        rangeMax: np.max, rangeCenter: np.center, mode: 'number' }; try { let rs = JSON.parse(localStorage
-                        .getItem(STORAGE_KEY) || '[]'); if (!rs.some(x => x.period === period && x.algorithm === a && x
-                            .mode === 'number')) { rs.unshift(rec); if (rs.length > 500) rs = rs.slice(0, 500);
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(rs)); } } catch (e) {} });
-                if (killPrediction.combo) { saveKillRecord(period, killPrediction.combo, ac, nums, sum); }
-                updateAlgoWinRates();
-                updateNumberAlgoWinRates();
-                algo888StatsDirty = true; }
-
-            function loadPredictHistoryUI() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); const tb = $(
-                    'recordTableBody'); if ($('recordCount')) $('recordCount').innerText = `共 ${rs.length} 条记录`; if (!tb)
-                    return; if (!rs.length) { tb.innerHTML =
-                        '<div class="tr"><div class="td" style="flex:4;text-align:center;color:#999;">暂无记录</div></div>'; return; }
-                tb.innerHTML = rs.slice(0, 60).map(r => { const isCombo = r.mode === 'combo' || (!r.mode && r.doublePred); const
-                        al = isCombo ? (algoNames[r.algorithm] || r.algorithm) : (numberAlgoNames[r.algorithm] || r
-                        .algorithm); let pred = ''; if (isCombo && r.doublePred) { const dp = r.doublePred || [];
-                        pred =
-                            `<span class="${(dp[0]||'').includes('大')?'btn-red':'btn-blue'}">${dp[0]||'--'}</span><span class="${(dp[1]||'').includes('大')?'btn-red':'btn-blue'}">${dp[1]||'--'}</span>`; } else if (!isCombo && r
-                            .rangeMin !== undefined) pred = `<span class="btn-range">${r.rangeMin}-${r.rangeMax}</span>`; else
-                        pred = '<span style="color:#999;">--</span>'; return `<div class="tr"><div class="td td-col-period">${r.period}</div><div class="td td-col-nums">${al}</div><div class="td td-col-pred">${pred}</div><div class="td td-col-result">${r.hit?'<span class="ok">中</span>':'<span class="err">错</span>'}</div></div>`; })
-                    .join(''); }
-
-            function initAudioContext() { if (!audioCtx) { try { audioCtx = new(window.AudioContext || window
-                        .webkitAudioContext)(); } catch (e) { return null; } } if (audioCtx.state === 'suspended') audioCtx
-                    .resume(); return audioCtx; }
-
-            function playBellSound() { if (!settings.soundEnabled) return; const ctx = initAudioContext(); if (!ctx) return; const
-                freqs = [880, 1100, 1320],
-                    now = ctx.currentTime;
-                freqs.forEach((f, i) => { const o = ctx.createOscillator(),
-                        g = ctx.createGain();
-                    o.connect(g);
-                    g.connect(ctx.destination);
-                    o.type = 'sine';
-                    o.frequency.value = f; const t = now + i * 0.12;
-                    g.gain.setValueAtTime(0.25, t);
-                    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-                    o.start(t);
-                    o.stop(t + 0.6); }); }
-
-            function loadSettings() { try { const s = JSON.parse(localStorage.getItem(SETTINGS_KEY)); if (s) { settings
-                        .soundEnabled = s.soundEnabled ?? true;
-                    settings.scratchEnabled = s.scratchEnabled ?? true; } } catch (e) {} $('toggleSound').checked = settings
-                    .soundEnabled;
-                $('toggleScratch').checked = settings.scratchEnabled; }
-
-            function saveSettings() { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }
-
-            function openSettings() { $('settingsOverlay').style.display = 'flex'; }
-
-            function closeSettings() { $('settingsOverlay').style.display = 'none'; }
-
-            function setupSettingsEvents() { $('settingsBtn').addEventListener('click', openSettings);
-                $('btnCloseSettings').addEventListener('click', closeSettings);
-                $('settingsOverlay').addEventListener('click', e => { if (e.target === $('settingsOverlay'))
-                    closeSettings(); });
-                $('toggleSound').addEventListener('change', function() { settings.soundEnabled = this.checked;
-                    saveSettings();
-                    toast(settings.soundEnabled ? '🔔 铃音已开启' : '🔕 铃音已关闭', 'success'); });
-                $('toggleScratch').addEventListener('change', function() { settings.scratchEnabled = this.checked;
-                    saveSettings(); if (settings.scratchEnabled) { toast('🎴 咪牌刮奖已开启', 'success'); } else { toast(
-                        '咪牌刮奖已关闭', 'success'); } });
-                $('btnTestSound').addEventListener('click', () => { initAudioContext();
-                    playBellSound();
-                    toast('🔔 铃音测试', 'success'); });
-                document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('settingsOverlay').style.display ===
-                        'flex') closeSettings(); }); }
-
-            function setupModeSwitch() { $('modeBtnCombo').addEventListener('click', () => { if (predictMode === 'combo')
+            function setupCountdown() {
+                if (timer) clearInterval(timer);
+                const latest = data[0];
+                if (!latest || !latest.opentime) {
+                    document.getElementById('cd').style.display = 'none';
                     return;
-                    predictMode = 'combo';
-                    $('modeBtnCombo').classList.add('active');
-                    $('modeBtnNumber').classList.remove('active');
-                    currentAlgoKey = 'ensemble';
-                    runAllPredictions();
-                    toast('🔮 组合预测模式', 'success'); });
-                $('modeBtnNumber').addEventListener('click', () => { if (predictMode === 'number') return;
-                    predictMode = 'number';
-                    $('modeBtnNumber').classList.add('active');
-                    $('modeBtnCombo').classList.remove('active');
-                    currentNumberAlgoKey = 'rangeEnsemble';
-                    runAllPredictions();
-                    toast('🎯 数字预测模式', 'success'); }); }
+                }
+                try {
+                    const parts = latest.opentime.trim().split(' ');
+                    let base;
+                    if (parts.length === 1) {
+                        const [h, m, s] = parts[0].split(':').map(Number);
+                        base = new Date();
+                        base.setHours(h, m, s || 0, 0);
+                        if (base > Date.now()) base.setDate(base.getDate() - 1);
+                    } else {
+                        base = new Date(latest.opentime.replace(/-/g, '/'));
+                    }
+                    const interval = 210000;
+                    const periodsPassed = Math.floor((Date.now() - base.getTime()) / interval);
+                    nextOpenTime = new Date(base.getTime() + (periodsPassed + 1) * interval);
+                    document.getElementById('cd').style.display = 'inline-block';
+                    tick();
+                    timer = setInterval(tick, 1000);
+                } catch (e) { document.getElementById('cd').style.display = 'none'; }
+            }
 
-            function updateApiStatus(type, msg) { const dot = $('apiDot'); const tip = $('apiTip'); const tag = $(
-                'apiStatusTag'); if (tag) tag.className = 'status-tag ' + type; if (type === 'loading') { tip.innerText =
-                    '连接中...';
-                dot.style.background = '#f57c00'; } else if (type === 'ok') { tip.innerText = '✅已同步';
-                dot.style.background = '#2e7d32'; } else if (type === 'error') { tip.innerText = '❌' + msg;
-                dot.style.background = '#e53935'; } else if (type === 'cache') { tip.innerText = '📦 使用缓存';
-                dot.style.background = '#1976d2'; } }
+            function tick() {
+                const diff = nextOpenTime - Date.now();
+                const cdTxt = document.getElementById('cd-txt');
+                const cdEl = document.getElementById('cd');
+                if (diff <= 0) {
+                    cdTxt.textContent = '正在开奖...';
+                    cdEl.classList.add('highlight');
+                    clearInterval(timer);
+                    if (!isFetching) fetchData(false);
+                    return;
+                }
+                const m = Math.floor(diff / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                cdTxt.textContent = `${m}分${s.toString().padStart(2, '0')}秒`;
+                cdEl.classList.toggle('highlight', diff < 30000);
+            }
 
-            function startCountdown() { if (timer) clearInterval(timer);
-                timer = setInterval(() => { if (isOpening) return; if (countdownSeconds <= 0) { isOpening = true;
-                        $('timerLabel').innerText = '🔥开奖中';
-                        $('count').innerText = '开奖中';
-                        $('count').classList.add('opening');
-                        $('openingAnim').style.display = 'flex';
-                        $('resultDisplay').style.display = 'none';
-                        startOpeningPolling(); } else { countdownSeconds--;
-                        $('count').innerText = fmtTime(countdownSeconds);
-                        $('count').classList.remove('opening'); } }, 1000); }
+            function renderAll() {
+                renderCurrent();
+                renderPredictions();
+                renderHistory();
+                setupCountdown();
+            }
 
-            function startOpeningPolling() { if (openingPolling) clearInterval(openingPolling);
-                openingPolling = setInterval(() => loadData(false, true), 1400); }
-
-            function startAutoRefresh(interval = 7500) { if (autoRefresh) clearInterval(autoRefresh);
-                autoRefresh = setInterval(() => { if (!isOpening) loadData(false, false); }, interval); }
-
-            async function tryFetchApi(index) { const url = API_URLS[index]; try { const ctrl = new AbortController(); const
-                    tid = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT); const resp = await fetch(url, { signal: ctrl.signal,
-                        mode: 'cors' });
-                    clearTimeout(tid); if (!resp.ok) throw new Error('HTTP ' + resp.status); const text = await resp
-                .text(); try { return JSON.parse(text); } catch (e) {} if (text.includes('<xml>') || text.includes(
-                        '<row')) { const parser = new DOMParser(); const xml = parser.parseFromString(text,
-                    'text/xml'); const rows = xml.querySelectorAll('row'); if (rows.length) return { data: Array.from(
-                        rows).map(r => ({ nbr: r.getAttribute('nbr') || '', number: r.getAttribute('number') ||
-                            '', num: r.getAttribute('num') || '', date: r.getAttribute('date') || '',
-                            time: r.getAttribute('time') || '' })) }; } throw new Error('解析失败'); } catch (err) { console
-                    .warn('API ' + (index + 1) + ' 失败:', err.message); return null; } }
-
-            function saveHistoryToCache() { try { localStorage.setItem(CACHE_KEY, JSON.stringify(historyData)); } catch (e) {} }
-
-            function loadHistoryFromCache() { try { const cached = localStorage.getItem(CACHE_KEY); if (cached) { const data =
-                        JSON.parse(cached); if (Array.isArray(data) && data.length > 0) { return data; } } } catch (e) {}
-                return null; }
-
-            async function loadData(manual = false, isPolling = false) { if (!isPolling) updateApiStatus('loading');
-                let data = null; for (let i = 0; i < API_URLS.length; i++) { const idx = (currentApiIndex + i) % API_URLS
-                    .length;
-                    data = await tryFetchApi(idx); if (data) { currentApiIndex = idx; break; } } if (!data) { updateApiStatus(
-                        'error', 'API失败'); const cached = loadHistoryFromCache(); if (cached) { historyData = cached;
-                        latestPeriod = historyData[0]?.period || '';
-                        updateApiStatus('cache', '使用缓存'); toast('⚠️ 网络异常，已加载本地缓存数据', 'error');
-                        runAllPredictions();
-                        updateCompensationFromHistory();
-                        updateStatsPanels();
-                        updateModelWinrateUI();
-                        loadPredictHistoryUI();
-                        updateSummaryStats();
-                        algo888UpdateDisplay();
-                        renderKillHistoryUI(); if (!isOpening) { const cd = Math.max(0, countdownSeconds);
-                            $('count').innerText = fmtTime(cd); } return; } else { updateApiStatus('error',
-                        '所有API失败且无缓存');
-                        toast('❌ 无法获取数据，请稍后重试', 'error'); return; } }
-                updateApiStatus('ok');
-                if (data && data.data && data.data.length) { const lt = data.data[0]; const cp = lt.nbr; const nums = lt.number
-                        .split('+').map(Number); const n1 = nums[0],
-                        n2 = nums[1],
-                        n3 = nums[2]; const sv = parseInt(lt.num); const info = getSumInfo(sv, [n1, n2, n3]); const ts = lt
-                        .date + ' ' + lt.time; const isNewPeriod = (latestPeriod && latestPeriod !== cp); if (isNewPeriod) { if (
-                            latestPeriod) { savePredictRecord(cp, info.pattern, [n1, n2, n3], sv, ts);
-                        algo888StatsDirty = true; } if (isOpening) { isOpening = false; if (openingPolling) { clearInterval(
-                                openingPolling);
-                                openingPolling = null; } }
-                        $('timerLabel').innerText = '下期开奖倒计时';
-                        $('count').classList.remove('opening');
-                        $('openingAnim').style.display = 'none';
-                        $('resultDisplay').style.display = 'block';
-                        pendingRow = null; if (latestPeriod) playBellSound();
-                        scratchRevealed = false; }
-                    latestPeriod = cp; if (!isOpening) { $('openingAnim').style.display = 'none';
-                        $('resultDisplay').style.display = 'block';
-                        $('n1ball').innerText = n1;
-                        $('n2ball').innerText = n2;
-                        $('n3ball').innerText = n3;
-                        $('sumBall').innerText = formatBlue(sv);
-                        $('sumBall').style.background = sv > 13 ? '#e53935' : '#1976d2';
-                        $('sumBall').style.borderRadius = sv > 13 ? '8px' : '50%';
-                        $('issue').innerText = cp;
-                        $('sumExpr').innerHTML = `${n1}+${n2}+${n3}=${sv}`;
-                        $('comboTag').innerHTML = `<span style="font-weight:700;">${info.pattern}</span>`;
-                        $('dxTag').innerHTML =
-                            `<span style="color:${info.dx==='大'?'#e53935':'#1976d2'};font-weight:700;">${info.dx}</span>`;
-                        $('dsTag').innerHTML = `<span style="font-weight:700;">${info.ds}</span>`; } if (!isOpening && data
-                        .countdown) { const cd = data.countdown; if (cd === '00:00' || cd === '0:00') { if (!isOpening) {
-                                isOpening = true;
-                                $('timerLabel').innerText = '🔥开奖中';
-                                $('count').innerText = '开奖中';
-                                $('count').classList.add('opening');
-                                $('openingAnim').style.display = 'flex';
-                                $('resultDisplay').style.display = 'none';
-                                startOpeningPolling(); } } else { const parts = cd.split(':').map(Number);
-                            countdownSeconds = parts[0] * 60 + parts[1];
-                            $('count').innerText = fmtTime(countdownSeconds);
-                            $('count').classList.remove('opening'); } } if (isNewPeriod || historyData.length === 0) {
-                        historyData = data.data.map(i => { const abc = i.number.split('+').map(Number); const a = abc[0],
-                                b = abc[1],
-                                c = abc[2]; const s2 = parseInt(i.num); const inf = getSumInfo(s2, [a, b, c]); return {
-                                period: i.nbr, numbers: [a, b, c], sum: s2, combo: inf.combo, pattern: inf
-                                    .pattern, time: i.date + ' ' + i.time, isBig: s2 > 13, isDuiZi: inf
-                                    .isDuiZi, isShunZi: inf.isShunZi, isBaoZi: inf.isBaoZi, isSum13: inf
-                                    .isSum13, isSum14: inf.isSum14 }; }).sort((a, b) => parseInt(b.period) - parseInt(
-                                a.period));
-                        saveHistoryToCache();
-                        runAllPredictions();
-                        updateCompensationFromHistory();
-                        updateStatsPanels();
-                        updateModelWinrateUI();
-                        loadPredictHistoryUI();
-                        updateSummaryStats();
-                        algo888UpdateDisplay();
-                        renderKillHistoryUI(); } } }
-
-            function updateAlgoWinRates() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                algoKeys.forEach(k => { const ar = rs.filter(r => r.algorithm === k && (r.mode === 'combo' || !r.mode || r
-                        .doublePred));
-                    algoWinRates[k] = ar.length ? (ar.filter(r => r.hit).length / ar.length * 100) : 0; });
-                sortedAlgoKeys = algoKeys.slice().sort((a, b) => (algoWinRates[b] || 0) - (algoWinRates[a] || 0)); if (
-                    predictMode === 'combo') renderAlgoTabs(); }
-
-            function updateNumberAlgoWinRates() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                numberAlgoKeys.forEach(k => { const ar = rs.filter(r => r.algorithm === k && r.mode === 'number');
-                    numberAlgoWinRates[k] = ar.length ? (ar.filter(r => r.hit).length / ar.length * 100) : 0; });
-                sortedNumberAlgoKeys = numberAlgoKeys.slice().sort((a, b) => (numberAlgoWinRates[b] || 0) - (
-                    numberAlgoWinRates[a] || 0)); if (predictMode === 'number') renderAlgoTabs(); }
-
-            function renderAlgoTabs() { const c = $('algoTabs'); if (!c) return; if (predictMode === 'combo') c.innerHTML =
-                    sortedAlgoKeys.map(k => { const wr = algoWinRates[k] || 0; return `<span class="algo-tab ${k===currentAlgoKey?'active':(wr>=45?'win-high':'')}" onclick="window.switchAlgo('${k}')">${algoNames[k]} ${wr.toFixed(0)}%</span>`; })
-                    .join(''); else c.innerHTML = sortedNumberAlgoKeys.map(k => { const wr = numberAlgoWinRates[k] || 0; return `<span class="algo-tab ${k===currentNumberAlgoKey?'active':(wr>=40?'win-high':'')}" onclick="window.switchAlgo('${k}')">${numberAlgoNames[k]} ${wr.toFixed(0)}%</span>`; })
-                    .join(''); }
-
-            window.switchAlgo = function(k) { if (predictMode === 'combo') { currentAlgoKey = k;
-                    runAllPredictions();
-                    toast(`切换到: ${algoNames[k]}`, 'success'); } else { currentNumberAlgoKey = k;
-                    runAllPredictions();
-                    toast(`切换到: ${numberAlgoNames[k]}`, 'success'); } };
-            window.filterTable = function(t) { currentFilter = t;
-                renderPredictTable(t === 'all' ? null : t); };
-            window.clearPredictHistoryUI = function() { if (confirm('清空记录？')) { localStorage.removeItem(STORAGE_KEY);
-                    loadPredictHistoryUI();
-                    updateAlgoWinRates();
-                    updateNumberAlgoWinRates();
-                    renderAlgoTabs();
-                    updateModelWinrateUI();
-                    updateSummaryStats();
-                    toast('记录已清空', 'success'); } };
-            window.exportRecords = function() { const rs = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); let text =
-                    'PC28预测记录\n\n';
-                rs.forEach(r => { const isCombo = r.mode === 'combo' || (!r.mode && r.doublePred); const al = isCombo ? (
-                        algoNames[r.algorithm] || r.algorithm) : (numberAlgoNames[r.algorithm] || r.algorithm); const pred =
-                        isCombo ? (r.doublePred || []).join('/') : (r.rangeMin + '-' + r.rangeMax);
-                    text +=
-                        `${r.period} ${r.numbers} 算法:${al} 预测:${pred} 结果:${r.actualCombo||r.sum} ${r.hit?'中':'错'}\n`; }); const blob =
-                    new Blob([text], { type: 'text/plain' }); const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `pc28_${new Date().toISOString().slice(0,10)}.txt`;
-                a.click();
-                toast('导出成功', 'success'); };
-            window.loadPredictHistoryUI = loadPredictHistoryUI;
-            window.loadData = loadData;
-
-            function initTabs() { const tc = $('mainTabs');
-                tc.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', function() { tc
-                        .querySelectorAll('.tab').forEach(t => t.classList.remove('active')); this.classList.add(
-                            'active'); const panel = $(`${this.dataset.panel}-panel`); document.querySelectorAll(
-                            '.panel').forEach(p => p.classList.remove('active')); if (panel) { panel.classList.add(
-                            'active'); if (this.dataset.panel === 'trend') renderTrendTable(); if (this.dataset
-                            .panel === 'stats') { updateCompensationFromHistory();
-                            updateStatsPanels();
-                            updateModelWinrateUI(); } if (this.dataset.panel === 'record')
-                        loadPredictHistoryUI(); if (this.dataset.panel === 'algo888') { algo888UpdateDisplay();
-                            algo888UpdatePredictCard(); } if (this.dataset.panel === 'killhistory')
-                        renderKillHistoryUI(); } }); }); }
-
-            function init() { loadSettings();
-                ALGO888_DEFS = build888Algos();
-                algo888InitStats();
-                loadKillHistory();
-                initTabs();
-                setupModeSwitch();
-                renderAlgoTabs();
-                updateCurrentAlgoUI();
-                setupSettingsEvents();
-                startCountdown();
-                startAutoRefresh(7500);
-                loadData();
-                loadPredictHistoryUI();
-                updateCompensationFromHistory();
-                updateStatsPanels();
-                updateModelWinrateUI();
-                updateSummaryStats();
-                $('predictColHeader').textContent = '预测';
-                algo888RenderUI();
-                algo888UpdatePredictCard();
-                renderKillHistoryUI();
-                setInterval(() => { updateCompensationFromHistory();
-                    updateStatsPanels();
-                    algo888UpdateDisplay(); }, 30000);
-                document.addEventListener('click', () => { initAudioContext(); }, { once: true });
-                document.addEventListener('touchstart', () => { initAudioContext(); }, { once: true }); } if (document
-                .readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-            else init();
+            // ====================== 初始化 ======================
+            document.addEventListener('DOMContentLoaded', () => {
+                generateUI();
+                fetchData();
+                document.getElementById('refresh-btn').addEventListener('click', () => fetchData(true));
+            });
         })();
     </script>
 </body>
