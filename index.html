@@ -1,669 +1,1594 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>yy独家算法 · 全自动预测+趋势判断</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开奖数据实时展示 · 表格预测版 (手机适配+统计)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg: #080e1a;
-            --bg2: #0d1424;
-            --panel: #111a2c;
-            --panel2: #152032;
-            --panel3: #19273d;
-            --line: rgba(255, 255, 255, 0.08);
-            --text1: #f0f3fa;
-            --text2: #b0b9ca;
-            --text3: #7a8496;
-            --cyan: #00e5ff;
-            --purple: #b44dff;
-            --gold: #ffc850;
-            --green: #2effa7;
-            --red: #ff5d56;
-            --shadow-xs: 0 2px 6px rgba(0, 0, 0, 0.12);
-            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.16);
-            --shadow-md: 0 16px 36px rgba(0, 0, 0, 0.22);
-            --shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.30);
-            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+            --primary: #2563eb;
+            --secondary: #3b82f6;
+            --accent: #60a5fa;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border: rgba(37, 99, 235, 0.2);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --kill-red: #dc2626;
+            --rec-green: #059669;
+            --hit-green: #10b981;
+            --miss-red: #ef4444;
+            --table-stripe: #f8fafc;
+            --table-hover: #eff6ff;
+            --gold-bg: #fef3c7;
+            --gold-text: #f59e0b;
+            --yy-bg: #ecfdf5;
+            --yy-border: #10b981;
         }
-        [data-theme="light"] {
-            --bg: #eef2f7;
-            --bg2: #f5f7fa;
-            --panel: #ffffff;
-            --panel2: #f0f3f8;
-            --panel3: #e4e9f2;
-            --line: rgba(0, 0, 0, 0.07);
-            --text1: #0f141d;
-            --text2: #5f6977;
-            --text3: #8f98a7;
-            --cyan: #009faf;
-            --purple: #7c3aed;
-            --gold: #c79120;
-            --green: #0d9e5e;
-            --red: #c62850;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { min-height: 100%; background: var(--bg); }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-            color: var(--text1); overflow-x: hidden; background: var(--bg);
-            -webkit-font-smoothing: antialiased;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 10px;
         }
-        button, input, select { font: inherit; border: none; outline: none; background: none; color: inherit; }
-        .app { width: min(100%, 520px); margin: 0 auto; min-height: 100vh; padding: 14px 14px calc(env(safe-area-inset-bottom) + 24px); position: relative; }
-        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-        .title-wrap .mini { font-size: 10px; color: var(--purple); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
-        .title-wrap h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .top-actions { display: flex; gap: 8px; }
-        .circle-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-xs); font-size: 17px; cursor: pointer; transition: all 0.2s var(--ease); }
-        .circle-btn:active { transform: scale(0.94); }
-        .hero { position: relative; overflow: hidden; border-radius: 30px; padding: 16px; background: linear-gradient(135deg, #1a1040, #151030 45%, #0f1830); box-shadow: 0 18px 44px rgba(80, 50, 180, 0.16); margin-bottom: 12px; isolation: isolate; border: 1px solid rgba(180, 77, 255, 0.12); }
-        .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; filter: blur(20px); pointer-events: none; z-index: 0; opacity: 0.35; }
-        .hero::before { width: 100px; height: 100px; left: -8px; top: 8px; background: rgba(0, 229, 255, 0.1); animation: floatGlow 10s ease-in-out infinite; }
-        .hero::after { width: 130px; height: 130px; right: -16px; bottom: -8px; background: rgba(180, 77, 255, 0.08); animation: floatGlow 12s ease-in-out infinite reverse; }
-        .hero-grid { position: relative; z-index: 2; }
-        .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-        .hero-tag { height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .hero-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px rgba(0, 229, 255, 0.6); animation: pulseDot 2s ease-in-out infinite; }
-        .hero-tools { display: flex; gap: 6px; }
-        .hero-tool { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 18px; cursor: pointer; transition: all 0.2s var(--ease); }
-        .hero-tool:active { background: rgba(255, 255, 255, 0.12); }
-        .hero-meta { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; margin-bottom: 6px; }
-        .period { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; letter-spacing: -0.02em; }
-        .sum { font-size: 15px; line-height: 1.3; color: rgba(255, 255, 255, 0.9); font-weight: 900; letter-spacing: -0.02em; margin-bottom: 3px; }
-        .status { min-height: 16px; font-size: 11px; color: rgba(255, 255, 255, 0.7); font-weight: 700; }
-        .hero-right { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
-        .hero-pill { min-width: 80px; height: 34px; padding: 0 10px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 900; font-size: 12px; }
-        .hero-pill small { font-size: 9px; opacity: 0.8; font-weight: 800; }
-        .count-dot { width: 6px; height: 6px; border-radius: 50%; background: #dff6ff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); flex: 0 0 auto; }
-        .countdown-warning .count-dot { background: #ffd36d; box-shadow: 0 0 10px rgba(255, 208, 106, 0.8); }
-        .hero-center { position: relative; display: flex; align-items: center; justify-content: center; min-height: 140px; margin: 2px 0 6px; }
-        .hero-orbit { position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; pointer-events: none; z-index: 0; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.015); animation: orbitBreathe 4.5s ease-in-out infinite; }
-        .hero-core-glow { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 60px; background: radial-gradient(circle, rgba(180, 77, 255, 0.12), transparent 70%); filter: blur(12px); z-index: 0; animation: softBreath 4s ease-in-out infinite; pointer-events: none; }
-        .hero-balls { position: relative; z-index: 2; display: flex; gap: 8px; align-items: center; justify-content: center; }
-        .hero-ball { width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 247, 251, 0.88)); color: #0b1017; display: grid; place-items: center; font-size: 30px; font-weight: 1000; letter-spacing: -0.03em; box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
-        .hero-ball::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 28%; background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent); pointer-events: none; }
-        .hero-ball.flash { animation: numberFlash 0.5s var(--ease); }
-        .hero-result-lines { display: grid; gap: 8px; margin-bottom: 12px; }
-        .hero-line { min-height: 46px; border-radius: 18px; padding: 10px 12px; display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .hero-line .k { color: rgba(255, 255, 255, 0.78); font-size: 11px; font-weight: 800; letter-spacing: 0.03em; }
-        .hero-line .v { color: #fff; font-size: 15px; font-weight: 1000; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hero-line .mini-copy { min-width: 46px; height: 28px; padding: 0 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 10px; font-weight: 900; cursor: pointer; }
-        .hero-actions { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
-        .auto-badge { height: 50px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 900; font-size: 13px; letter-spacing: 0.04em; cursor: default; box-shadow: var(--shadow-xs); }
-        .auto-badge .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px rgba(46, 255, 167, 0.6); animation: pulseDot 2s ease-in-out infinite; }
-        .secondary-btn { height: 50px; padding: 0 14px; min-width: 64px; border-radius: 999px; cursor: pointer; font-weight: 1000; box-shadow: var(--shadow-sm); transition: all 0.2s var(--ease); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 12px; }
-        .secondary-btn:active { transform: scale(0.96); }
-        .mode-row { display: flex; gap: 8px; overflow: auto; padding: 2px 0 8px; scrollbar-width: none; margin-bottom: 2px; }
-        .mode-row::-webkit-scrollbar { display: none; }
-        .mode-chip { height: 38px; padding: 0 14px; border-radius: 999px; white-space: nowrap; background: var(--panel); border: 1px solid var(--line); color: var(--text2); font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: var(--shadow-xs); flex: 0 0 auto; transition: all 0.2s var(--ease); }
-        .mode-chip.active { background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #fff; border-color: transparent; box-shadow: 0 8px 20px rgba(140, 70, 240, 0.2); }
-        .view { display: none; }
-        .view.active { display: block; }
-        .result-bars { display: grid; gap: 10px; margin-top: 4px; }
-        .result-bar { border-radius: 24px; padding: 14px; display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; cursor: pointer; box-shadow: var(--shadow-sm); border: 1px solid var(--line); transition: transform 0.2s var(--ease); }
-        .result-bar:active { transform: scale(0.98); }
-        .result-bar.black { background: linear-gradient(135deg, #0e1116, #1a1030); color: #fff; border-color: rgba(180, 77, 255, 0.18); }
-        .result-bar.purple { background: linear-gradient(135deg, #3d2a80, #5c3dc0); color: #fff; border-color: transparent; }
-        .result-bar.orange { background: linear-gradient(135deg, #ff9e40, #e07820); color: #151515; border-color: transparent; }
-        .result-bar.white { background: var(--panel); color: var(--text1); border: 1px solid var(--line); }
-        .bar-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.08); font-size: 16px; font-weight: 900; }
-        .orange .bar-icon { background: rgba(255, 255, 255, 0.26); }
-        .white .bar-icon { background: var(--panel2); }
-        .bar-main { min-width: 0; }
-        .bar-label { font-size: 10px; opacity: 0.7; font-weight: 900; margin-bottom: 2px; }
-        .bar-value { font-size: 18px; font-weight: 1000; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-        .bar-sub { font-size: 10px; opacity: 0.65; line-height: 1.35; }
-        .bar-badge { min-width: 28px; height: 28px; border-radius: 999px; padding: 0 7px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 1000; background: rgba(255, 255, 255, 0.1); }
-        .section { margin-top: 8px; border-radius: 26px; padding: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
-        .section-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-        .section-top h3 { font-size: 17px; font-weight: 1000; letter-spacing: -0.02em; margin-bottom: 2px; }
-        .section-top p { font-size: 11px; color: var(--text2); line-height: 1.4; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
-        .stats-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 20px; padding: 12px; }
-        .stats-card .title { font-size: 12px; font-weight: 900; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.03em; }
-        .stats-card .content { display: flex; flex-direction: column; gap: 6px; }
-        .stats-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; line-height: 1.35; }
-        .stats-row .key { color: var(--text2); }
-        .stats-row .val { color: var(--text1); font-weight: 900; background: var(--panel3); padding: 2px 8px; border-radius: 999px; min-width: 44px; text-align: center; }
-        .stats-subgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
-        .stats-subitem { background: var(--panel3); border-radius: 12px; padding: 8px 2px; text-align: center; }
-        .stats-subitem .num { font-size: 14px; font-weight: 1000; color: var(--text1); line-height: 1.2; }
-        .stats-subitem .miss { font-size: 9px; color: var(--text3); margin-top: 2px; }
-        .history-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-        .ghost-btn, .filter-chip { height: 32px; padding: 0 11px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); color: var(--text2); font-size: 11px; font-weight: 900; cursor: pointer; }
-        .filter-chip.active { background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #fff; border-color: transparent; }
-        .history-list { display: grid; gap: 8px; max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; contain: content; }
-        .history-item { border-radius: 18px; padding: 11px; background: var(--panel2); border: 1px solid var(--line); }
-        .history-item-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
-        .history-period { font-size: 14px; font-weight: 1000; letter-spacing: -0.02em; }
-        .history-actions { display: flex; align-items: center; gap: 6px; }
-        .history-tag { height: 24px; padding: 0 8px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 1000; }
-        .history-tag.correct { background: rgba(46, 255, 167, 0.14); color: #2effa7; }
-        .history-tag.wrong { background: rgba(255, 61, 113, 0.14); color: #ff5d7a; }
-        .history-tag.pending { background: rgba(0, 229, 255, 0.12); color: #00e5ff; }
-        .history-delete { height: 26px; padding: 0 8px; border-radius: 999px; background: var(--panel3); border: 1px solid var(--line); color: var(--text2); font-size: 10px; font-weight: 900; cursor: pointer; }
-        .history-body { display: grid; gap: 4px; }
-        .history-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; color: var(--text2); }
-        .history-row span { color: var(--text3); }
-        .history-row b { color: var(--text1); text-align: right; font-size: 12px; font-weight: 900; }
-        .trend-card { border-radius: 22px; padding: 14px; margin: 12px 0; background: var(--panel2); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
-        .trend-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .trend-header h4 { font-size: 15px; font-weight: 900; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .trend-status { display: flex; align-items: center; gap: 8px; }
-        .trend-badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-        .trend-badge.good { background: rgba(46, 255, 167, 0.18); color: var(--green); }
-        .trend-badge.warn { background: rgba(255, 193, 80, 0.18); color: var(--gold); }
-        .trend-badge.bad { background: rgba(255, 61, 113, 0.18); color: var(--red); }
-        .trend-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin: 6px 0; }
-        .trend-row .label { color: var(--text2); }
-        .trend-row .value { font-weight: 900; }
-        .sheet-wrap, .modal-wrap { position: fixed; inset: 0; z-index: 80; visibility: hidden; opacity: 0; transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease); }
-        .sheet-wrap.show, .modal-wrap.show { visibility: visible; opacity: 1; }
-        .sheet-backdrop, .modal-backdrop { position: absolute; inset: 0; background: rgba(4, 8, 16, 0.6); }
-        .sheet { position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; width: min(100%, 520px); max-height: 78vh; overflow: auto; padding: 10px 12px calc(env(safe-area-inset-bottom) + 18px); border-radius: 26px 26px 0 0; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-lg); transform: translateY(20px); transition: transform 0.3s var(--ease); -webkit-overflow-scrolling: touch; contain: content; }
-        .sheet-wrap.show .sheet { transform: translateY(0); }
-        .sheet-handle { width: 36px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 8px; }
-        .sheet-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-        .sheet-top h2 { font-size: 17px; font-weight: 1000; letter-spacing: -0.02em; }
-        .sheet-top p { color: var(--text2); font-size: 11px; }
-        .sheet-close { width: 34px; height: 34px; border-radius: 50%; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 16px; cursor: pointer; }
-        .sheet-stack { display: grid; gap: 8px; }
-        .sheet-card { border-radius: 20px; padding: 12px; background: var(--panel2); border: 1px solid var(--line); position: relative; overflow: hidden; }
-        .sheet-card h3 { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 900; }
-        .sheet-card .big { font-size: 22px; font-weight: 1000; letter-spacing: -0.03em; margin-bottom: 4px; }
-        .watermark-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255, 255, 255, 0.03); font-weight: 900; letter-spacing: 0.2em; transform: rotate(-15deg); white-space: nowrap; z-index: 1; }
-        .sheet-card .subtext { font-size: 11px; color: var(--text2); line-height: 1.55; white-space: pre-wrap; }
-        .sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .mini-card { border-radius: 16px; padding: 10px; background: var(--panel2); border: 1px solid var(--line); }
-        .mini-card .k { font-size: 10px; color: var(--text3); font-weight: 900; margin-bottom: 4px; }
-        .mini-card .v { font-size: 14px; font-weight: 1000; line-height: 1.3; }
-        .process { white-space: pre-wrap; font-size: 11px; line-height: 1.65; color: var(--text2); }
-        .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(14px); padding: 10px 16px; border-radius: 999px; background: rgba(15, 22, 33, 0.9); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11px; font-weight: 900; z-index: 120; opacity: 0; visibility: hidden; transition: all 0.3s var(--ease); box-shadow: var(--shadow-md); pointer-events: none; }
-        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-        .mipai-modal { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 16px; overflow: auto; }
-        .mipai-card { width: min(100%, 520px); border-radius: 28px; overflow: hidden; background: linear-gradient(180deg, #f48f82, #ea8175); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35); position: relative; border: 1px solid rgba(255, 255, 255, 0.16); }
-        .mipai-close { position: absolute; right: 12px; top: 12px; z-index: 4; width: 48px; height: 48px; border-radius: 50%; background: #ff5f46; color: #fff; display: grid; place-items: center; font-size: 26px; cursor: pointer; border: 2px solid rgba(255, 255, 255, 0.18); }
-        .mipai-header { position: relative; padding: 18px 14px 0; min-height: 140px; background: linear-gradient(180deg, #ff5f46, #ff7b5e); overflow: hidden; }
-        .mipai-title { position: relative; z-index: 2; text-align: center; margin-top: 20px; font-size: 34px; font-weight: 1000; letter-spacing: -0.04em; color: #ffe67d; text-shadow: 0 3px 0 rgba(187, 61, 18, 0.35); }
-        .mipai-sub { position: relative; z-index: 2; text-align: center; color: #fff8ef; margin-top: 4px; font-size: 12px; font-weight: 900; }
-        .mipai-cloud-band { position: relative; z-index: 1; margin-top: 8px; height: 40px; background: radial-gradient(circle at 4% 100%, #f6e8d1 0 22px, transparent 23px), radial-gradient(circle at 14% 100%, #f6e8d1 0 22px, transparent 23px), radial-gradient(circle at 26% 100%, #f6e8d1 0 26px, transparent 27px), radial-gradient(circle at 40% 100%, #f6e8d1 0 24px, transparent 25px), radial-gradient(circle at 54% 100%, #f6e8d1 0 28px, transparent 29px), radial-gradient(circle at 68% 100%, #f6e8d1 0 24px, transparent 25px), radial-gradient(circle at 82% 100%, #f6e8d1 0 26px, transparent 27px), radial-gradient(circle at 96% 100%, #f6e8d1 0 22px, transparent 23px); }
-        .mipai-body { padding: 14px 14px 16px; background: #ea8175; }
-        .mipai-period { text-align: center; font-size: 16px; color: #fffdf8; font-weight: 1000; margin-bottom: 10px; }
-        .scratch-wrap { position: relative; border-radius: 18px; overflow: hidden; background: #fff; border: 1px solid rgba(255, 255, 255, 0.08); }
-        .scratch-content { position: relative; min-height: 170px; display: flex; align-items: center; justify-content: center; padding: 16px 10px; background: #fff; overflow: hidden; }
-        .scratch-formula { display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .scratch-ball { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #111; background: #fff; display: grid; place-items: center; font-weight: 1000; font-size: 26px; color: #111; }
-        .scratch-symbol { font-size: 32px; font-weight: 1000; color: #111; }
-        #scratchCanvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
-        .mipai-foot { margin-top: 12px; text-align: center; font-size: 13px; color: #fffdf7; font-weight: 1000; }
-        .mipai-actions { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .mipai-btn { height: 44px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); color: #fff; border: 1px solid rgba(255, 255, 255, 0.14); font-weight: 1000; font-size: 13px; cursor: pointer; }
-        .mipai-btn.primary { background: rgba(255, 255, 255, 0.88); color: #d14a36; }
-        .splash { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 10%, rgba(130, 100, 240, 0.18), transparent 22%), linear-gradient(180deg, #060d18, #0a1222 55%, #0f1929); transition: opacity 0.6s var(--ease), visibility 0.6s var(--ease); }
-        .splash.hide { opacity: 0; visibility: hidden; }
-        .splash-core { text-align: center; z-index: 2; }
-        .splash-orbit { width: 130px; height: 130px; margin: 0 auto 14px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.08); animation: orbitBreathe 3.6s ease-in-out infinite; position: relative; }
-        .splash-logo { position: absolute; inset: 0; display: grid; place-items: center; font-size: 44px; animation: logoPop 1.8s infinite alternate; }
-        .splash-title { font-size: 20px; font-weight: 1000; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
-        .splash-sub { font-size: 11px; color: rgba(255, 255, 255, 0.55); font-weight: 700; }
-        .splash-loader { width: 90px; height: 2px; margin: 10px auto 0; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden; }
-        .splash-loader span { display: block; width: 45%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--purple), #fff); animation: loadingBar 1.4s ease-in-out infinite; }
-        @keyframes orbitBreathe { 0%, 100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.03); opacity: 1; } }
-        @keyframes floatGlow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(6px, -5px); } }
-        @keyframes softBreath { 0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); } }
-        @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.35); opacity: 1; } }
-        @keyframes numberFlash { 0% { transform: translateY(5px) scale(0.95); opacity: 0.7; } 50% { transform: translateY(-2px) scale(1.02); opacity: 1; } 100% { transform: translateY(0) scale(1); } }
-        @keyframes logoPop { from { transform: translateY(0) scale(1); } to { transform: translateY(-2px) scale(1.03); } }
-        @keyframes loadingBar { 0% { transform: translateX(-120%); } 100% { transform: translateX(240%); } }
-        @media (max-width: 380px) {
-            .hero-ball { width: 56px; height: 56px; font-size: 26px; }
-            .hero-line { grid-template-columns: 50px 1fr auto; }
-            .hero-line .v { font-size: 13px; }
-            .hero-actions { grid-template-columns: 1fr 56px 56px; }
-            .bar-value { font-size: 16px; }
-            .mipai-title { font-size: 28px; }
-            .scratch-ball { width: 44px; height: 44px; font-size: 22px; }
-            .scratch-symbol { font-size: 26px; }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .card.yy-card {
+            border-left: 4px solid var(--yy-border);
+            background: var(--yy-bg);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .current-result {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        .period {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .numbers {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        .sum-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .countdown {
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-text);
+            background: var(--gold-bg);
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .countdown.highlight {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .opentime {
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .error {
+            color: #ef4444;
+            padding: 16px;
+            background: #fef2f2;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ef4444;
+            display: none;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .predict-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 900px;
+        }
+        .predict-table thead th {
+            background: var(--primary);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+        }
+        .predict-table thead th:first-child {
+            border-radius: 8px 0 0 0;
+            min-width: 90px;
+        }
+        .predict-table thead th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        .predict-table tbody td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .predict-table tbody tr {
+            transition: background 0.2s;
+        }
+        .predict-table tbody tr:hover td {
+            background: var(--table-hover);
+        }
+        .predict-table tbody tr:nth-child(even) td {
+            background: var(--table-stripe);
+        }
+        .predict-table tbody tr:nth-child(even):hover td {
+            background: var(--table-hover);
+        }
+        .predict-table .algo-name {
+            font-weight: 700;
+            color: var(--primary);
+            text-align: left;
+            padding-left: 12px;
+            white-space: nowrap;
+        }
+        .predict-table .algo-name.yy-name {
+            color: #059669;
+        }
+        .predict-table .algo-name .yy-badge {
+            display: inline-block;
+            background: #059669;
+            color: #fff;
+            font-size: 9px;
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .predict-table .algo-num {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 11px;
+            line-height: 22px;
+            text-align: center;
+            margin-right: 6px;
+            font-weight: 700;
+        }
+        .predict-table .algo-num.yy-num {
+            background: #059669;
+        }
+        .predict-table .kill-cell {
+            color: var(--kill-red);
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .predict-table .rec-cell {
+            color: var(--rec-green);
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .predict-table .rec-cell.yy-rec {
+            color: #059669;
+            font-size: 12px;
+        }
+        .predict-table .stat-cell {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .predict-table .stat-rate {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .predict-table .rate-high {
+            color: #10b981;
+        }
+        .predict-table .rate-mid {
+            color: #f59e0b;
+        }
+        .predict-table .rate-low {
+            color: #ef4444;
+        }
+        .predict-table .consec-badge {
+            display: inline-block;
+            background: #10b981;
+            color: #fff;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .predict-table .consec-badge.zero {
+            background: #e2e8f0;
+            color: #94a3b8;
+        }
+        .predict-table .na-cell {
+            color: #cbd5e1;
+            font-style: italic;
+        }
+        .predict-table .ref-point {
+            display: inline-block;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 12px;
+            padding: 2px 10px;
+            margin: 1px 2px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #065f46;
+        }
+        .predict-table .ref-point .rp-val {
+            color: #047857;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .history-table th {
+            background: #1e40af;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .history-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+        .history-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+        .history-table td {
+            padding: 8px 5px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+        }
+        .history-table tbody tr:hover td {
+            background: #f1f5f9;
+        }
+        .result-correct {
+            color: #10b981;
+            font-weight: 700;
+        }
+        .result-wrong {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            flex: 1 1 auto;
+            min-width: 60px;
+            padding: 8px 5px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .tab-btn:hover {
+            background: #eff6ff;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .tab-btn.yy-tab {
+            border-color: #059669;
+            color: #059669;
+        }
+        .tab-btn.yy-tab.active {
+            background: #059669;
+            color: white;
+        }
+        .tab-hint {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .auto-refresh-badge {
+            display: inline-block;
+            background: #10b981;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 2px;
+            }
+            .card {
+                padding: 12px;
+                margin-bottom: 10px;
+                border-radius: 12px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .numbers {
+                font-size: 24px;
+            }
+            .predict-table {
+                font-size: 11px;
+                min-width: 750px;
+            }
+            .predict-table thead th,
+            .predict-table tbody td {
+                padding: 7px 4px;
+                font-size: 11px;
+            }
+            .predict-table .algo-name {
+                padding-left: 6px;
+                font-size: 11px;
+            }
+            .predict-table .algo-num {
+                width: 18px;
+                height: 18px;
+                font-size: 10px;
+                line-height: 18px;
+                margin-right: 3px;
+            }
+            .predict-table .kill-cell,
+            .predict-table .rec-cell {
+                font-size: 12px;
+            }
+            .predict-table .rec-cell.yy-rec {
+                font-size: 10px;
+            }
+            .predict-table .ref-point {
+                font-size: 9px;
+                padding: 1px 6px;
+            }
+            .tab-btn {
+                font-size: 10px;
+                padding: 6px 3px;
+                min-width: 48px;
+            }
+            .btn {
+                padding: 10px 16px;
+                font-size: 14px;
+                width: 100%;
+                justify-content: center;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .history-table th,
+            .history-table td {
+                padding: 6px 3px;
+                font-size: 10px;
+            }
+            .section-title {
+                font-size: 15px;
+            }
+            .period {
+                font-size: 15px;
+            }
+            .sum-tag {
+                font-size: 13px;
+                padding: 5px 12px;
+            }
+            .countdown {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .auto-refresh-badge {
+                font-size: 9px;
+                padding: 1px 8px;
+            }
+        }
+        @media (max-width: 480px) {
+            .predict-table {
+                min-width: 650px;
+            }
+            .predict-table thead th,
+            .predict-table tbody td {
+                padding: 5px 3px;
+                font-size: 10px;
+            }
+            .predict-table .algo-name {
+                font-size: 10px;
+            }
+            .predict-table .algo-num {
+                width: 16px;
+                height: 16px;
+                font-size: 9px;
+                line-height: 16px;
+            }
+            .predict-table .kill-cell,
+            .predict-table .rec-cell {
+                font-size: 11px;
+            }
+            .predict-table .rec-cell.yy-rec {
+                font-size: 9px;
+            }
+            .predict-table .ref-point {
+                font-size: 8px;
+                padding: 1px 4px;
+            }
+            .tab-buttons {
+                gap: 2px;
+            }
+            .tab-btn {
+                font-size: 9px;
+                padding: 5px 2px;
+                min-width: 40px;
+                border-radius: 6px;
+            }
         }
     </style>
 </head>
 <body>
-<div id="splash" class="splash">
-    <div class="splash-core">
-        <div class="splash-orbit"><div class="splash-logo">yy</div></div>
-        <div class="splash-title">yy独家算法</div>
-        <div class="splash-sub">形态交叉平衡 · 全自动预测</div>
-        <div class="splash-loader"><span></span></div>
-    </div>
-</div>
-<div class="toast" id="toast"></div>
-<div class="app">
-    <div class="topbar">
-        <div class="title-wrap"><div class="mini">yy独家算法 · 全自动预测</div><h1>yy独家算法</h1></div>
-        <div class="top-actions"><button class="circle-btn" id="themeBtn" aria-label="切换主题">◐</button></div>
-    </div>
-    <section class="hero">
-        <div class="hero-grid">
-            <div class="hero-top"><div class="hero-tag">yy独家算法</div><div class="hero-tools"><button class="hero-tool" id="themeBtn2" aria-label="切换主题">◑</button></div></div>
-            <div class="hero-meta">
-                <div class="hero-left">
-                    <div class="period" id="latestPeriod">--期</div>
-                    <div class="sum" id="latestSum">和值 -- · --</div>
-                    <div class="status" id="heroStatus">初始化中...</div>
-                </div>
-                <div class="hero-right">
-                    <div class="hero-pill" id="countdownWrap"><span class="count-dot"></span><span id="countdown">--:--</span></div>
-                    <div class="hero-pill"><small>引擎</small><span id="gaugeValue">全维分析</span></div>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1><i class="fas fa-database"></i> 开奖数据实时展示</h1>
+            <p>实时获取最新开奖数据 · 12算法完整版 · 表格预测总览
+                <span class="auto-refresh-badge"><i class="fas fa-sync-alt fa-fw fa-spin"></i> 全自动刷新</span>
+            </p>
+        </div>
+        <div id="error" class="error"></div>
+
+        <!-- 最新开奖 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-chart-line"></i><span>最新开奖</span></div>
+            <div class="current-result">
+                <div class="period">第 <span id="cur-period">--</span> 期</div>
+                <div class="numbers" id="cur-nums">--+--+--=--</div>
+                <div class="sum-tag" id="cur-tag">大小单双: --</div>
+                <div class="opentime" id="cur-time">开奖时间: --</div>
+                <div id="cd" class="countdown" style="display:none;">
+                    <i class="fas fa-clock"></i> 下一期: <span id="cd-txt">--分--秒</span>
                 </div>
             </div>
-            <div class="hero-center">
-                <div class="hero-orbit"></div>
-                <div class="hero-core-glow"></div>
-                <div class="hero-balls">
-                    <div class="hero-ball" id="ball1"><span id="num1">-</span></div>
-                    <div class="hero-ball" id="ball2"><span id="num2">-</span></div>
-                    <div class="hero-ball" id="ball3"><span id="num3">-</span></div>
-                </div>
-            </div>
-            <div class="hero-result-lines">
-                <div class="hero-line"><div class="k">预测结果</div><div class="v" id="heroKill">数据预热中...</div><button class="mini-copy" id="copyKillBtn">复制</button></div>
-                <div class="hero-line"><div class="k">参考区间</div><div class="v" id="heroRecommend">--</div><button class="mini-copy" id="copyRecommendBtn">复制</button></div>
-            </div>
-            <div class="hero-actions">
-                <div class="auto-badge"><span class="pulse"></span>yy独家算法 · 自动预测中</div>
-                <button class="secondary-btn" id="processBtn">计算过程</button>
-                <button class="secondary-btn" id="miPaiBtn">咪牌</button>
+            <div class="actions">
+                <button id="refresh-btn" class="btn btn-primary"><i class="fas fa-sync-alt"></i> 手动刷新</button>
             </div>
         </div>
-    </section>
-    <div class="trend-card" id="trendCard">
-        <div class="trend-header">
-            <h4>📈 趋势判断</h4>
-            <div class="trend-status">
-                <span id="trendLevel" class="trend-badge good">优</span>
-                <span id="trendSuggest" style="font-size:11px;">杂六延续</span>
+
+        <!-- 预测总览表格 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-table"></i><span>12算法预测总览</span></div>
+            <div class="table-responsive">
+                <table class="predict-table" id="predict-table">
+                    <thead>
+                        <tr>
+                            <th>算法</th>
+                            <th>杀组1</th>
+                            <th>杀组2</th>
+                            <th>最终建议</th>
+                            <th>总次数</th>
+                            <th>命中</th>
+                            <th>中奖率</th>
+                            <th>连中</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predict-tbody">
+                        <!-- JS动态填充 -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-hint">
+                <span style="background:#059669;color:#fff;padding:0 8px;border-radius:10px;font-weight:700;">★</span>
+                算法1已升级为 <strong>yy独家算法·形态交叉平衡法</strong> ｜
+                算法2-AI多模型 | 算法3-深度学习AI | 算法4-贝叶斯推断 | 算法5-遗传算法 | 算法6-支持向量机
+                | 算法7-随机森林 | 算法8-强化学习 | 算法9-集成学习 | 算法10-元学习 | 算法11-时间系数算法 | 算法12-综合最优杀组
             </div>
         </div>
-        <div class="trend-row"><span class="label">最近5期形态</span><span class="value" id="trendRecent5">--</span></div>
-        <div class="trend-row"><span class="label">杂六占比</span><span class="value" id="trendRatio">--</span></div>
-        <div class="trend-row"><span class="label">下期提示</span><span class="value" id="trendNextHint">--</span></div>
-    </div>
-    <div class="mode-row">
-        <button class="mode-chip active" data-view="homeView">主页</button>
-        <button class="mode-chip" data-view="historyView">预测历史</button>
-        <button class="mode-chip" data-view="statsView">统计</button>
-    </div>
-    <section class="view active" id="homeView">
-        <section class="result-bars">
-            <article class="result-bar black"><div class="bar-icon">◉</div><div class="bar-main"><div class="bar-label">预测数字</div><div class="bar-value" id="killPreview">--</div><div class="bar-sub">四个态势参考点</div></div><div class="bar-badge">数</div></article>
-            <article class="result-bar purple"><div class="bar-icon">◎</div><div class="bar-main"><div class="bar-label">预测形态</div><div class="bar-value" id="recommendPreview">--</div><div class="bar-sub">全维分析结果</div></div><div class="bar-badge">形</div></article>
-            <article class="result-bar orange"><div class="bar-icon">◌</div><div class="bar-main"><div class="bar-label">近3期和值</div><div class="bar-value" id="specialPreview">--</div><div class="bar-sub">数据源快照</div></div><div class="bar-badge">源</div></article>
-            <article class="result-bar white"><div class="bar-icon">↗</div><div class="bar-main"><div class="bar-label">预测胜率</div><div class="bar-value" id="winRatePreview">--</div><div class="bar-sub">基于历史回测</div></div><div class="bar-badge">胜</div></article>
-        </section>
-    </section>
-    <section class="view" id="historyView">
-        <section class="section">
-            <div class="section-top"><div><h3>预测历史（自动归档）</h3><p id="historyAccuracy">命中率：--</p></div></div>
-            <div class="history-toolbar">
-                <button class="filter-chip active" data-history-filter="all">全部</button>
-                <button class="filter-chip" data-history-filter="correct">正确</button>
-                <button class="filter-chip" data-history-filter="wrong">错误</button>
-                <button class="filter-chip" data-history-filter="pending">待开奖</button>
-                <button class="ghost-btn" id="clearHistoryBtn">清空</button>
-            </div>
-            <div class="history-list" id="historyTimeline"></div>
-        </section>
-    </section>
-    <section class="view" id="statsView">
-        <section class="section">
-            <div class="section-top"><div><h3>实时遗漏</h3><p>和值遗漏与分类统计</p></div></div>
-            <div style="background:var(--panel2); border-radius:20px; padding:14px; margin-bottom:14px">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px"><span style="font-size:16px; font-weight:1000">和值遗漏</span><span style="font-size:11px; color:var(--text3)">00~27</span></div>
-                <div class="stats-subgrid" id="sumMissGrid"></div>
-            </div>
-            <div class="stats-grid">
-                <div class="stats-card"><div class="title">基本类型</div><div class="content"><div class="stats-row"><span class="key">单</span><span class="val" id="miss-dan">--</span></div><div class="stats-row"><span class="key">双</span><span class="val" id="miss-shuang">--</span></div><div class="stats-row"><span class="key">大</span><span class="val" id="miss-da">--</span></div><div class="stats-row"><span class="key">小</span><span class="val" id="miss-xiao">--</span></div></div></div>
-                <div class="stats-card"><div class="title">形态分布</div><div class="content"><div class="stats-row"><span class="key">大单</span><span class="val" id="miss-xiaodan">--</span></div><div class="stats-row"><span class="key">大双</span><span class="val" id="miss-xiaoshuang">--</span></div><div class="stats-row"><span class="key">小单</span><span class="val" id="miss-dadan">--</span></div><div class="stats-row"><span class="key">小双</span><span class="val" id="miss-dashuang">--</span></div></div></div>
-            </div>
-        </section>
-    </section>
-</div>
-<div class="sheet-wrap" id="resultSection">
-    <div class="sheet-backdrop" id="sheetBackdrop"></div>
-    <div class="sheet">
-        <div class="sheet-handle"></div>
-        <div class="sheet-top"><div><h2 id="sheetTitle">yy独家算法 · 计算过程</h2><p id="sheetSubtitle">内部参考 · 隐晦描述</p></div><button class="sheet-close" id="closeSheetBtn">✕</button></div>
-        <div class="sheet-stack">
-            <div class="sheet-card" style="position:relative"><div class="watermark-overlay">yy独家算法 · 系统参考</div><h3>预测结果</h3><div class="big" id="sheetKillValue">--</div></div>
-            <div class="sheet-grid">
-                <div class="mini-card"><div class="k">算法版本</div><div class="v" id="sheetKillConf">形态交叉平衡法</div></div>
-                <div class="mini-card"><div class="k">调节状态</div><div class="v" id="sheetKillStrategy">--</div></div>
-                <div class="mini-card" style="position:relative"><div class="watermark-overlay" style="font-size:8px">yy ref</div><div class="k">态势参考点</div><div class="v" id="sheetRecommendValue">--</div></div>
-                <div class="mini-card"><div class="k">近3期源</div><div class="v" id="sheetSpecialValue">--</div></div>
-            </div>
-            <div class="sheet-card"><h3>计算过程（隐晦版）</h3><div class="process" id="sheetCalcSteps">等待自动生成...</div></div>
-            <div class="sheet-card"><h3>免责声明</h3><div class="subtext">本内容由"yy独家算法"系统动态生成，非固定投注建议。所有数值均经过视觉包装，实际结果存在不确定性，请理性参考。</div></div>
+
+        <!-- 历史记录 -->
+        <div class="card">
+            <div class="section-title"><i class="fas fa-history"></i><span>历史回溯验证</span></div>
+            <div class="tab-buttons" id="algo-tabs"></div>
+            <div id="history-container"></div>
         </div>
     </div>
-</div>
-<div class="modal-wrap" id="miPaiModal">
-    <div class="modal-backdrop" id="miPaiBackdrop"></div>
-    <div class="mipai-modal">
-        <div class="mipai-card">
-            <button class="mipai-close" id="closeMiPaiBtn">×</button>
-            <div class="mipai-header">
-                <div class="mipai-title">咪牌刮刮乐</div>
-                <div class="mipai-sub">用手指刮开涂层查看结果</div>
-                <div class="mipai-cloud-band"></div>
-            </div>
-            <div class="mipai-body">
-                <div class="mipai-period" id="miPaiPeriod">第 -- 期结果</div>
-                <div class="scratch-wrap" id="scratchWrap">
-                    <div class="scratch-content" id="scratchContent">
-                        <div class="scratch-formula" id="scratchFormula">
-                            <div class="scratch-ball" id="scratchN1">-</div>
-                            <div class="scratch-symbol">+</div>
-                            <div class="scratch-ball" id="scratchN2">-</div>
-                            <div class="scratch-symbol">+</div>
-                            <div class="scratch-ball" id="scratchN3">-</div>
-                            <div class="scratch-symbol">=</div>
-                            <div class="scratch-ball" id="scratchSum">-</div>
+
+    <script>
+        (function() {
+            const API_URL = 'https://pc28.help/api/kj.json?nbr=30';
+            const CACHE_KEY = 'pc28_live_table_v5';
+            let data = [];
+            let timer = null;
+            let isFetching = false;
+            let nextOpenTime = null;
+            let currentTab = 1;
+            let autoRefreshInterval = null;
+
+            // ====================== 工具函数 ======================
+            function mapApiItem(item) {
+                return {
+                    qihao: item.nbr || '',
+                    opennum: item.number || '',
+                    sum: parseInt(item.num) || 0,
+                    opentime: (item.date || '') + ' ' + (item.time || '')
+                };
+            }
+
+            function getShape(v) {
+                if (v >= 14 && v % 2 === 1) return '大单';
+                if (v >= 14 && v % 2 === 0) return '大双';
+                if (v <= 13 && v % 2 === 1) return '小单';
+                if (v <= 13 && v % 2 === 0) return '小双';
+                return '未知';
+            }
+
+            function getTag(sum) { return getShape(sum); }
+
+            function formatTime(timeStr) {
+                if (!timeStr) return '--';
+                try {
+                    const parts = timeStr.split(' ');
+                    if (parts.length >= 2) {
+                        const [datePart, timePart] = parts;
+                        const dateParts = datePart.split('-');
+                        if (dateParts.length === 3) return dateParts[1] + '-' + dateParts[2] + ' ' + timePart;
+                    }
+                    return timeStr;
+                } catch (e) { return timeStr; }
+            }
+
+            function parseNumbers(opennum) {
+                if (!opennum) return [0, 0, 0];
+                return opennum.split('+').map(p => parseInt(p) || 0);
+            }
+
+            const shapesAll = ['小双', '小单', '大单', '大双'];
+
+            // ====================== 新算法：yy独家算法·形态交叉平衡法 ======================
+            function yyExclusiveAlgorithm(arr) {
+                // 取最近三期（按时间从早到晚排序：arr[2]最早，arr[0]最新）
+                if (!arr || arr.length < 3) return null;
+
+                const v1 = parseInt(arr[2].sum) || 0;
+                const v2 = parseInt(arr[1].sum) || 0;
+                const v3 = parseInt(arr[0].sum) || 0;
+
+                const m1 = getShape(v1);
+                const m2 = getShape(v2);
+                const m3 = getShape(v3);
+
+                const shapes = [m1, m2, m3];
+                const values = [v1, v2, v3];
+
+                // 检查是否互不相同
+                const unique = new Set(shapes);
+                if (unique.size === 3) {
+                    // 直接输出，无需调整
+                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
+                    return {
+                        refs: refs,
+                        shapes: shapes,
+                        values: values,
+                        output: refs.map(r => r.shape + r.value).join('、')
+                    };
+                }
+
+                // ---- 有重复，进行补偿调节 ----
+
+                // 5.1 确定调整位置
+                let idx = 3; // 默认调整 V3
+                let vx = v3;
+                let mx = m3;
+                if (m3 === m1 || m3 === m2) {
+                    idx = 3;
+                    vx = v3;
+                    mx = m3;
+                } else if (m2 === m1) {
+                    idx = 2;
+                    vx = v2;
+                    mx = m2;
+                }
+
+                // 5.2 确定缺失形态集合
+                const allShapes = ['大单', '大双', '小单', '小双'];
+                const existing = new Set(shapes);
+                const missing = allShapes.filter(s => !existing.has(s));
+
+                if (missing.length === 0) {
+                    // 理论上不会发生，但以防万一
+                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
+                    return {
+                        refs: refs,
+                        shapes: shapes,
+                        values: values,
+                        output: refs.map(r => r.shape + r.value).join('、')
+                    };
+                }
+
+                // 5.3 为每个缺失形态计算"最近代表值"
+                function findClosest(shape, target) {
+                    let candidates = [];
+                    if (shape === '大单') {
+                        for (let i = 15; i <= 27; i += 2) candidates.push(i);
+                    } else if (shape === '大双') {
+                        for (let i = 14; i <= 26; i += 2) candidates.push(i);
+                    } else if (shape === '小单') {
+                        for (let i = 1; i <= 13; i += 2) candidates.push(i);
+                    } else if (shape === '小双') {
+                        for (let i = 0; i <= 12; i += 2) candidates.push(i);
+                    }
+                    if (candidates.length === 0) return null;
+                    let closest = candidates[0];
+                    let minDiff = Math.abs(candidates[0] - target);
+                    for (let c of candidates) {
+                        const diff = Math.abs(c - target);
+                        if (diff < minDiff || (diff === minDiff && c < closest)) {
+                            closest = c;
+                            minDiff = diff;
+                        }
+                    }
+                    return closest;
+                }
+
+                // 5.4 选择最终替换值
+                let bestVal = null;
+                let bestDiff = Infinity;
+                let bestShape = null;
+                for (let shape of missing) {
+                    const val = findClosest(shape, vx);
+                    if (val === null) continue;
+                    const diff = Math.abs(val - vx);
+                    if (diff < bestDiff || (diff === bestDiff && (bestVal === null || val < bestVal))) {
+                        bestVal = val;
+                        bestDiff = diff;
+                        bestShape = shape;
+                    }
+                }
+
+                if (bestVal === null || bestShape === null) {
+                    // 极端情况，回退到原始值
+                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
+                    return {
+                        refs: refs,
+                        shapes: shapes,
+                        values: values,
+                        output: refs.map(r => r.shape + r.value).join('、')
+                    };
+                }
+
+                // 5.5 执行替换
+                const resultValues = [v1, v2, v3];
+                const resultShapes = [m1, m2, m3];
+                if (idx === 3) {
+                    resultValues[2] = bestVal;
+                    resultShapes[2] = bestShape;
+                } else if (idx === 2) {
+                    resultValues[1] = bestVal;
+                    resultShapes[1] = bestShape;
+                }
+
+                const refs = resultShapes.map((s, i) => ({ shape: s, value: resultValues[i] }));
+                return {
+                    refs: refs,
+                    shapes: resultShapes,
+                    values: resultValues,
+                    output: refs.map(r => r.shape + r.value).join('、')
+                };
+            }
+
+            // ====================== 算法1适配器 ======================
+            function algo1Combine(arr) {
+                const result = yyExclusiveAlgorithm(arr);
+                if (!result) return { shapes: [], killShape: null, killShape2: null, refs: [] };
+                // 返回兼容格式
+                return {
+                    shapes: result.shapes,
+                    killShape: null,
+                    killShape2: null,
+                    refs: result.refs,
+                    output: result.output,
+                    values: result.values
+                };
+            }
+
+            // ====================== 算法2：AI多模型集成 ======================
+            class AIStatisticalModel {
+                analyze(arr, w) {
+                    if (arr.length < 3) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const n = Math.min(arr.length, 10);
+                    const cnt = {};
+                    arr.slice(0, n).forEach(d => {
+                        const s = getShape(parseInt(d.sum) || 0);
+                        cnt[s] = (cnt[s] || 0) + 1;
+                    });
+                    Object.keys(scores).forEach(k => {
+                        scores[k] -= (cnt[k] || 0) * w;
+                        scores[k] += (n - (cnt[k] || 0)) * w * 0.5;
+                    });
+                    return scores;
+                }
+            }
+            class AITrendModel {
+                analyze(arr, w) {
+                    if (arr.length < 5) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const recent = arr.slice(0, 5).map(d => getShape(parseInt(d.sum) || 0));
+                    for (let i = 1; i < recent.length; i++)
+                        if (recent[i] === recent[i - 1]) scores[recent[i]] -= w;
+                    let alt = true;
+                    for (let i = 2; i < recent.length; i++)
+                        if (recent[i] === recent[i - 2]) { alt = false; break; }
+                    if (alt) scores[recent[0]] -= w * 1.5;
+                    return scores;
+                }
+            }
+            class AICycleModel {
+                analyze(arr, w) {
+                    if (arr.length < 8) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    for (let off = 0; off < 3; off++) {
+                        const period = [];
+                        for (let i = off; i < Math.min(arr.length, 15); i += 3) period.push(getShape(parseInt(arr[i].sum) ||
+                            0));
+                        if (period.length >= 2) {
+                            const cnt = {};
+                            period.forEach(s => cnt[s] = (cnt[s] || 0) + 1);
+                            const idx = arr.length % 3;
+                            if (idx === off) {
+                                const sorted = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+                                if (sorted.length) scores[sorted[0][0]] -= w;
+                            }
+                        }
+                    }
+                    return scores;
+                }
+            }
+            class AITimeSeriesModel {
+                analyze(arr, w) {
+                    if (arr.length < 6) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 6).map(d => parseInt(d.sum) || 0);
+                    const ma3 = sums.slice(0, 3).reduce((a, b) => a + b) / 3;
+                    const maR = sums.slice(3, 6).reduce((a, b) => a + b) / 3;
+                    const trend = maR - ma3;
+                    if (trend > 2) { scores['大单'] -= w;
+                        scores['大双'] -= w * 0.5; }
+                    if (trend < -2) { scores['小单'] -= w;
+                        scores['小双'] -= w * 0.5; }
+                    const last = sums[0];
+                    if (last >= 22) { scores['大双'] -= w * 0.8;
+                        scores['大单'] -= w * 0.6; }
+                    if (last <= 5) { scores['小单'] -= w * 0.8;
+                        scores['小双'] -= w * 0.6; }
+                    return scores;
+                }
+            }
+            class AIMLPatternModel {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const pattern = arr.slice(0, 3).map(d => getShape(parseInt(d.sum) || 0));
+                    for (let i = 3; i < arr.length; i++) {
+                        const hist = arr.slice(i, i + 3).map(d => getShape(parseInt(d.sum) || 0));
+                        let sim = 0;
+                        for (let j = 0; j < 3; j++)
+                            if (pattern[j] === hist[j]) sim++;
+                        if (sim >= 2 && i + 3 < arr.length) {
+                            const next = getShape(parseInt(arr[i + 3].sum) || 0);
+                            scores[next] -= w * sim;
+                        }
+                    }
+                    return scores;
+                }
+            }
+
+            function aiIntegratedAlgorithmGroup(arr, group) {
+                if (arr.length < 10) return { killShape1: null, killShape2: null };
+                const models = [
+                    new AIStatisticalModel(), new AIStatisticalModel(), new AIStatisticalModel(),
+                    new AITrendModel(), new AITrendModel(), new AITrendModel(),
+                    new AICycleModel(), new AICycleModel(),
+                    new AITimeSeriesModel(), new AIMLPatternModel()
+                ];
+                const total = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                const w1 = group === 1 ? 2.0 : 1.5;
+                models.forEach(m => {
+                    const s = m.analyze(arr, w1);
+                    if (s) Object.keys(total).forEach(k => total[k] += s[k] || 0);
+                });
+                if (group === 2) {
+                    const boost = [3, 2, 1.5];
+                    arr.slice(0, 3).forEach((d, i) => {
+                        const shape = getShape(parseInt(d.sum) || 0);
+                        total[shape] -= boost[i];
+                    });
+                }
+                const sorted = Object.entries(total).sort((a, b) => a[1] - b[1]);
+                return { killShape1: sorted[0]?.[0] || null, killShape2: sorted[1]?.[0] || null };
+            }
+
+            function aiIntegratedKillAlgorithm(arr) {
+                const g1 = aiIntegratedAlgorithmGroup(arr, 1);
+                const g2 = aiIntegratedAlgorithmGroup(arr, 2);
+                const cnt = {};
+                [g1.killShape1, g1.killShape2, g2.killShape1, g2.killShape2].filter(Boolean).forEach(s => cnt[s] = (cnt[
+                    s] || 0) + 1);
+                let k1 = null,
+                    k2 = null;
+                const entries = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+                if (entries.length) k1 = entries[0][0];
+                if (entries.length > 1) k2 = entries[1][0];
+                return { aiKillGroup1: k1, aiKillGroup2: k2 };
+            }
+
+            // ====================== 算法3：深度学习AI ======================
+            class DeepLayer1 {
+                analyze(arr, w) {
+                    if (arr.length < 15) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 15).map(d => parseInt(d.sum) || 0);
+                    const mean = sums.reduce((a, b) => a + b) / 15;
+                    const variance = sums.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / 15;
+                    const skew = sums.reduce((a, b) => a + Math.pow(b - mean, 3), 0) / (Math.sqrt(variance) * variance *
+                        variance);
+                    if (skew > 0.5) { scores['小双'] -= w * 2;
+                        scores['小单'] -= w * 1.5; } else if (skew < -0.5) { scores['大双'] -= w * 2;
+                        scores['大单'] -= w * 1.5; }
+                    return scores;
+                }
+            }
+            class DeepLayer2 {
+                analyze(arr, w) {
+                    if (arr.length < 12) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const ws = 5;
+                    const patterns = {};
+                    for (let i = 0; i <= arr.length - ws; i++) {
+                        const win = arr.slice(i, i + ws).map(d => getShape(parseInt(d.sum) || 0));
+                        const pat = win.join('-');
+                        patterns[pat] = (patterns[pat] || 0) + 1;
+                    }
+                    Object.entries(patterns).sort((a, b) => b[1] - a[1]).slice(0, 2).forEach(([pat, cnt]) => {
+                        const last = pat.split('-').pop();
+                        if (scores[last] !== undefined) scores[last] -= w * cnt * 0.3;
+                    });
+                    return scores;
+                }
+            }
+            class DeepAttention {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const weights = [];
+                    for (let i = 0; i < Math.min(arr.length, 10); i++) weights.push(Math.exp(-i * 0.3));
+                    const cnt = {};
+                    arr.slice(0, 10).forEach((d, i) => {
+                        const shape = getShape(parseInt(d.sum) || 0);
+                        cnt[shape] = (cnt[shape] || 0) + weights[i];
+                    });
+                    const max = Math.max(...Object.values(cnt));
+                    Object.keys(scores).forEach(k => { scores[k] -= (cnt[k] || 0) / max * w * 3; });
+                    return scores;
+                }
+            }
+            class DeepLSTM {
+                analyze(arr, w) {
+                    if (arr.length < 15) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const long = arr.slice(0, 15).map(d => getShape(parseInt(d.sum) || 0));
+                    const short = arr.slice(0, 5).map(d => getShape(parseInt(d.sum) || 0));
+                    const lcnt = {};
+                    long.forEach(s => lcnt[s] = (lcnt[s] || 0) + 1);
+                    const scnt = {};
+                    short.forEach(s => scnt[s] = (scnt[s] || 0) + 1);
+                    Object.keys(scores).forEach(k => {
+                        if ((scnt[k] || 0) >= 3) scores[k] -= w * 2;
+                        if ((lcnt[k] || 0) >= 7 && (scnt[k] || 0) >= 2) scores[k] -= w * 1.5;
+                    });
+                    return scores;
+                }
+            }
+            class DeepResNet {
+                analyze(arr, w) {
+                    if (arr.length < 10) return null;
+                    const scores = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                    const sums = arr.slice(0, 10).map(d => parseInt(d.sum) || 0);
+                    const ma3 = sums.slice(0, 3).reduce((a, b) => a + b) / 3;
+                    const res1 = sums[0] - ma3;
+                    const ma5 = sums.slice(0, 5).reduce((a, b) => a + b) / 5;
+                    const res2 = sums[0] - ma5;
+                    const lastShape = getShape(sums[0]);
+                    if (Math.abs(res1) > 5 && scores[lastShape] !== undefined) scores[lastShape] -= w * 1.5;
+                    if (Math.abs(res2) > 3 && scores[lastShape] !== undefined) scores[lastShape] -= w * 0.8;
+                    return scores;
+                }
+            }
+
+            function deepAIIntegratedKillAlgorithm(arr) {
+                if (arr.length < 15) return { killShape1: null, killShape2: null };
+                const models1 = [new DeepLayer1(), new DeepLayer1(), new DeepLayer1(), new DeepAttention(),
+                new DeepAttention()];
+                const models2 = [new DeepLayer2(), new DeepLayer2(), new DeepLSTM(), new DeepLSTM(), new DeepResNet()];
+                const total1 = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                const total2 = { '小双': 0, '小单': 0, '大单': 0, '大双': 0 };
+                models1.forEach(m => { const s = m.analyze(arr, 1.2); if (s) Object.keys(total1).forEach(k => total1[
+                    k] += s[k] || 0); });
+                models2.forEach(m => { const s = m.analyze(arr, 1.3); if (s) Object.keys(total2).forEach(k => total2[
+                    k] += s[k] || 0); });
+                const sorted1 = Object.entries(total1).sort((a, b) => a[1] - b[1]);
+                const sorted2 = Object.entries(total2).sort((a, b) => a[1] - b[1]);
+                return { killShape1: sorted1[0]?.[0] || null, killShape2: sorted2[0]?.[0] || null };
+            }
+
+            // ====================== 算法4-10通用生成 ======================
+            function genericAlgorithm(arr, num) {
+                if (arr.length < 10) return { killShape1: null, killShape2: null };
+                const scores = {};
+                shapesAll.forEach(s => scores[s] = 0);
+                const recent = arr.slice(0, 10);
+                switch (num) {
+                    case 4:
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += 1; });
+                        break;
+                    case 5:
+                        recent.forEach((d, i) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += (10 - i) * 0.5; });
+                        break;
+                    case 6:
+                        const sums6 = recent.map(d => parseInt(d.sum) || 0);
+                        const mean6 = sums6.reduce((a, b) => a + b) / 10;
+                        recent.forEach((d) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] -= Math.abs(parseInt(d.sum) - mean6) * 0.1; });
+                        break;
+                    case 7:
+                        for (let t = 0; t < 10; t++) { const idx = t % recent.length;
+                            const s = getShape(parseInt(recent[idx].sum) || 0);
+                            scores[s] += 1; }
+                        break;
+                    case 8:
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += parseInt(d.sum) > 14 ? 1 : -1; });
+                        break;
+                    case 9:
+                        recent.forEach(d => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += 2; });
+                        break;
+                    case 10:
+                        recent.forEach((d, i) => { const s = getShape(parseInt(d.sum) || 0);
+                            scores[s] += (10 - i) * 0.7; });
+                        break;
+                }
+                const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+                return { killShape1: sorted[0]?.[0] || null, killShape2: sorted[1]?.[0] || null };
+            }
+
+            function timeCoefficientAlgorithm(arr) {
+                if (arr.length < 2) return { killShape1: null, killShape2: null };
+                const cur = arr[0];
+                const sum = parseInt(cur.sum) || 0;
+                const periodEnd = parseInt((cur.qihao || '0').slice(-2)) || 97;
+                let timeVal = 1;
+                try {
+                    const match = cur.opentime.match(/(\d{1,2}):(\d{2}):(\d{2})/);
+                    if (match) {
+                        const h = parseInt(match[1]),
+                            m = parseInt(match[2]),
+                            s = parseInt(match[3]);
+                        timeVal = (m === 0 && s === 0) ? h : m + s / 100;
+                    }
+                } catch (e) {}
+                if (timeVal === 0) timeVal = 1;
+                const result = (sum * 3) / periodEnd * timeVal;
+                const str = result.toFixed(10);
+                const dot = str.indexOf('.');
+                const before = dot !== -1 ? parseInt(str.substring(0, dot).slice(-1)) || 0 : parseInt(str.slice(-1)) ||
+                    0;
+                const after = dot !== -1 && dot + 1 < str.length ? parseInt(str[dot + 1]) || 0 : 0;
+                const map = { 0: '大双', 1: '大单', 2: '大双', 3: '大单', 4: '大双', 5: '小单', 6: '小双', 7: '小单', 8: '小双',
+                    9: '小单' };
+                return { killShape1: map[before] || null, killShape2: map[after] || null };
+            }
+
+            function comprehensiveOptimalKillAlgorithm(arr) {
+                const allKills = [];
+                if (arr.length >= 3) {
+                    const k1 = { killShape: null };
+                    const k2 = { killShape: null };
+                    if (k1.killShape) allKills.push({ shape: k1.killShape });
+                    if (k2.killShape) allKills.push({ shape: k2.killShape });
+                }
+                if (arr.length >= 10) {
+                    const ai = aiIntegratedKillAlgorithm(arr);
+                    if (ai.aiKillGroup1) allKills.push({ shape: ai.aiKillGroup1 });
+                    if (ai.aiKillGroup2) allKills.push({ shape: ai.aiKillGroup2 });
+                }
+                if (arr.length >= 15) {
+                    const deep = deepAIIntegratedKillAlgorithm(arr);
+                    if (deep.killShape1) allKills.push({ shape: deep.killShape1 });
+                    if (deep.killShape2) allKills.push({ shape: deep.killShape2 });
+                }
+                for (let num = 4; num <= 10; num++) {
+                    if (arr.length >= 10) {
+                        const gen = genericAlgorithm(arr, num);
+                        if (gen.killShape1) allKills.push({ shape: gen.killShape1 });
+                        if (gen.killShape2) allKills.push({ shape: gen.killShape2 });
+                    }
+                }
+                if (arr.length >= 2) {
+                    const tc = timeCoefficientAlgorithm(arr);
+                    if (tc.killShape1) allKills.push({ shape: tc.killShape1 });
+                    if (tc.killShape2) allKills.push({ shape: tc.killShape2 });
+                }
+                const seen = new Set();
+                const selected = [];
+                for (const k of allKills) {
+                    if (!seen.has(k.shape)) {
+                        seen.add(k.shape);
+                        selected.push(k.shape);
+                        if (selected.length >= 2) break;
+                    }
+                }
+                return { killShape1: selected[0] || null, killShape2: selected[1] || null };
+            }
+
+            // ====================== 算法元数据 ======================
+            const algoMeta = [
+                { num: 1, shortName: 'yy独家算法', fullName: '算法1-yy独家算法·形态交叉平衡法', isYY: true },
+                { num: 2, shortName: 'AI多模型', fullName: '算法2-AI多模型集成' },
+                { num: 3, shortName: '深度学习AI', fullName: '算法3-深度学习AI' },
+                { num: 4, shortName: '贝叶斯推断', fullName: '算法4-贝叶斯推断' },
+                { num: 5, shortName: '遗传算法', fullName: '算法5-遗传算法' },
+                { num: 6, shortName: '支持向量机', fullName: '算法6-支持向量机' },
+                { num: 7, shortName: '随机森林', fullName: '算法7-随机森林' },
+                { num: 8, shortName: '强化学习', fullName: '算法8-强化学习' },
+                { num: 9, shortName: '集成学习', fullName: '算法9-集成学习' },
+                { num: 10, shortName: '元学习', fullName: '算法10-元学习' },
+                { num: 11, shortName: '时间系数', fullName: '算法11-时间系数算法' },
+                { num: 12, shortName: '综合最优', fullName: '算法12-综合最优杀组' },
+            ];
+
+            // ====================== 获取预测结果 ======================
+            function getPrediction(arr, algoNum) {
+                if (algoNum === 1) {
+                    if (arr.length < 3) return null;
+                    return algo1Combine(arr);
+                }
+                if (algoNum === 2) {
+                    if (arr.length < 10) return null;
+                    return aiIntegratedKillAlgorithm(arr);
+                }
+                if (algoNum === 3) {
+                    if (arr.length < 15) return null;
+                    return deepAIIntegratedKillAlgorithm(arr);
+                }
+                if (algoNum >= 4 && algoNum <= 10) {
+                    if (arr.length < 10) return null;
+                    return genericAlgorithm(arr, algoNum);
+                }
+                if (algoNum === 11) {
+                    if (arr.length < 2) return null;
+                    return timeCoefficientAlgorithm(arr);
+                }
+                if (algoNum === 12) {
+                    if (arr.length < 10) return null;
+                    return comprehensiveOptimalKillAlgorithm(arr);
+                }
+                return null;
+            }
+
+            // 从预测结果中提取统一的杀组1、杀组2、最终建议
+            function extractPredictionData(res, algoNum) {
+                if (!res) return { k1: null, k2: null, final: null, refs: null };
+
+                // 算法1特殊处理（yy独家算法）
+                if (algoNum === 1) {
+                    const refs = res.refs || [];
+                    const finalStr = refs.map(r => r.shape + r.value).join('、');
+                    return { k1: null, k2: null, final: finalStr || '--', refs: refs };
+                }
+
+                let k1 = null,
+                    k2 = null;
+                if (algoNum === 2) {
+                    k1 = res.aiKillGroup1 || null;
+                    k2 = res.aiKillGroup2 || null;
+                } else {
+                    k1 = res.killShape1 || null;
+                    k2 = res.killShape2 || null;
+                }
+                const finalShapes = shapesAll.filter(s => s !== k1 && s !== k2);
+                return { k1, k2, final: finalShapes.join('、') || '--', refs: null };
+            }
+
+            // 判断是否命中
+            function checkHit(algoNum, res, actual) {
+                if (!res) return false;
+                if (algoNum === 1) {
+                    const refs = res.refs || [];
+                    return refs.some(r => r.shape === actual);
+                }
+                const pred = extractPredictionData(res, algoNum);
+                if (!pred.final || pred.final === '--') return false;
+                return pred.final.includes(actual);
+            }
+
+            // ====================== 构建UI ======================
+            const algoNames = ['算法1', '算法2', '算法3', '算法4', '算法5', '算法6', '算法7', '算法8', '算法9', '算法10', '算法11',
+                '算法12'
+            ];
+
+            function generateUI() {
+                const tbody = document.getElementById('predict-tbody');
+                algoMeta.forEach(meta => {
+                    const row = document.createElement('tr');
+                    row.id = `predict-row-${meta.num}`;
+                    const isYY = meta.isYY || false;
+                    const nameClass = isYY ? 'algo-name yy-name' : 'algo-name';
+                    const numClass = isYY ? 'algo-num yy-num' : 'algo-num';
+                    const yyBadge = isYY ? '<span class="yy-badge">★独家</span>' : '';
+                    row.innerHTML = `
+                        <td class="${nameClass}"><span class="${numClass}">${meta.num}</span>${meta.shortName}${yyBadge}</td>
+                        <td class="kill-cell" id="pred-k1-${meta.num}">--</td>
+                        <td class="kill-cell" id="pred-k2-${meta.num}">--</td>
+                        <td class="rec-cell ${isYY ? 'yy-rec' : ''}" id="pred-final-${meta.num}">--</td>
+                        <td class="stat-cell" id="stat-total-${meta.num}">0</td>
+                        <td class="stat-cell" id="stat-hits-${meta.num}">0</td>
+                        <td class="stat-rate" id="stat-rate-${meta.num}">0%</td>
+                        <td><span class="consec-badge zero" id="stat-consec-${meta.num}">0</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                const tabsContainer = document.getElementById('algo-tabs');
+                algoNames.forEach((name, i) => {
+                    const btn = document.createElement('button');
+                    const isYY = (i === 0);
+                    btn.className = 'tab-btn' + (i === 0 ? ' active' : '') + (isYY ? ' yy-tab' : '');
+                    btn.textContent = name;
+                    btn.onclick = () => switchTab(i + 1);
+                    tabsContainer.appendChild(btn);
+                });
+
+                const histContainer = document.getElementById('history-container');
+                for (let algoNum = 1; algoNum <= 12; algoNum++) {
+                    const histCard = document.createElement('div');
+                    histCard.className = 'card';
+                    histCard.id = `history-card-${algoNum}`;
+                    histCard.style.display = algoNum === 1 ? 'block' : 'none';
+                    histCard.style.padding = '12px';
+                    histCard.style.marginTop = '8px';
+                    const isAlgo1 = algoNum === 1;
+                    const meta = algoMeta[algoNum - 1];
+                    const titleSuffix = isAlgo1 ? ' · yy独家算法·形态交叉平衡法' : '';
+                    histCard.innerHTML = `
+                        <div class="section-title" style="font-size:15px;">
+                            <i class="fas fa-history"></i>
+                            <span>${meta.fullName}${titleSuffix}</span>
+                            ${isAlgo1 ? '<span style="background:#059669;color:#fff;font-size:10px;padding:0 8px;border-radius:10px;">★独家</span>' : ''}
                         </div>
-                    </div>
-                    <canvas id="scratchCanvas"></canvas>
-                </div>
-                <div class="mipai-foot">截止第 <span id="miPaiNextPeriod">--</span> 期开奖结果：<span id="miPaiCountdown">--:--</span></div>
-                <div class="mipai-actions">
-                    <button class="mipai-btn" id="resetScratchBtn">重新咪牌</button>
-                    <button class="mipai-btn primary" id="copyCurrentDrawBtn">复制结果</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-(function() {
-    const STORAGE_KEY = 'yy_algo_auto_v11';
-    const THEME_KEY = 'prob_theme';
-    const API_URL = 'https://super.pc28998.com/history/JND28';
-    const PERIOD_MS = 210000;
+                        <div class="table-responsive">
+                            <table class="history-table">
+                                <thead>${isAlgo1 ?
+                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>参考点1</th><th>参考点2</th><th>参考点3</th><th>命中</th><th>时间</th></tr>' :
+                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>杀组1</th><th>对错</th><th>杀组2</th><th>对错</th><th>最终建议</th><th>命中</th><th>时间</th></tr>'
+                                }</thead>
+                                <tbody id="history-tbody-${algoNum}"></tbody>
+                            </table>
+                        </div>
+                    `;
+                    histContainer.appendChild(histCard);
+                }
+            }
 
-    function getType(sum) { return sum >= 14 ? (sum % 2 === 1 ? '大单' : '大双') : (sum % 2 === 1 ? '小单' : '小双'); }
-    function numsForType(t) {
-        const r = [];
-        if (t === '小单') for (let i = 1; i <= 13; i += 2) r.push(i);
-        else if (t === '小双') for (let i = 0; i <= 12; i += 2) r.push(i);
-        else if (t === '大单') for (let i = 15; i <= 27; i += 2) r.push(i);
-        else if (t === '大双') for (let i = 14; i <= 26; i += 2) r.push(i);
-        return r;
-    }
-    function closestInType(v, t) {
-        const c = numsForType(t);
-        if (!c.length) return v;
-        let best = c[0], bestDist = Math.abs(v - best);
-        for (const x of c) {
-            const d = Math.abs(v - x);
-            if (d < bestDist || (d === bestDist && x < best)) { best = x; bestDist = d; }
-        }
-        return best;
-    }
+            function switchTab(num) {
+                currentTab = num;
+                for (let i = 1; i <= 12; i++) {
+                    document.getElementById(`history-card-${i}`).style.display = i === num ? 'block' : 'none';
+                }
+                document.querySelectorAll('#algo-tabs .tab-btn').forEach((btn, i) => {
+                    btn.classList.toggle('active', i === num - 1);
+                });
+                renderSingleHistory(num);
+            }
 
-    function crossBalance(V1, V2, V3) {
-        const vals = [V1, V2, V3], types = vals.map(v => getType(v));
-        const adj = [...vals];
-        let wasAdj = false;
-        const uniq = new Set(types);
-        if (uniq.size === 3) return { values: adj, types: types, wasAdjusted: false };
-        wasAdj = true;
-        let idx = 2;
-        if (types[2] === types[1]) idx = 2;
-        else if (types[1] === types[0]) idx = 1;
-        else if (types[2] === types[0]) idx = 2;
-        const missing = ['大单', '大双', '小单', '小双'].filter(t => !uniq.has(t));
-        const orig = adj[idx];
-        let bt = null, bv = null, bd = Infinity;
-        for (const m of missing) {
-            const cv = closestInType(orig, m);
-            const d = Math.abs(cv - orig);
-            if (d < bd || (d === bd && cv < bv)) { bd = d; bt = m; bv = cv; }
-        }
-        if (bt) adj[idx] = bv;
-        return { values: adj, types: adj.map(v => getType(v)), wasAdjusted: true };
-    }
+            // ====================== 渲染函数 ======================
+            function renderCurrent() {
+                const latest = data[0];
+                if (!latest) return;
+                document.getElementById('cur-period').textContent = latest.qihao || '--';
+                document.getElementById('cur-nums').textContent = latest.opennum ?
+                    `${latest.opennum}=${latest.sum}` : '--+--+--=--';
+                document.getElementById('cur-tag').textContent = `大小单双: ${getTag(latest.sum)}`;
+                document.getElementById('cur-time').textContent = '开奖时间: ' + (latest.opentime || '--');
+            }
 
-    function fmtPred(vals, types) { return vals.map((v, i) => `${types[i]} ${v}`).join(' ｜ '); }
-    function rangeDesc(vals) { const mn = Math.min(...vals), mx = Math.max(...vals); return `${mn}-${mx}`; }
-    function obscuredProcess(types, wasAdj) {
-        const syms = types.map(t => ({ '大单': 'α', '大双': 'β', '小单': 'γ', '小双': 'δ' }[t]));
-        return [
-            '【yy独家算法 · 内部参考】',
-            '第一步：采集近三周期态势值，构建三元基准序列。',
-            '第二步：将基准序列映射至四象限（α/β/γ/δ），校验象限标签互斥性。',
-            wasAdj ? '第三步：检测到标签重叠，激活补偿调节器。按最小位移原则重映射冲突项，直至三标签完全分化。' : '第三步：未检测到标签重叠，跳过补偿调节器。',
-            `第四步：输出独立参考点及其象限归属：${syms.join(' / ')}。`,
-            '注：以上为形态交叉平衡法的抽象概括，具体数值已视觉包装处理。'
-        ].join('\n');
-    }
+            function renderPredictions() {
+                if (data.length < 2) return;
+                for (let algoNum = 1; algoNum <= 12; algoNum++) {
+                    const predData = data.slice(1);
+                    const res = getPrediction(predData, algoNum);
+                    const pred = extractPredictionData(res, algoNum);
+                    const k1El = document.getElementById(`pred-k1-${algoNum}`);
+                    const k2El = document.getElementById(`pred-k2-${algoNum}`);
+                    const finalEl = document.getElementById(`pred-final-${algoNum}`);
 
-    function getPattern(nums) {
-        if (!nums || nums.length < 3) return '未知';
-        const [a, b, c] = nums.sort((x, y) => x - y);
-        if (a === b && b === c) return '豹子';
-        if (a === b || b === c || a === c) return '对子';
-        if (b - a === 1 && c - b === 1) return '顺子';
-        return '杂六';
-    }
+                    if (algoNum === 1) {
+                        if (k1El) k1El.textContent = '--';
+                        if (k2El) k2El.textContent = '--';
+                        if (finalEl) {
+                            if (pred.final && pred.final !== '--') {
+                                const refs = pred.refs || [];
+                                const html = refs.map(r =>
+                                    `<span class="ref-point">${r.shape} <span class="rp-val">${r.value}</span></span>`
+                                ).join(' ');
+                                finalEl.innerHTML = html;
+                            } else {
+                                finalEl.textContent = '--';
+                            }
+                        }
+                    } else {
+                        if (k1El) k1El.textContent = pred.k1 || '--';
+                        if (k2El) k2El.textContent = pred.k2 || '--';
+                        if (finalEl) finalEl.textContent = pred.final || '--';
+                    }
+                }
+            }
 
-    function analyzeTrend(historyData) {
-        if (!historyData || historyData.length < 5) return { level: '中', suggest: '数据不足', recentPatterns: [], ratio: 0, nextHint: '等待更多数据' };
-        const recent5 = historyData.slice(0, 5).map(item => getPattern(parseCode(item.opencode)));
-        const mixedCount = recent5.filter(p => p === '杂六').length;
-        const ratio = mixedCount / 5;
-        let level, suggest, nextHint;
-        if (ratio >= 0.8) { level = '优'; suggest = '杂六强势'; nextHint = '杂六可能延续，可顺势而为'; }
-        else if (ratio <= 0.4) { level = '差'; suggest = '回本概率高'; nextHint = '警惕对子/顺子/豹子出现'; }
-        else { level = '中'; suggest = '震荡期'; nextHint = '杂六与回本交替，谨慎判断'; }
-        return { level, suggest, recentPatterns: recent5, ratio, nextHint };
-    }
+            // 更新所有算法的统计信息（总次数、命中、中奖率、连中）
+            function updateAllStats() {
+                if (data.length < 2) return;
+                for (let algoNum = 1; algoNum <= 12; algoNum++) {
+                    const hitArray = [];
+                    const maxRows = Math.min(data.length - 1, 30);
+                    for (let i = 0; i < maxRows; i++) {
+                        const cur = data[i];
+                        const actual = getTag(parseInt(cur.sum) || 0);
+                        const predData = data.slice(i + 1);
+                        const res = getPrediction(predData, algoNum);
+                        if (!res) continue;
+                        const hit = checkHit(algoNum, res, actual);
+                        hitArray.push(hit);
+                    }
+                    updateStats(algoNum, hitArray);
+                }
+            }
 
-    function updateTrendUI(trend) {
-        if (!trend) return;
-        document.getElementById('trendLevel').textContent = trend.level;
-        document.getElementById('trendLevel').className = 'trend-badge ' + (trend.level === '优' ? 'good' : (trend.level === '差' ? 'bad' : 'warn'));
-        document.getElementById('trendSuggest').textContent = trend.suggest;
-        document.getElementById('trendRecent5').textContent = trend.recentPatterns.join(' → ');
-        document.getElementById('trendRatio').textContent = (trend.ratio * 100).toFixed(0) + '%';
-        document.getElementById('trendNextHint').textContent = trend.nextHint;
-    }
+            function renderSingleHistory(algoNum) {
+                const tbody = document.getElementById(`history-tbody-${algoNum}`);
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (data.length < 2) return;
+                const maxRows = 30;
+                const isAlgo1 = algoNum === 1;
 
-    function computeStats(history) {
-        if (!history || history.length === 0) return null;
-        const sums = history.map(item => sumCode(item.opencode));
-        const stats = {};
-        for (let i = 0; i <= 27; i++) {
-            const idx = sums.indexOf(i);
-            stats[String(i).padStart(2, '0')] = idx === -1 ? history.length : idx;
-        }
-        const findMiss = (arr, cond) => { for (let i = 0; i < arr.length; i++) if (cond(arr[i])) return i; return arr.length; };
-        const findPatternMiss = (hist, cond) => { for (let i = 0; i < hist.length; i++) { const nums = parseCode(hist[i].opencode); if (cond(nums)) return i; } return hist.length; };
-        stats['单'] = findMiss(sums, v => v % 2 === 1);
-        stats['双'] = findMiss(sums, v => v % 2 === 0);
-        stats['大'] = findMiss(sums, v => v >= 14);
-        stats['小'] = findMiss(sums, v => v <= 13);
-        stats['大单'] = findMiss(sums, v => v >= 14 && v % 2 === 1);
-        stats['大双'] = findMiss(sums, v => v >= 14 && v % 2 === 0);
-        stats['小单'] = findMiss(sums, v => v <= 13 && v % 2 === 1);
-        stats['小双'] = findMiss(sums, v => v <= 13 && v % 2 === 0);
-        stats['极小'] = findMiss(sums, v => v <= 5);
-        stats['极大'] = findMiss(sums, v => v >= 22);
-        stats['小边'] = findMiss(sums, v => v >= 6 && v <= 9);
-        stats['大边'] = findMiss(sums, v => v >= 18 && v <= 21);
-        stats['中'] = findMiss(sums, v => v >= 10 && v <= 17);
-        stats['对子'] = findPatternMiss(history, nums => nums && nums.length === 3 && (nums[0] === nums[1] || nums[1] === nums[2] || nums[0] === nums[2]) && !(nums[0] === nums[1] && nums[1] === nums[2]));
-        stats['顺子'] = findPatternMiss(history, nums => nums && nums.length === 3 && (nums[1] - nums[0] === 1 && nums[2] - nums[1] === 1));
-        stats['豹子'] = findPatternMiss(history, nums => nums && nums.length === 3 && nums[0] === nums[1] && nums[1] === nums[2]);
-        stats['杂六'] = findPatternMiss(history, nums => nums && nums.length === 3 && getPattern(nums) === '杂六');
-        stats['龙'] = findMiss(sums, v => [0, 3, 6, 9].includes(v % 10));
-        stats['虎'] = findMiss(sums, v => [1, 4, 7].includes(v % 10));
-        stats['合'] = findMiss(sums, v => [2, 5, 8].includes(v % 10));
-        return stats;
-    }
+                for (let i = 0; i < Math.min(data.length - 1, maxRows); i++) {
+                    const cur = data[i];
+                    const actual = getTag(parseInt(cur.sum) || 0);
+                    const predData = data.slice(i + 1);
+                    const res = getPrediction(predData, algoNum);
+                    if (!res) continue;
+                    const pred = extractPredictionData(res, algoNum);
 
-    function renderStats(stats) {
-        if (!stats) return;
-        let gridHtml = '';
-        for (let i = 0; i <= 27; i++) {
-            const key = String(i).padStart(2, '0');
-            gridHtml += `<div class="stats-subitem"><div class="num">${key}</div><div class="miss">${stats[key] ?? '--'}期</div></div>`;
-        }
-        document.getElementById('sumMissGrid').innerHTML = gridHtml;
-        const ids = {
-            '单': 'miss-dan', '双': 'miss-shuang', '大': 'miss-da', '小': 'miss-xiao',
-            '大单': 'miss-xiaodan', '大双': 'miss-xiaoshuang', '小单': 'miss-dadan', '小双': 'miss-dashuang',
-            '极小': 'miss-jixiao', '极大': 'miss-jida', '小边': 'miss-xiaobian', '大边': 'miss-dabian', '中': 'miss-zhong',
-            '对子': 'miss-duizi', '顺子': 'miss-shunzi', '豹子': 'miss-baozi', '杂六': 'miss-zaliu',
-            '龙': 'miss-long', '虎': 'miss-hu', '合': 'miss-he'
-        };
-        for (const [stat, id] of Object.entries(ids)) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = stats[stat] ?? '--';
-        }
-    }
+                    if (isAlgo1) {
+                        const refs = pred.refs || [];
+                        const hit = refs.some(r => r.shape === actual);
+                        const row = document.createElement('tr');
+                        const r1 = refs[0] ? `${refs[0].shape}${refs[0].value}` : '--';
+                        const r2 = refs[1] ? `${refs[1].shape}${refs[1].value}` : '--';
+                        const r3 = refs[2] ? `${refs[2].shape}${refs[2].value}` : '--';
+                        row.innerHTML = `
+                            <td>${cur.qihao}</td>
+                            <td>${cur.opennum}=${cur.sum}</td>
+                            <td>${actual}</td>
+                            <td>${r1}</td>
+                            <td>${r2}</td>
+                            <td>${r3}</td>
+                            <td class="${hit ? 'result-correct' : 'result-wrong'}">${hit ? '中' : '错'}</td>
+                            <td>${formatTime(cur.opentime)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    } else {
+                        const k1Hit = pred.k1 && actual !== pred.k1;
+                        const k2Hit = pred.k2 && actual !== pred.k2;
+                        const finalHit = pred.final && pred.final !== '--' && pred.final.includes(actual);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${cur.qihao}</td>
+                            <td>${cur.opennum}=${cur.sum}</td>
+                            <td>${actual}</td>
+                            <td>${pred.k1||'--'}</td>
+                            <td class="${k1Hit?'result-correct':'result-wrong'}">${k1Hit?'中':'错'}</td>
+                            <td>${pred.k2||'--'}</td>
+                            <td class="${k2Hit?'result-correct':'result-wrong'}">${k2Hit?'中':'错'}</td>
+                            <td>${pred.final||'--'}</td>
+                            <td class="${finalHit?'result-correct':'result-wrong'}">${finalHit?'中':'错'}</td>
+                            <td>${formatTime(cur.opentime)}</td>
+                        `;
+                        tbody.appendChild(row);
+                    }
+                }
+            }
 
-    const S = {
-        latest: null, historyData: [], predHistory: [], curAnalysis: null,
-        countdownTimer: null, pollTimer: null,
-        historyFilter: 'all', activeView: 'homeView',
-        scratch: { canvas: null, ctx: null, drawing: false }, statsData: null
-    };
-    function $(id) { return document.getElementById(id); }
-    function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1400); }
-    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ predHistory: S.predHistory.slice(0, 50), curAnalysis: S.curAnalysis })); }
-    function load() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { const d = JSON.parse(r); S.predHistory = d.predHistory || []; S.curAnalysis = d.curAnalysis || null; } } catch (e) {} }
-    function saveTheme(t) { localStorage.setItem(THEME_KEY, t); }
-    function loadTheme() { const t = localStorage.getItem(THEME_KEY); if (t) document.documentElement.setAttribute('data-theme', t); }
-    function toggleTheme() { const cur = document.documentElement.getAttribute('data-theme') || 'dark', nxt = cur === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nxt); saveTheme(nxt); toast(nxt === 'dark' ? '深色主题' : '浅色主题'); }
-    function fmtTime(sec) { const m = String(Math.floor(sec / 60)).padStart(2, '0'), s = String(sec % 60).padStart(2, '0'); return `${m}:${s}`; }
-    function tsMs(ts) { const n = Number(ts); return n < 1e12 ? n * 1000 : n; }
-    function parseCode(c) { return String(c || '').split(',').map(n => Number(n.trim())).filter(Number.isFinite); }
-    function sumCode(c) { const n = Array.isArray(c) ? c : parseCode(c); return n.reduce((a, b) => a + b, 0); }
+            function renderHistory() {
+                renderSingleHistory(currentTab);
+            }
 
-    function renderLatest() {
-        const l = S.latest;
-        if (!l) { $('latestPeriod').textContent = '--期'; $('latestSum').textContent = '和值 -- · --'; $('miPaiPeriod').textContent = '第 -- 期结果'; $('miPaiNextPeriod').textContent = '--'; ['scratchN1','scratchN2','scratchN3','scratchSum'].forEach(id => $(id).textContent = '-'); return; }
-        const nums = parseCode(l.opencode), sum = sumCode(nums), type = getType(sum);
-        $('latestPeriod').textContent = `${l.expect}期`; $('latestSum').textContent = `和值 ${sum} · ${type}`;
-        $('miPaiPeriod').textContent = `第 ${l.expect} 期结果`; $('miPaiNextPeriod').textContent = String(Number(l.expect) + 1);
-        $('scratchN1').textContent = nums[0] ?? '-'; $('scratchN2').textContent = nums[1] ?? '-'; $('scratchN3').textContent = nums[2] ?? '-'; $('scratchSum').textContent = sum;
-        const trend = analyzeTrend(S.historyData);
-        updateTrendUI(trend);
-    }
+            function updateStats(algoNum, hitArray) {
+                const total = hitArray.length;
+                const hits = hitArray.filter(Boolean).length;
+                const rate = total > 0 ? Math.round((hits / total) * 100) : 0;
+                let consec = 0;
+                for (let i = 0; i < total; i++) {
+                    if (hitArray[i]) consec++;
+                    else break;
+                }
+                const elTotal = document.getElementById(`stat-total-${algoNum}`);
+                const elHits = document.getElementById(`stat-hits-${algoNum}`);
+                const elRate = document.getElementById(`stat-rate-${algoNum}`);
+                const elConsec = document.getElementById(`stat-consec-${algoNum}`);
+                if (elTotal) elTotal.textContent = total;
+                if (elHits) elHits.textContent = hits;
+                if (elRate) {
+                    elRate.textContent = rate + '%';
+                    elRate.className = 'stat-rate';
+                    if (rate >= 60) elRate.classList.add('rate-high');
+                    else if (rate >= 40) elRate.classList.add('rate-mid');
+                    else if (total > 0) elRate.classList.add('rate-low');
+                }
+                if (elConsec) {
+                    elConsec.textContent = consec;
+                    elConsec.className = 'consec-badge' + (consec === 0 ? ' zero' : '');
+                }
+            }
 
-    function runAutoPredict() {
-        if (!S.latest || S.historyData.length < 3) { $('heroStatus').textContent = '数据预热中，需至少3期...'; return; }
-        const recent = S.historyData.slice(0, 3).reverse(); if (recent.length < 3) return;
-        const V1 = sumCode(recent[0].opencode), V2 = sumCode(recent[1].opencode), V3 = sumCode(recent[2].opencode);
-        const result = crossBalance(V1, V2, V3);
-        const targetExpect = String(Number(S.latest.expect) + 1);
-        const displayText = fmtPred(result.values, result.types);
-        const rangeD = rangeDesc(result.values);
-        const obsProc = obscuredProcess(result.types, result.wasAdjusted);
-        const analysis = { expect: targetExpect, values: result.values, types: result.types, displayText, rangeDesc: rangeD, obscuredProcess: obsProc, wasAdjusted: result.wasAdjusted, sourceValues: [V1, V2, V3], generatedAt: Date.now() };
-        S.curAnalysis = analysis;
-        $('heroKill').textContent = displayText; $('heroRecommend').textContent = rangeD;
-        $('killPreview').textContent = result.values.join(' '); $('recommendPreview').textContent = result.types.join(' ');
-        $('specialPreview').textContent = `${V1} · ${V2} · ${V3}`;
-        $('num1').textContent = result.values[0]; $('num2').textContent = result.values[1]; $('num3').textContent = result.values[2];
-        $('heroStatus').textContent = `预测已自动生成 · ${targetExpect}期`;
-        const exists = S.predHistory.find(i => i.expect === targetExpect);
-        if (!exists) saveRecord({ expect: targetExpect, values: result.values, types: result.types, displayText, rangeDesc: rangeD, generatedAt: Date.now(), status: '待开奖', actualResult: '' });
-        save();
-    }
+            // ====================== 自动刷新 ======================
+            function setupCountdown() {
+                if (timer) clearInterval(timer);
+                const latest = data[0];
+                if (!latest || !latest.opentime) {
+                    document.getElementById('cd').style.display = 'none';
+                    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = setInterval(() => {
+                        if (!isFetching) fetchData(false);
+                    }, 60000);
+                    return;
+                }
+                try {
+                    const parts = latest.opentime.trim().split(' ');
+                    let base;
+                    if (parts.length === 1) {
+                        const [h, m, s] = parts[0].split(':').map(Number);
+                        base = new Date();
+                        base.setHours(h, m, s || 0, 0);
+                        if (base > Date.now()) base.setDate(base.getDate() - 1);
+                    } else {
+                        base = new Date(latest.opentime.replace(/-/g, '/'));
+                    }
+                    const interval = 210000;
+                    const periodsPassed = Math.floor((Date.now() - base.getTime()) / interval);
+                    nextOpenTime = new Date(base.getTime() + (periodsPassed + 1) * interval);
+                    document.getElementById('cd').style.display = 'inline-block';
+                    tick();
+                    timer = setInterval(tick, 1000);
 
-    function saveRecord(rec) {
-        const idx = S.predHistory.findIndex(i => i.expect === rec.expect);
-        if (idx > -1) S.predHistory[idx] = { ...S.predHistory[idx], ...rec };
-        else S.predHistory.unshift(rec);
-        S.predHistory = S.predHistory.slice(0, 50); save(); renderHistory(); updateWinRate();
-    }
-    function deleteRecord(expect) { S.predHistory = S.predHistory.filter(i => i.expect !== expect); save(); renderHistory(); updateWinRate(); }
-    function clearHistory() { if (confirm('清空所有历史？')) { S.predHistory = []; save(); renderHistory(); updateWinRate(); toast('已清空'); } }
-    function filterHistory() { const f = S.historyFilter; if (f === 'correct') return S.predHistory.filter(i => i.status === '正确'); if (f === 'wrong') return S.predHistory.filter(i => i.status === '错误'); if (f === 'pending') return S.predHistory.filter(i => i.status === '待开奖'); return S.predHistory; }
-    function renderHistory() {
-        const list = $('historyTimeline'); const settled = S.predHistory.filter(i => i.status === '正确' || i.status === '错误'); const corr = settled.filter(i => i.status === '正确').length;
-        $('historyAccuracy').textContent = settled.length ? `命中率：${Math.round(corr / settled.length * 100)}% (${corr}/${settled.length})` : '暂无回测数据';
-        const filtered = filterHistory().slice(0, 30);
-        if (!filtered.length) { list.innerHTML = '<div class="history-item"><div class="history-body"><div class="history-row"><b>暂无记录</b></div></div></div>'; return; }
-        list.innerHTML = filtered.map(item => { const cls = item.status === '正确' ? 'correct' : item.status === '错误' ? 'wrong' : 'pending'; return `<div class="history-item"><div class="history-item-top"><div class="history-period">${item.expect}期</div><div class="history-actions"><span class="history-tag ${cls}">${item.status}</span><button class="history-delete" data-delete="${item.expect}">删除</button></div></div><div class="history-body"><div class="history-row"><span>预测</span><b>${item.displayText || '--'}</b></div><div class="history-row"><span>实际</span><b>${item.actualResult || '待开奖'}</b></div></div></div>`; }).join('');
-        document.querySelectorAll('.history-delete').forEach(b => b.addEventListener('click', e => deleteRecord(e.target.dataset.delete)));
-    }
-    function updateWinRate() { const settled = S.predHistory.filter(i => i.status === '正确' || i.status === '错误'); const corr = settled.filter(i => i.status === '正确').length; $('winRatePreview').textContent = settled.length ? Math.round(corr / settled.length * 100) + '%' : '--'; }
+                    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = setInterval(() => {
+                        const now = Date.now();
+                        if (nextOpenTime && now >= nextOpenTime.getTime() - 2000) {
+                            if (!isFetching) fetchData(false);
+                        }
+                    }, 10000);
 
-    async function fetchData(silent = false) {
-        try {
-            if (!silent) $('heroStatus').textContent = '同步数据...';
-            const res = await fetch(API_URL, { cache: 'no-store' }); const data = await res.json(); if (data.code !== 1 || !Array.isArray(data.data)) throw new Error('接口异常');
-            S.historyData = data.data.slice(0, 50).map(item => ({ expect: String(item.expect), opencode: item.opencode, opentime: item.opentime }));
-            const prevLatest = S.latest; S.latest = S.historyData[0] || null;
-            if (S.latest) S.latest.sum = sumCode(S.latest.opencode);
-            renderLatest();
-            const newExpect = S.latest?.expect;
-            if (prevLatest && newExpect && prevLatest.expect !== newExpect) { await checkBetRecords(); runAutoPredict(); if (!silent) toast('新一期已开奖，预测已自动更新'); }
-            else if (!prevLatest) { await checkBetRecords(); runAutoPredict(); }
-            else { await checkBetRecords(); if (!S.curAnalysis) runAutoPredict(); }
-            $('heroStatus').textContent = `数据就绪 · ${S.latest?.expect || '--'}期`;
-            updateCountdown();
-            S.statsData = computeStats(S.historyData);
-            if (S.activeView === 'statsView') renderStats(S.statsData);
-        } catch (e) { $('heroStatus').textContent = '同步失败，自动重试中...'; }
-    }
+                } catch (e) {
+                    document.getElementById('cd').style.display = 'none';
+                    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = setInterval(() => {
+                        if (!isFetching) fetchData(false);
+                    }, 60000);
+                }
+            }
 
-    function getRemainSec() { if (!S.latest) return 0; return Math.floor((tsMs(S.latest.opentime) + PERIOD_MS - Date.now()) / 1000); }
-    function updateCountdown() { clearInterval(S.countdownTimer); const tick = () => { if (!S.latest) { $('countdown').textContent = '--:--'; $('miPaiCountdown').textContent = '--:--'; return; } const r = getRemainSec(); if (r <= 0) { $('countdown').textContent = '开奖中'; $('miPaiCountdown').textContent = '开奖中'; return; } $('countdown').textContent = fmtTime(r); $('miPaiCountdown').textContent = fmtTime(r); $('countdownWrap').classList.toggle('countdown-warning', r <= 10); }; tick(); S.countdownTimer = setInterval(tick, 1000); }
-    function getPollInterval() { const r = getRemainSec(); if (r <= 10) return 2000; if (r <= 120) return 5000; return 30000; }
-    function schedulePolling() { clearInterval(S.pollTimer); const poll = () => { const interval = getPollInterval(); clearInterval(S.pollTimer); S.pollTimer = setInterval(() => { fetchData(true).then(() => { const newInterval = getPollInterval(); if (newInterval !== interval) schedulePolling(); }); }, interval); }; poll(); }
+            function tick() {
+                const diff = nextOpenTime - Date.now();
+                const cdTxt = document.getElementById('cd-txt');
+                const cdEl = document.getElementById('cd');
+                if (diff <= 0) {
+                    cdTxt.textContent = '正在开奖...';
+                    cdEl.classList.add('highlight');
+                    clearInterval(timer);
+                    if (!isFetching) fetchData(false);
+                    return;
+                }
+                const m = Math.floor(diff / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                cdTxt.textContent = `${m}分${s.toString().padStart(2, '0')}秒`;
+                cdEl.classList.toggle('highlight', diff < 30000);
+            }
 
-    async function checkBetRecords() { if (!S.historyData.length || !S.predHistory.length) return; const map = new Map(); S.historyData.forEach(item => map.set(String(item.expect), item)); let changed = false; S.predHistory = S.predHistory.map(item => { if (item.status !== '待开奖') return item; const hit = map.get(String(item.expect)); if (!hit) return item; const sum = sumCode(hit.opencode), realType = getType(sum); const isCorrect = item.types && item.types.includes(realType); changed = true; return { ...item, actualResult: `${parseCode(hit.opencode).join('+')}=${sum} ${realType}`, status: isCorrect ? '正确' : '错误' }; }); if (changed) save(); }
+            // ====================== 数据获取 ======================
+            async function fetchData(showLoading = true) {
+                if (isFetching) return;
+                isFetching = true;
+                if (showLoading) document.getElementById('error').style.display = 'none';
+                try {
+                    const resp = await fetch(API_URL);
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    const json = await resp.json();
+                    if (json && json.data && Array.isArray(json.data)) {
+                        data = json.data.map(mapApiItem);
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                        renderAll();
+                        hideError();
+                    } else {
+                        throw new Error('数据格式错误');
+                    }
+                } catch (e) {
+                    console.warn('API请求失败，使用缓存:', e.message);
+                    const cached = localStorage.getItem(CACHE_KEY);
+                    if (cached) {
+                        data = JSON.parse(cached);
+                        renderAll();
+                        showError('网络异常，已加载本地缓存数据');
+                    } else {
+                        showError('数据加载失败：' + e.message);
+                    }
+                } finally {
+                    isFetching = false;
+                }
+            }
 
-    function copyText(text) { if (navigator.clipboard) return navigator.clipboard.writeText(text); const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } finally { document.body.removeChild(ta); } }
+            function showError(msg) { const el = document.getElementById('error');
+                el.textContent = msg;
+                el.style.display = 'block'; }
 
-    function openProcessSheet() { if (!S.curAnalysis) { toast('暂无分析结果'); return; } const a = S.curAnalysis; $('sheetKillValue').textContent = a.displayText; $('sheetKillConf').textContent = '形态交叉平衡法'; $('sheetKillStrategy').textContent = a.wasAdjusted ? '已微调' : '直接通过'; $('sheetRecommendValue').textContent = a.values.join(' / '); $('sheetSpecialValue').textContent = a.sourceValues.join(' · '); $('sheetCalcSteps').textContent = a.obscuredProcess; $('resultSection').classList.add('show'); }
+            function hideError() { document.getElementById('error').style.display = 'none'; }
 
-    function openMiPai() { $('miPaiModal').classList.add('show'); setTimeout(() => initScratch(), 60); }
-    function closeMiPai() { $('miPaiModal').classList.remove('show'); }
-    function initScratch() { const canvas = $('scratchCanvas'), wrap = $('scratchWrap'); if (!canvas || !wrap) return; const rect = wrap.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.floor(rect.width * dpr); canvas.height = Math.floor(rect.height * dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; const ctx = canvas.getContext('2d', { alpha: true }); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); S.scratch.ctx = ctx; S.scratch.canvas = canvas; S.scratch.drawing = false; drawCover(); bindScratch(); }
-    function drawCover() { const ctx = S.scratch.ctx; const w = S.scratch.canvas.clientWidth, h = S.scratch.canvas.clientHeight; ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#c0c0c0'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#ffd74f'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('刮一刮', w / 2, h / 2 - 8); ctx.font = '14px sans-serif'; ctx.fillText('更刺激', w / 2, h / 2 + 18); }
-    function getPt(e) { const r = S.scratch.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
-    function scratchLine(f, t) { const ctx = S.scratch.ctx; if (!ctx) return; ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 32; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y); ctx.stroke(); ctx.restore(); }
-    function bindScratch() { const c = S.scratch.canvas; if (!c || c.dataset.bound) return; c.dataset.bound = '1'; let lp = null; c.addEventListener('pointerdown', e => { e.preventDefault(); S.scratch.drawing = true; lp = getPt(e); scratchDot(lp); }); c.addEventListener('pointermove', e => { if (!S.scratch.drawing) return; e.preventDefault(); const p = getPt(e); if (lp) scratchLine(lp, p); lp = p; }); window.addEventListener('pointerup', () => { S.scratch.drawing = false; lp = null; }); }
-    function scratchDot(p) { const ctx = S.scratch.ctx; ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
-    function resetScratch() { drawCover(); toast('已重置'); }
-    function copyCurResult() { if (!S.latest) return; const n = parseCode(S.latest.opencode); copyText(`${S.latest.expect}期 ${n.join('+')}=${sumCode(n)} ${getType(sumCode(n))}`); toast('已复制'); }
+            // ====================== 主渲染 ======================
+            function renderAll() {
+                renderCurrent();
+                renderPredictions();
+                updateAllStats(); // 关键：自动更新所有统计
+                renderHistory();
+                setupCountdown();
+            }
 
-    function bindEvents() {
-        $('themeBtn').addEventListener('click', toggleTheme); $('themeBtn2').addEventListener('click', toggleTheme);
-        $('processBtn').addEventListener('click', openProcessSheet);
-        $('copyKillBtn').addEventListener('click', () => { if (S.curAnalysis) { copyText(S.curAnalysis.displayText); toast('已复制预测结果'); } });
-        $('copyRecommendBtn').addEventListener('click', () => { if (S.curAnalysis) { copyText(S.curAnalysis.rangeDesc); toast('已复制参考区间'); } });
-        $('miPaiBtn').addEventListener('click', openMiPai); $('closeMiPaiBtn').addEventListener('click', closeMiPai); $('miPaiBackdrop').addEventListener('click', closeMiPai);
-        $('resetScratchBtn').addEventListener('click', resetScratch); $('copyCurrentDrawBtn').addEventListener('click', copyCurResult);
-        $('closeSheetBtn').addEventListener('click', () => $('resultSection').classList.remove('show')); $('sheetBackdrop').addEventListener('click', () => $('resultSection').classList.remove('show'));
-        $('clearHistoryBtn').addEventListener('click', clearHistory);
-        document.querySelectorAll('.mode-chip').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.mode-chip').forEach(x => x.classList.remove('active')); b.classList.add('active'); S.activeView = b.dataset.view; document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === b.dataset.view)); if (b.dataset.view === 'statsView' && S.statsData) renderStats(S.statsData); }));
-        document.querySelectorAll('.filter-chip').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active')); b.classList.add('active'); S.historyFilter = b.dataset.historyFilter; renderHistory(); }));
-    }
-
-    function hideSplash() { $('splash').classList.add('hide'); }
-    async function bootstrap() {
-        loadTheme(); load(); renderHistory(); updateWinRate(); bindEvents();
-        await fetchData(true);
-        if (S.curAnalysis) { const a = S.curAnalysis; $('heroKill').textContent = a.displayText || '--'; $('heroRecommend').textContent = a.rangeDesc || '--'; $('killPreview').textContent = a.displayText || '--'; $('recommendPreview').textContent = (a.types || []).join(' '); $('specialPreview').textContent = (a.sourceValues || []).join(' · '); $('num1').textContent = a.values?.[0] ?? '-'; $('num2').textContent = a.values?.[1] ?? '-'; $('num3').textContent = a.values?.[2] ?? '-'; $('heroStatus').textContent = '预测已就绪（自动更新）'; }
-        updateCountdown(); schedulePolling();
-        setTimeout(hideSplash, 1200);
-    }
-    bootstrap().catch(console.error);
-})();
-</script>
+            // ====================== 初始化 ======================
+            document.addEventListener('DOMContentLoaded', () => {
+                generateUI();
+                const cached = localStorage.getItem(CACHE_KEY);
+                if (cached) {
+                    try {
+                        data = JSON.parse(cached);
+                        renderAll();
+                    } catch (e) {}
+                }
+                fetchData(true);
+                document.getElementById('refresh-btn').addEventListener('click', () => fetchData(true));
+            });
+        })();
+    </script>
 </body>
 </html>
