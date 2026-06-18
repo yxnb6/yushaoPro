@@ -1,680 +1,669 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-theme="dark">
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>yy独家算法 · 全自动预测+趋势判断</title>
+    <style>
+        :root {
+            --bg: #080e1a;
+            --bg2: #0d1424;
+            --panel: #111a2c;
+            --panel2: #152032;
+            --panel3: #19273d;
+            --line: rgba(255, 255, 255, 0.08);
+            --text1: #f0f3fa;
+            --text2: #b0b9ca;
+            --text3: #7a8496;
+            --cyan: #00e5ff;
+            --purple: #b44dff;
+            --gold: #ffc850;
+            --green: #2effa7;
+            --red: #ff5d56;
+            --shadow-xs: 0 2px 6px rgba(0, 0, 0, 0.12);
+            --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.16);
+            --shadow-md: 0 16px 36px rgba(0, 0, 0, 0.22);
+            --shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.30);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        [data-theme="light"] {
+            --bg: #eef2f7;
+            --bg2: #f5f7fa;
+            --panel: #ffffff;
+            --panel2: #f0f3f8;
+            --panel3: #e4e9f2;
+            --line: rgba(0, 0, 0, 0.07);
+            --text1: #0f141d;
+            --text2: #5f6977;
+            --text3: #8f98a7;
+            --cyan: #009faf;
+            --purple: #7c3aed;
+            --gold: #c79120;
+            --green: #0d9e5e;
+            --red: #c62850;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { min-height: 100%; background: var(--bg); }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            color: var(--text1); overflow-x: hidden; background: var(--bg);
+            -webkit-font-smoothing: antialiased;
+        }
+        button, input, select { font: inherit; border: none; outline: none; background: none; color: inherit; }
+        .app { width: min(100%, 520px); margin: 0 auto; min-height: 100vh; padding: 14px 14px calc(env(safe-area-inset-bottom) + 24px); position: relative; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .title-wrap .mini { font-size: 10px; color: var(--purple); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2px; font-weight: 700; }
+        .title-wrap h1 { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .top-actions { display: flex; gap: 8px; }
+        .circle-btn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-xs); font-size: 17px; cursor: pointer; transition: all 0.2s var(--ease); }
+        .circle-btn:active { transform: scale(0.94); }
+        .hero { position: relative; overflow: hidden; border-radius: 30px; padding: 16px; background: linear-gradient(135deg, #1a1040, #151030 45%, #0f1830); box-shadow: 0 18px 44px rgba(80, 50, 180, 0.16); margin-bottom: 12px; isolation: isolate; border: 1px solid rgba(180, 77, 255, 0.12); }
+        .hero::before, .hero::after { content: ""; position: absolute; border-radius: 50%; filter: blur(20px); pointer-events: none; z-index: 0; opacity: 0.35; }
+        .hero::before { width: 100px; height: 100px; left: -8px; top: 8px; background: rgba(0, 229, 255, 0.1); animation: floatGlow 10s ease-in-out infinite; }
+        .hero::after { width: 130px; height: 130px; right: -16px; bottom: -8px; background: rgba(180, 77, 255, 0.08); animation: floatGlow 12s ease-in-out infinite reverse; }
+        .hero-grid { position: relative; z-index: 2; }
+        .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .hero-tag { height: 36px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; color: #fff; font-size: 11px; font-weight: 900; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .hero-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px rgba(0, 229, 255, 0.6); animation: pulseDot 2s ease-in-out infinite; }
+        .hero-tools { display: flex; gap: 6px; }
+        .hero-tool { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 18px; cursor: pointer; transition: all 0.2s var(--ease); }
+        .hero-tool:active { background: rgba(255, 255, 255, 0.12); }
+        .hero-meta { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; margin-bottom: 6px; }
+        .period { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; letter-spacing: -0.02em; }
+        .sum { font-size: 15px; line-height: 1.3; color: rgba(255, 255, 255, 0.9); font-weight: 900; letter-spacing: -0.02em; margin-bottom: 3px; }
+        .status { min-height: 16px; font-size: 11px; color: rgba(255, 255, 255, 0.7); font-weight: 700; }
+        .hero-right { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+        .hero-pill { min-width: 80px; height: 34px; padding: 0 10px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.1); font-weight: 900; font-size: 12px; }
+        .hero-pill small { font-size: 9px; opacity: 0.8; font-weight: 800; }
+        .count-dot { width: 6px; height: 6px; border-radius: 50%; background: #dff6ff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.6); flex: 0 0 auto; }
+        .countdown-warning .count-dot { background: #ffd36d; box-shadow: 0 0 10px rgba(255, 208, 106, 0.8); }
+        .hero-center { position: relative; display: flex; align-items: center; justify-content: center; min-height: 140px; margin: 2px 0 6px; }
+        .hero-orbit { position: absolute; inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 180px; height: 180px; border-radius: 50%; pointer-events: none; z-index: 0; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.015); animation: orbitBreathe 4.5s ease-in-out infinite; }
+        .hero-core-glow { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 120px; height: 60px; background: radial-gradient(circle, rgba(180, 77, 255, 0.12), transparent 70%); filter: blur(12px); z-index: 0; animation: softBreath 4s ease-in-out infinite; pointer-events: none; }
+        .hero-balls { position: relative; z-index: 2; display: flex; gap: 8px; align-items: center; justify-content: center; }
+        .hero-ball { width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(245, 247, 251, 0.88)); color: #0b1017; display: grid; place-items: center; font-size: 30px; font-weight: 1000; letter-spacing: -0.03em; box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+        .hero-ball::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 28%; background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), transparent); pointer-events: none; }
+        .hero-ball.flash { animation: numberFlash 0.5s var(--ease); }
+        .hero-result-lines { display: grid; gap: 8px; margin-bottom: 12px; }
+        .hero-line { min-height: 46px; border-radius: 18px; padding: 10px 12px; display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .hero-line .k { color: rgba(255, 255, 255, 0.78); font-size: 11px; font-weight: 800; letter-spacing: 0.03em; }
+        .hero-line .v { color: #fff; font-size: 15px; font-weight: 1000; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hero-line .mini-copy { min-width: 46px; height: 28px; padding: 0 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .hero-actions { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+        .auto-badge { height: 50px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-weight: 900; font-size: 13px; letter-spacing: 0.04em; cursor: default; box-shadow: var(--shadow-xs); }
+        .auto-badge .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px rgba(46, 255, 167, 0.6); animation: pulseDot 2s ease-in-out infinite; }
+        .secondary-btn { height: 50px; padding: 0 14px; min-width: 64px; border-radius: 999px; cursor: pointer; font-weight: 1000; box-shadow: var(--shadow-sm); transition: all 0.2s var(--ease); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; font-size: 12px; }
+        .secondary-btn:active { transform: scale(0.96); }
+        .mode-row { display: flex; gap: 8px; overflow: auto; padding: 2px 0 8px; scrollbar-width: none; margin-bottom: 2px; }
+        .mode-row::-webkit-scrollbar { display: none; }
+        .mode-chip { height: 38px; padding: 0 14px; border-radius: 999px; white-space: nowrap; background: var(--panel); border: 1px solid var(--line); color: var(--text2); font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: var(--shadow-xs); flex: 0 0 auto; transition: all 0.2s var(--ease); }
+        .mode-chip.active { background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #fff; border-color: transparent; box-shadow: 0 8px 20px rgba(140, 70, 240, 0.2); }
+        .view { display: none; }
+        .view.active { display: block; }
+        .result-bars { display: grid; gap: 10px; margin-top: 4px; }
+        .result-bar { border-radius: 24px; padding: 14px; display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; cursor: pointer; box-shadow: var(--shadow-sm); border: 1px solid var(--line); transition: transform 0.2s var(--ease); }
+        .result-bar:active { transform: scale(0.98); }
+        .result-bar.black { background: linear-gradient(135deg, #0e1116, #1a1030); color: #fff; border-color: rgba(180, 77, 255, 0.18); }
+        .result-bar.purple { background: linear-gradient(135deg, #3d2a80, #5c3dc0); color: #fff; border-color: transparent; }
+        .result-bar.orange { background: linear-gradient(135deg, #ff9e40, #e07820); color: #151515; border-color: transparent; }
+        .result-bar.white { background: var(--panel); color: var(--text1); border: 1px solid var(--line); }
+        .bar-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.08); font-size: 16px; font-weight: 900; }
+        .orange .bar-icon { background: rgba(255, 255, 255, 0.26); }
+        .white .bar-icon { background: var(--panel2); }
+        .bar-main { min-width: 0; }
+        .bar-label { font-size: 10px; opacity: 0.7; font-weight: 900; margin-bottom: 2px; }
+        .bar-value { font-size: 18px; font-weight: 1000; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+        .bar-sub { font-size: 10px; opacity: 0.65; line-height: 1.35; }
+        .bar-badge { min-width: 28px; height: 28px; border-radius: 999px; padding: 0 7px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 1000; background: rgba(255, 255, 255, 0.1); }
+        .section { margin-top: 8px; border-radius: 26px; padding: 14px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+        .section-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+        .section-top h3 { font-size: 17px; font-weight: 1000; letter-spacing: -0.02em; margin-bottom: 2px; }
+        .section-top p { font-size: 11px; color: var(--text2); line-height: 1.4; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+        .stats-card { background: var(--panel2); border: 1px solid var(--line); border-radius: 20px; padding: 12px; }
+        .stats-card .title { font-size: 12px; font-weight: 900; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.03em; }
+        .stats-card .content { display: flex; flex-direction: column; gap: 6px; }
+        .stats-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; line-height: 1.35; }
+        .stats-row .key { color: var(--text2); }
+        .stats-row .val { color: var(--text1); font-weight: 900; background: var(--panel3); padding: 2px 8px; border-radius: 999px; min-width: 44px; text-align: center; }
+        .stats-subgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+        .stats-subitem { background: var(--panel3); border-radius: 12px; padding: 8px 2px; text-align: center; }
+        .stats-subitem .num { font-size: 14px; font-weight: 1000; color: var(--text1); line-height: 1.2; }
+        .stats-subitem .miss { font-size: 9px; color: var(--text3); margin-top: 2px; }
+        .history-toolbar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .ghost-btn, .filter-chip { height: 32px; padding: 0 11px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); color: var(--text2); font-size: 11px; font-weight: 900; cursor: pointer; }
+        .filter-chip.active { background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #fff; border-color: transparent; }
+        .history-list { display: grid; gap: 8px; max-height: 60vh; overflow-y: auto; -webkit-overflow-scrolling: touch; contain: content; }
+        .history-item { border-radius: 18px; padding: 11px; background: var(--panel2); border: 1px solid var(--line); }
+        .history-item-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px; }
+        .history-period { font-size: 14px; font-weight: 1000; letter-spacing: -0.02em; }
+        .history-actions { display: flex; align-items: center; gap: 6px; }
+        .history-tag { height: 24px; padding: 0 8px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 1000; }
+        .history-tag.correct { background: rgba(46, 255, 167, 0.14); color: #2effa7; }
+        .history-tag.wrong { background: rgba(255, 61, 113, 0.14); color: #ff5d7a; }
+        .history-tag.pending { background: rgba(0, 229, 255, 0.12); color: #00e5ff; }
+        .history-delete { height: 26px; padding: 0 8px; border-radius: 999px; background: var(--panel3); border: 1px solid var(--line); color: var(--text2); font-size: 10px; font-weight: 900; cursor: pointer; }
+        .history-body { display: grid; gap: 4px; }
+        .history-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: 11px; color: var(--text2); }
+        .history-row span { color: var(--text3); }
+        .history-row b { color: var(--text1); text-align: right; font-size: 12px; font-weight: 900; }
+        .trend-card { border-radius: 22px; padding: 14px; margin: 12px 0; background: var(--panel2); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+        .trend-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .trend-header h4 { font-size: 15px; font-weight: 900; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .trend-status { display: flex; align-items: center; gap: 8px; }
+        .trend-badge { padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+        .trend-badge.good { background: rgba(46, 255, 167, 0.18); color: var(--green); }
+        .trend-badge.warn { background: rgba(255, 193, 80, 0.18); color: var(--gold); }
+        .trend-badge.bad { background: rgba(255, 61, 113, 0.18); color: var(--red); }
+        .trend-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin: 6px 0; }
+        .trend-row .label { color: var(--text2); }
+        .trend-row .value { font-weight: 900; }
+        .sheet-wrap, .modal-wrap { position: fixed; inset: 0; z-index: 80; visibility: hidden; opacity: 0; transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease); }
+        .sheet-wrap.show, .modal-wrap.show { visibility: visible; opacity: 1; }
+        .sheet-backdrop, .modal-backdrop { position: absolute; inset: 0; background: rgba(4, 8, 16, 0.6); }
+        .sheet { position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; width: min(100%, 520px); max-height: 78vh; overflow: auto; padding: 10px 12px calc(env(safe-area-inset-bottom) + 18px); border-radius: 26px 26px 0 0; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow-lg); transform: translateY(20px); transition: transform 0.3s var(--ease); -webkit-overflow-scrolling: touch; contain: content; }
+        .sheet-wrap.show .sheet { transform: translateY(0); }
+        .sheet-handle { width: 36px; height: 4px; border-radius: 999px; background: var(--line); margin: 0 auto 8px; }
+        .sheet-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+        .sheet-top h2 { font-size: 17px; font-weight: 1000; letter-spacing: -0.02em; }
+        .sheet-top p { color: var(--text2); font-size: 11px; }
+        .sheet-close { width: 34px; height: 34px; border-radius: 50%; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 16px; cursor: pointer; }
+        .sheet-stack { display: grid; gap: 8px; }
+        .sheet-card { border-radius: 20px; padding: 12px; background: var(--panel2); border: 1px solid var(--line); position: relative; overflow: hidden; }
+        .sheet-card h3 { font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 900; }
+        .sheet-card .big { font-size: 22px; font-weight: 1000; letter-spacing: -0.03em; margin-bottom: 4px; }
+        .watermark-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; font-size: 9px; color: rgba(255, 255, 255, 0.03); font-weight: 900; letter-spacing: 0.2em; transform: rotate(-15deg); white-space: nowrap; z-index: 1; }
+        .sheet-card .subtext { font-size: 11px; color: var(--text2); line-height: 1.55; white-space: pre-wrap; }
+        .sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .mini-card { border-radius: 16px; padding: 10px; background: var(--panel2); border: 1px solid var(--line); }
+        .mini-card .k { font-size: 10px; color: var(--text3); font-weight: 900; margin-bottom: 4px; }
+        .mini-card .v { font-size: 14px; font-weight: 1000; line-height: 1.3; }
+        .process { white-space: pre-wrap; font-size: 11px; line-height: 1.65; color: var(--text2); }
+        .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(14px); padding: 10px 16px; border-radius: 999px; background: rgba(15, 22, 33, 0.9); color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 11px; font-weight: 900; z-index: 120; opacity: 0; visibility: hidden; transition: all 0.3s var(--ease); box-shadow: var(--shadow-md); pointer-events: none; }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .mipai-modal { position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 16px; overflow: auto; }
+        .mipai-card { width: min(100%, 520px); border-radius: 28px; overflow: hidden; background: linear-gradient(180deg, #f48f82, #ea8175); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35); position: relative; border: 1px solid rgba(255, 255, 255, 0.16); }
+        .mipai-close { position: absolute; right: 12px; top: 12px; z-index: 4; width: 48px; height: 48px; border-radius: 50%; background: #ff5f46; color: #fff; display: grid; place-items: center; font-size: 26px; cursor: pointer; border: 2px solid rgba(255, 255, 255, 0.18); }
+        .mipai-header { position: relative; padding: 18px 14px 0; min-height: 140px; background: linear-gradient(180deg, #ff5f46, #ff7b5e); overflow: hidden; }
+        .mipai-title { position: relative; z-index: 2; text-align: center; margin-top: 20px; font-size: 34px; font-weight: 1000; letter-spacing: -0.04em; color: #ffe67d; text-shadow: 0 3px 0 rgba(187, 61, 18, 0.35); }
+        .mipai-sub { position: relative; z-index: 2; text-align: center; color: #fff8ef; margin-top: 4px; font-size: 12px; font-weight: 900; }
+        .mipai-cloud-band { position: relative; z-index: 1; margin-top: 8px; height: 40px; background: radial-gradient(circle at 4% 100%, #f6e8d1 0 22px, transparent 23px), radial-gradient(circle at 14% 100%, #f6e8d1 0 22px, transparent 23px), radial-gradient(circle at 26% 100%, #f6e8d1 0 26px, transparent 27px), radial-gradient(circle at 40% 100%, #f6e8d1 0 24px, transparent 25px), radial-gradient(circle at 54% 100%, #f6e8d1 0 28px, transparent 29px), radial-gradient(circle at 68% 100%, #f6e8d1 0 24px, transparent 25px), radial-gradient(circle at 82% 100%, #f6e8d1 0 26px, transparent 27px), radial-gradient(circle at 96% 100%, #f6e8d1 0 22px, transparent 23px); }
+        .mipai-body { padding: 14px 14px 16px; background: #ea8175; }
+        .mipai-period { text-align: center; font-size: 16px; color: #fffdf8; font-weight: 1000; margin-bottom: 10px; }
+        .scratch-wrap { position: relative; border-radius: 18px; overflow: hidden; background: #fff; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .scratch-content { position: relative; min-height: 170px; display: flex; align-items: center; justify-content: center; padding: 16px 10px; background: #fff; overflow: hidden; }
+        .scratch-formula { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .scratch-ball { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #111; background: #fff; display: grid; place-items: center; font-weight: 1000; font-size: 26px; color: #111; }
+        .scratch-symbol { font-size: 32px; font-weight: 1000; color: #111; }
+        #scratchCanvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; z-index: 2; }
+        .mipai-foot { margin-top: 12px; text-align: center; font-size: 13px; color: #fffdf7; font-weight: 1000; }
+        .mipai-actions { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .mipai-btn { height: 44px; border-radius: 999px; background: rgba(255, 255, 255, 0.14); color: #fff; border: 1px solid rgba(255, 255, 255, 0.14); font-weight: 1000; font-size: 13px; cursor: pointer; }
+        .mipai-btn.primary { background: rgba(255, 255, 255, 0.88); color: #d14a36; }
+        .splash { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 10%, rgba(130, 100, 240, 0.18), transparent 22%), linear-gradient(180deg, #060d18, #0a1222 55%, #0f1929); transition: opacity 0.6s var(--ease), visibility 0.6s var(--ease); }
+        .splash.hide { opacity: 0; visibility: hidden; }
+        .splash-core { text-align: center; z-index: 2; }
+        .splash-orbit { width: 130px; height: 130px; margin: 0 auto 14px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.08); animation: orbitBreathe 3.6s ease-in-out infinite; position: relative; }
+        .splash-logo { position: absolute; inset: 0; display: grid; place-items: center; font-size: 44px; animation: logoPop 1.8s infinite alternate; }
+        .splash-title { font-size: 20px; font-weight: 1000; background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+        .splash-sub { font-size: 11px; color: rgba(255, 255, 255, 0.55); font-weight: 700; }
+        .splash-loader { width: 90px; height: 2px; margin: 10px auto 0; background: rgba(255, 255, 255, 0.08); border-radius: 999px; overflow: hidden; }
+        .splash-loader span { display: block; width: 45%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--purple), #fff); animation: loadingBar 1.4s ease-in-out infinite; }
+        @keyframes orbitBreathe { 0%, 100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.03); opacity: 1; } }
+        @keyframes floatGlow { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(6px, -5px); } }
+        @keyframes softBreath { 0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); } }
+        @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.35); opacity: 1; } }
+        @keyframes numberFlash { 0% { transform: translateY(5px) scale(0.95); opacity: 0.7; } 50% { transform: translateY(-2px) scale(1.02); opacity: 1; } 100% { transform: translateY(0) scale(1); } }
+        @keyframes logoPop { from { transform: translateY(0) scale(1); } to { transform: translateY(-2px) scale(1.03); } }
+        @keyframes loadingBar { 0% { transform: translateX(-120%); } 100% { transform: translateX(240%); } }
+        @media (max-width: 380px) {
+            .hero-ball { width: 56px; height: 56px; font-size: 26px; }
+            .hero-line { grid-template-columns: 50px 1fr auto; }
+            .hero-line .v { font-size: 13px; }
+            .hero-actions { grid-template-columns: 1fr 56px 56px; }
+            .bar-value { font-size: 16px; }
+            .mipai-title { font-size: 28px; }
+            .scratch-ball { width: 44px; height: 44px; font-size: 22px; }
+            .scratch-symbol { font-size: 26px; }
+        }
+    </style>
 </head>
 <body>
+<div id="splash" class="splash">
+    <div class="splash-core">
+        <div class="splash-orbit"><div class="splash-logo">yy</div></div>
+        <div class="splash-title">yy独家算法</div>
+        <div class="splash-sub">形态交叉平衡 · 全自动预测</div>
+        <div class="splash-loader"><span></span></div>
+    </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="app">
+    <div class="topbar">
+        <div class="title-wrap"><div class="mini">yy独家算法 · 全自动预测</div><h1>yy独家算法</h1></div>
+        <div class="top-actions"><button class="circle-btn" id="themeBtn" aria-label="切换主题">◐</button></div>
+    </div>
+    <section class="hero">
+        <div class="hero-grid">
+            <div class="hero-top"><div class="hero-tag">yy独家算法</div><div class="hero-tools"><button class="hero-tool" id="themeBtn2" aria-label="切换主题">◑</button></div></div>
+            <div class="hero-meta">
+                <div class="hero-left">
+                    <div class="period" id="latestPeriod">--期</div>
+                    <div class="sum" id="latestSum">和值 -- · --</div>
+                    <div class="status" id="heroStatus">初始化中...</div>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-pill" id="countdownWrap"><span class="count-dot"></span><span id="countdown">--:--</span></div>
+                    <div class="hero-pill"><small>引擎</small><span id="gaugeValue">全维分析</span></div>
+                </div>
+            </div>
+            <div class="hero-center">
+                <div class="hero-orbit"></div>
+                <div class="hero-core-glow"></div>
+                <div class="hero-balls">
+                    <div class="hero-ball" id="ball1"><span id="num1">-</span></div>
+                    <div class="hero-ball" id="ball2"><span id="num2">-</span></div>
+                    <div class="hero-ball" id="ball3"><span id="num3">-</span></div>
+                </div>
+            </div>
+            <div class="hero-result-lines">
+                <div class="hero-line"><div class="k">预测结果</div><div class="v" id="heroKill">数据预热中...</div><button class="mini-copy" id="copyKillBtn">复制</button></div>
+                <div class="hero-line"><div class="k">参考区间</div><div class="v" id="heroRecommend">--</div><button class="mini-copy" id="copyRecommendBtn">复制</button></div>
+            </div>
+            <div class="hero-actions">
+                <div class="auto-badge"><span class="pulse"></span>yy独家算法 · 自动预测中</div>
+                <button class="secondary-btn" id="processBtn">计算过程</button>
+                <button class="secondary-btn" id="miPaiBtn">咪牌</button>
+            </div>
+        </div>
+    </section>
+    <div class="trend-card" id="trendCard">
+        <div class="trend-header">
+            <h4>📈 趋势判断</h4>
+            <div class="trend-status">
+                <span id="trendLevel" class="trend-badge good">优</span>
+                <span id="trendSuggest" style="font-size:11px;">杂六延续</span>
+            </div>
+        </div>
+        <div class="trend-row"><span class="label">最近5期形态</span><span class="value" id="trendRecent5">--</span></div>
+        <div class="trend-row"><span class="label">杂六占比</span><span class="value" id="trendRatio">--</span></div>
+        <div class="trend-row"><span class="label">下期提示</span><span class="value" id="trendNextHint">--</span></div>
+    </div>
+    <div class="mode-row">
+        <button class="mode-chip active" data-view="homeView">主页</button>
+        <button class="mode-chip" data-view="historyView">预测历史</button>
+        <button class="mode-chip" data-view="statsView">统计</button>
+    </div>
+    <section class="view active" id="homeView">
+        <section class="result-bars">
+            <article class="result-bar black"><div class="bar-icon">◉</div><div class="bar-main"><div class="bar-label">预测数字</div><div class="bar-value" id="killPreview">--</div><div class="bar-sub">四个态势参考点</div></div><div class="bar-badge">数</div></article>
+            <article class="result-bar purple"><div class="bar-icon">◎</div><div class="bar-main"><div class="bar-label">预测形态</div><div class="bar-value" id="recommendPreview">--</div><div class="bar-sub">全维分析结果</div></div><div class="bar-badge">形</div></article>
+            <article class="result-bar orange"><div class="bar-icon">◌</div><div class="bar-main"><div class="bar-label">近3期和值</div><div class="bar-value" id="specialPreview">--</div><div class="bar-sub">数据源快照</div></div><div class="bar-badge">源</div></article>
+            <article class="result-bar white"><div class="bar-icon">↗</div><div class="bar-main"><div class="bar-label">预测胜率</div><div class="bar-value" id="winRatePreview">--</div><div class="bar-sub">基于历史回测</div></div><div class="bar-badge">胜</div></article>
+        </section>
+    </section>
+    <section class="view" id="historyView">
+        <section class="section">
+            <div class="section-top"><div><h3>预测历史（自动归档）</h3><p id="historyAccuracy">命中率：--</p></div></div>
+            <div class="history-toolbar">
+                <button class="filter-chip active" data-history-filter="all">全部</button>
+                <button class="filter-chip" data-history-filter="correct">正确</button>
+                <button class="filter-chip" data-history-filter="wrong">错误</button>
+                <button class="filter-chip" data-history-filter="pending">待开奖</button>
+                <button class="ghost-btn" id="clearHistoryBtn">清空</button>
+            </div>
+            <div class="history-list" id="historyTimeline"></div>
+        </section>
+    </section>
+    <section class="view" id="statsView">
+        <section class="section">
+            <div class="section-top"><div><h3>实时遗漏</h3><p>和值遗漏与分类统计</p></div></div>
+            <div style="background:var(--panel2); border-radius:20px; padding:14px; margin-bottom:14px">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px"><span style="font-size:16px; font-weight:1000">和值遗漏</span><span style="font-size:11px; color:var(--text3)">00~27</span></div>
+                <div class="stats-subgrid" id="sumMissGrid"></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stats-card"><div class="title">基本类型</div><div class="content"><div class="stats-row"><span class="key">单</span><span class="val" id="miss-dan">--</span></div><div class="stats-row"><span class="key">双</span><span class="val" id="miss-shuang">--</span></div><div class="stats-row"><span class="key">大</span><span class="val" id="miss-da">--</span></div><div class="stats-row"><span class="key">小</span><span class="val" id="miss-xiao">--</span></div></div></div>
+                <div class="stats-card"><div class="title">形态分布</div><div class="content"><div class="stats-row"><span class="key">大单</span><span class="val" id="miss-xiaodan">--</span></div><div class="stats-row"><span class="key">大双</span><span class="val" id="miss-xiaoshuang">--</span></div><div class="stats-row"><span class="key">小单</span><span class="val" id="miss-dadan">--</span></div><div class="stats-row"><span class="key">小双</span><span class="val" id="miss-dashuang">--</span></div></div></div>
+            </div>
+        </section>
+    </section>
+</div>
+<div class="sheet-wrap" id="resultSection">
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-top"><div><h2 id="sheetTitle">yy独家算法 · 计算过程</h2><p id="sheetSubtitle">内部参考 · 隐晦描述</p></div><button class="sheet-close" id="closeSheetBtn">✕</button></div>
+        <div class="sheet-stack">
+            <div class="sheet-card" style="position:relative"><div class="watermark-overlay">yy独家算法 · 系统参考</div><h3>预测结果</h3><div class="big" id="sheetKillValue">--</div></div>
+            <div class="sheet-grid">
+                <div class="mini-card"><div class="k">算法版本</div><div class="v" id="sheetKillConf">形态交叉平衡法</div></div>
+                <div class="mini-card"><div class="k">调节状态</div><div class="v" id="sheetKillStrategy">--</div></div>
+                <div class="mini-card" style="position:relative"><div class="watermark-overlay" style="font-size:8px">yy ref</div><div class="k">态势参考点</div><div class="v" id="sheetRecommendValue">--</div></div>
+                <div class="mini-card"><div class="k">近3期源</div><div class="v" id="sheetSpecialValue">--</div></div>
+            </div>
+            <div class="sheet-card"><h3>计算过程（隐晦版）</h3><div class="process" id="sheetCalcSteps">等待自动生成...</div></div>
+            <div class="sheet-card"><h3>免责声明</h3><div class="subtext">本内容由"yy独家算法"系统动态生成，非固定投注建议。所有数值均经过视觉包装，实际结果存在不确定性，请理性参考。</div></div>
+        </div>
+    </div>
+</div>
+<div class="modal-wrap" id="miPaiModal">
+    <div class="modal-backdrop" id="miPaiBackdrop"></div>
+    <div class="mipai-modal">
+        <div class="mipai-card">
+            <button class="mipai-close" id="closeMiPaiBtn">×</button>
+            <div class="mipai-header">
+                <div class="mipai-title">咪牌刮刮乐</div>
+                <div class="mipai-sub">用手指刮开涂层查看结果</div>
+                <div class="mipai-cloud-band"></div>
+            </div>
+            <div class="mipai-body">
+                <div class="mipai-period" id="miPaiPeriod">第 -- 期结果</div>
+                <div class="scratch-wrap" id="scratchWrap">
+                    <div class="scratch-content" id="scratchContent">
+                        <div class="scratch-formula" id="scratchFormula">
+                            <div class="scratch-ball" id="scratchN1">-</div>
+                            <div class="scratch-symbol">+</div>
+                            <div class="scratch-ball" id="scratchN2">-</div>
+                            <div class="scratch-symbol">+</div>
+                            <div class="scratch-ball" id="scratchN3">-</div>
+                            <div class="scratch-symbol">=</div>
+                            <div class="scratch-ball" id="scratchSum">-</div>
+                        </div>
+                    </div>
+                    <canvas id="scratchCanvas"></canvas>
+                </div>
+                <div class="mipai-foot">截止第 <span id="miPaiNextPeriod">--</span> 期开奖结果：<span id="miPaiCountdown">--:--</span></div>
+                <div class="mipai-actions">
+                    <button class="mipai-btn" id="resetScratchBtn">重新咪牌</button>
+                    <button class="mipai-btn primary" id="copyCurrentDrawBtn">复制结果</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-const s=">lmth/<
->ydob/<
->tpircs/<
-;)()}
-;)rorre.elosnoc(hctac.)(partstoob    
-}    
-;)0021 ,hsalpSedih(tuoemiTtes        
-;)(gnilloPeludehcs ;)(nwodtnuoCetadpu        
-} ;'）新更动自（绪就已测预' = tnetnoCtxet.)'sutatSoreh'($ ;'-' ?? ]2[.?seulav.a = tnetnoCtxet.)'3mun'($ ;'-' ?? ]1[.?seulav.a = tnetnoCtxet.)'2mun'($ ;'-' ?? ]0[.?seulav.a = tnetnoCtxet.)'1mun'($ ;)' · '(nioj.)][ || seulaVecruos.a( = tnetnoCtxet.)'weiverPlaiceps'($ ;)' '(nioj.)][ || sepyt.a( = tnetnoCtxet.)'weiverPdnemmocer'($ ;'--' || txeTyalpsid.a = tnetnoCtxet.)'weiverPllik'($ ;'--' || cseDegnar.a = tnetnoCtxet.)'dnemmoceRoreh'($ ;'--' || txeTyalpsid.a = tnetnoCtxet.)'lliKoreh'($ ;sisylanAruc.S = a tsnoc { )sisylanAruc.S( fi        
-;)eurt(ataDhctef tiawa        
-;)(stnevEdnib ;)(etaRniWetadpu ;)(yrotsiHredner ;)(daol ;)(emehTdaol        
-{ )(partstoob noitcnuf cnysa    
-} ;)'edih'(dda.tsiLssalc.)'hsalps'($ { )(hsalpSedih noitcnuf    
+(function() {
+    const STORAGE_KEY = 'yy_algo_auto_v11';
+    const THEME_KEY = 'prob_theme';
+    const API_URL = 'https://super.pc28998.com/history/JND28';
+    const PERIOD_MS = 210000;
 
-}    
-;))} ;)(yrotsiHredner ;retliFyrotsih.tesatad.b = retliFyrotsih.S ;)'evitca'(dda.tsiLssalc.b ;))'evitca'(evomer.tsiLssalc.x >= x(hcaErof.)'pihc-retlif.'(llArotceleSyreuq.tnemucod { >= )( ,'kcilc'(renetsiLtnevEdda.b >= b(hcaErof.)'pihc-retlif.'(llArotceleSyreuq.tnemucod        
-;))} ;)ataDstats.S(statSredner )ataDstats.S && 'weiVstats' === weiv.tesatad.b( fi ;))weiv.tesatad.b === di.v ,'evitca'(elggot.tsiLssalc.v >= v(hcaErof.)'weiv.'(llArotceleSyreuq.tnemucod ;weiv.tesatad.b = weiVevitca.S ;)'evitca'(dda.tsiLssalc.b ;))'evitca'(evomer.tsiLssalc.x >= x(hcaErof.)'pihc-edom.'(llArotceleSyreuq.tnemucod { >= )( ,'kcilc'(renetsiLtnevEdda.b >= b(hcaErof.)'pihc-edom.'(llArotceleSyreuq.tnemucod        
-;)yrotsiHraelc ,'kcilc'(renetsiLtnevEdda.)'ntByrotsiHraelc'($        
-;))'wohs'(evomer.tsiLssalc.)'noitceStluser'($ >= )( ,'kcilc'(renetsiLtnevEdda.)'pordkcaBteehs'($ ;))'wohs'(evomer.tsiLssalc.)'noitceStluser'($ >= )( ,'kcilc'(renetsiLtnevEdda.)'ntBteehSesolc'($        
-;)tluseRruCypoc ,'kcilc'(renetsiLtnevEdda.)'ntBwarDtnerruCypoc'($ ;)hctarcSteser ,'kcilc'(renetsiLtnevEdda.)'ntBhctarcSteser'($        
-;)iaPiMesolc ,'kcilc'(renetsiLtnevEdda.)'pordkcaBiaPim'($ ;)iaPiMesolc ,'kcilc'(renetsiLtnevEdda.)'ntBiaPiMesolc'($ ;)iaPiMnepo ,'kcilc'(renetsiLtnevEdda.)'ntBiaPim'($        
-;)} } ;)'间区考参制复已'(tsaot ;)cseDegnar.sisylanAruc.S(txeTypoc { )sisylanAruc.S( fi { >= )( ,'kcilc'(renetsiLtnevEdda.)'ntBdnemmoceRypoc'($        
-;)} } ;)'果结测预制复已'(tsaot ;)txeTyalpsid.sisylanAruc.S(txeTypoc { )sisylanAruc.S( fi { >= )( ,'kcilc'(renetsiLtnevEdda.)'ntBlliKypoc'($        
-;)teehSssecorPnepo ,'kcilc'(renetsiLtnevEdda.)'ntBssecorp'($        
-;)emehTelggot ,'kcilc'(renetsiLtnevEdda.)'2ntBemeht'($ ;)emehTelggot ,'kcilc'(renetsiLtnevEdda.)'ntBemeht'($        
-{ )(stnevEdnib noitcnuf    
+    function getType(sum) { return sum >= 14 ? (sum % 2 === 1 ? '大单' : '大双') : (sum % 2 === 1 ? '小单' : '小双'); }
+    function numsForType(t) {
+        const r = [];
+        if (t === '小单') for (let i = 1; i <= 13; i += 2) r.push(i);
+        else if (t === '小双') for (let i = 0; i <= 12; i += 2) r.push(i);
+        else if (t === '大单') for (let i = 15; i <= 27; i += 2) r.push(i);
+        else if (t === '大双') for (let i = 14; i <= 26; i += 2) r.push(i);
+        return r;
+    }
+    function closestInType(v, t) {
+        const c = numsForType(t);
+        if (!c.length) return v;
+        let best = c[0], bestDist = Math.abs(v - best);
+        for (const x of c) {
+            const d = Math.abs(v - x);
+            if (d < bestDist || (d === bestDist && x < best)) { best = x; bestDist = d; }
+        }
+        return best;
+    }
 
-} ;)'制复已'(tsaot ;)`}))n(edoCmus(epyTteg{$ })n(edoCmus{$=})'+'(nioj.n{$ 期}tcepxe.tsetal.S{$`(txeTypoc ;)edocnepo.tsetal.S(edoCesrap = n tsnoc ;nruter )tsetal.S!( fi { )(tluseRruCypoc noitcnuf    
-} ;)'置重已'(tsaot ;)(revoCward { )(hctarcSteser noitcnuf    
-} ;)(erotser.xtc ;)(llif.xtc ;)2 * IP.htaM ,0 ,41 ,y.p ,x.p(cra.xtc ;)(htaPnigeb.xtc ;'tuo-noitanitsed' = noitarepOetisopmoClabolg.xtc ;)(evas.xtc ;xtc.hctarcs.S = xtc tsnoc { )p(toDhctarcs noitcnuf    
-} ;)} ;llun = pl ;eslaf = gniward.hctarcs.S { >= )( ,'puretniop'(renetsiLtnevEdda.wodniw ;)} ;p = pl ;)p ,pl(eniLhctarcs )pl( fi ;)e(tPteg = p tsnoc ;)(tluafeDtneverp.e ;nruter )gniward.hctarcs.S!( fi { >= e ,'evomretniop'(renetsiLtnevEdda.c ;)} ;)pl(toDhctarcs ;)e(tPteg = pl ;eurt = gniward.hctarcs.S ;)(tluafeDtneverp.e { >= e ,'nwodretniop'(renetsiLtnevEdda.c ;llun = pl tel ;'1' = dnuob.tesatad.c ;nruter )dnuob.tesatad.c || c!( fi ;savnac.hctarcs.S = c tsnoc { )(hctarcSdnib noitcnuf    
-} ;)(erotser.xtc ;)(ekorts.xtc ;)y.t ,x.t(oTenil.xtc ;)y.f ,x.f(oTevom.xtc ;)(htaPnigeb.xtc ;'dnuor' = nioJenil.xtc ;'dnuor' = paCenil.xtc ;23 = htdiWenil.xtc ;'tuo-noitanitsed' = noitarepOetisopmoClabolg.xtc ;)(evas.xtc ;nruter )xtc!( fi ;xtc.hctarcs.S = xtc tsnoc { )t ,f(eniLhctarcs noitcnuf    
-} ;} pot.r - Ytneilc.e :y ,tfel.r - Xtneilc.e :x { nruter ;)(tceRtneilCgnidnuoBteg.savnac.hctarcs.S = r tsnoc { )e(tPteg noitcnuf    
-} ;)81 + 2 / h ,2 / w ,'激刺更'(txeTllif.xtc ;'fires-snas xp41' = tnof.xtc ;)8 - 2 / h ,2 / w ,'刮一刮'(txeTllif.xtc ;'retnec' = ngilAtxet.xtc ;'fires-snas xp42 dlob' = tnof.xtc ;'f47dff#' = elytSllif.xtc ;)h ,w ,0 ,0(tceRllif.xtc ;'0c0c0c#' = elytSllif.xtc ;)h ,w ,0 ,0(tceRraelc.xtc ;thgieHtneilc.savnac.hctarcs.S = h ,htdiWtneilc.savnac.hctarcs.S = w tsnoc ;xtc.hctarcs.S = xtc tsnoc { )(revoCward noitcnuf    
-} ;)(hctarcSdnib ;)(revoCward ;eslaf = gniward.hctarcs.S ;savnac = savnac.hctarcs.S ;xtc = xtc.hctarcs.S ;)0 ,0 ,rpd ,0 ,0 ,rpd(mrofsnarTtes.xtc ;)} eurt :ahpla { ,'d2'(txetnoCteg.savnac = xtc tsnoc ;'xp' + thgieh.tcer = thgieh.elyts.savnac ;'xp' + htdiw.tcer = htdiw.elyts.savnac ;)rpd * thgieh.tcer(roolf.htaM = thgieh.savnac ;)rpd * htdiw.tcer(roolf.htaM = htdiw.savnac ;)2 ,1 || oitaRlexiPecived.wodniw(nim.htaM = rpd ,)(tceRtneilCgnidnuoBteg.parw = tcer tsnoc ;nruter )parw! || savnac!( fi ;)'parWhctarcs'($ = parw ,)'savnaChctarcs'($ = savnac tsnoc { )(hctarcStini noitcnuf    
-} ;)'wohs'(evomer.tsiLssalc.)'ladoMiaPim'($ { )(iaPiMesolc noitcnuf    
-} ;)06 ,)(hctarcStini >= )((tuoemiTtes ;)'wohs'(dda.tsiLssalc.)'ladoMiaPim'($ { )(iaPiMnepo noitcnuf    
+    function crossBalance(V1, V2, V3) {
+        const vals = [V1, V2, V3], types = vals.map(v => getType(v));
+        const adj = [...vals];
+        let wasAdj = false;
+        const uniq = new Set(types);
+        if (uniq.size === 3) return { values: adj, types: types, wasAdjusted: false };
+        wasAdj = true;
+        let idx = 2;
+        if (types[2] === types[1]) idx = 2;
+        else if (types[1] === types[0]) idx = 1;
+        else if (types[2] === types[0]) idx = 2;
+        const missing = ['大单', '大双', '小单', '小双'].filter(t => !uniq.has(t));
+        const orig = adj[idx];
+        let bt = null, bv = null, bd = Infinity;
+        for (const m of missing) {
+            const cv = closestInType(orig, m);
+            const d = Math.abs(cv - orig);
+            if (d < bd || (d === bd && cv < bv)) { bd = d; bt = m; bv = cv; }
+        }
+        if (bt) adj[idx] = bv;
+        return { values: adj, types: adj.map(v => getType(v)), wasAdjusted: true };
+    }
 
-} ;)'wohs'(dda.tsiLssalc.)'noitceStluser'($ ;ssecorPderucsbo.a = tnetnoCtxet.)'spetSclaCteehs'($ ;)' · '(nioj.seulaVecruos.a = tnetnoCtxet.)'eulaVlaicepSteehs'($ ;)' / '(nioj.seulav.a = tnetnoCtxet.)'eulaVdnemmoceRteehs'($ ;'过通接直' : '调微已' ? detsujdAsaw.a = tnetnoCtxet.)'ygetartSlliKteehs'($ ;'法衡平叉交态形' = tnetnoCtxet.)'fnoClliKteehs'($ ;txeTyalpsid.a = tnetnoCtxet.)'eulaVlliKteehs'($ ;sisylanAruc.S = a tsnoc } ;nruter ;)'果结析分无暂'(tsaot { )sisylanAruc.S!( fi { )(teehSssecorPnepo noitcnuf    
+    function fmtPred(vals, types) { return vals.map((v, i) => `${types[i]} ${v}`).join(' ｜ '); }
+    function rangeDesc(vals) { const mn = Math.min(...vals), mx = Math.max(...vals); return `${mn}-${mx}`; }
+    function obscuredProcess(types, wasAdj) {
+        const syms = types.map(t => ({ '大单': 'α', '大双': 'β', '小单': 'γ', '小双': 'δ' }[t]));
+        return [
+            '【yy独家算法 · 内部参考】',
+            '第一步：采集近三周期态势值，构建三元基准序列。',
+            '第二步：将基准序列映射至四象限（α/β/γ/δ），校验象限标签互斥性。',
+            wasAdj ? '第三步：检测到标签重叠，激活补偿调节器。按最小位移原则重映射冲突项，直至三标签完全分化。' : '第三步：未检测到标签重叠，跳过补偿调节器。',
+            `第四步：输出独立参考点及其象限归属：${syms.join(' / ')}。`,
+            '注：以上为形态交叉平衡法的抽象概括，具体数值已视觉包装处理。'
+        ].join('\n');
+    }
 
-} } ;)at(dlihCevomer.ydob.tnemucod { yllanif } ;)'ypoc'(dnammoCcexe.tnemucod { yrt ;)(tceles.at ;)at(dlihCdneppa.ydob.tnemucod ;txet = eulav.at ;)'aeratxet'(tnemelEetaerc.tnemucod = at tsnoc ;)txet(txeTetirw.draobpilc.rotagivan nruter )draobpilc.rotagivan( fi { )txet(txeTypoc noitcnuf    
+    function getPattern(nums) {
+        if (!nums || nums.length < 3) return '未知';
+        const [a, b, c] = nums.sort((x, y) => x - y);
+        if (a === b && b === c) return '豹子';
+        if (a === b || b === c || a === c) return '对子';
+        if (b - a === 1 && c - b === 1) return '顺子';
+        return '杂六';
+    }
 
-} ;)(evas )degnahc( fi ;)} ;} '误错' : '确正' ? tcerroCsi :sutats ,`}epyTlaer{$ }mus{$=})'+'(nioj.)edocnepo.tih(edoCesrap{$` :tluseRlautca ,meti... { nruter ;eurt = degnahc ;)epyTlaer(sedulcni.sepyt.meti && sepyt.meti = tcerroCsi tsnoc ;)mus(epyTteg = epyTlaer ,)edocnepo.tih(edoCmus = mus tsnoc ;meti nruter )tih!( fi ;))tcepxe.meti(gnirtS(teg.pam = tih tsnoc ;meti nruter )'奖开待' ==! sutats.meti( fi { >= meti(pam.yrotsiHderp.S = yrotsiHderp.S ;eslaf = degnahc tel ;))meti ,)tcepxe.meti(gnirtS(tes.pam >= meti(hcaErof.ataDyrotsih.S ;)(paM wen = pam tsnoc ;nruter )htgnel.yrotsiHderp.S! || htgnel.ataDyrotsih.S!( fi { )(sdroceRteBkcehc noitcnuf cnysa    
+    function analyzeTrend(historyData) {
+        if (!historyData || historyData.length < 5) return { level: '中', suggest: '数据不足', recentPatterns: [], ratio: 0, nextHint: '等待更多数据' };
+        const recent5 = historyData.slice(0, 5).map(item => getPattern(parseCode(item.opencode)));
+        const mixedCount = recent5.filter(p => p === '杂六').length;
+        const ratio = mixedCount / 5;
+        let level, suggest, nextHint;
+        if (ratio >= 0.8) { level = '优'; suggest = '杂六强势'; nextHint = '杂六可能延续，可顺势而为'; }
+        else if (ratio <= 0.4) { level = '差'; suggest = '回本概率高'; nextHint = '警惕对子/顺子/豹子出现'; }
+        else { level = '中'; suggest = '震荡期'; nextHint = '杂六与回本交替，谨慎判断'; }
+        return { level, suggest, recentPatterns: recent5, ratio, nextHint };
+    }
 
-} ;)(llop ;} ;)lavretni ,} ;)} ;)(gnilloPeludehcs )lavretni ==! lavretnIwen( fi ;)(lavretnIlloPteg = lavretnIwen tsnoc { >= )((neht.)eurt(ataDhctef { >= )((lavretnItes = remiTllop.S ;)remiTllop.S(lavretnIraelc ;)(lavretnIlloPteg = lavretni tsnoc { >= )( = llop tsnoc ;)remiTllop.S(lavretnIraelc { )(gnilloPeludehcs noitcnuf    
-} ;00003 nruter ;0005 nruter )021 =< r( fi ;0002 nruter )01 =< r( fi ;)(ceSniameRteg = r tsnoc { )(lavretnIlloPteg noitcnuf    
-} ;)0001 ,kcit(lavretnItes = remiTnwodtnuoc.S ;)(kcit ;} ;)01 =< r ,'gninraw-nwodtnuoc'(elggot.tsiLssalc.)'parWnwodtnuoc'($ ;)r(emiTtmf = tnetnoCtxet.)'nwodtnuoCiaPim'($ ;)r(emiTtmf = tnetnoCtxet.)'nwodtnuoc'($ } ;nruter ;'中奖开' = tnetnoCtxet.)'nwodtnuoCiaPim'($ ;'中奖开' = tnetnoCtxet.)'nwodtnuoc'($ { )0 =< r( fi ;)(ceSniameRteg = r tsnoc } ;nruter ;'--:--' = tnetnoCtxet.)'nwodtnuoCiaPim'($ ;'--:--' = tnetnoCtxet.)'nwodtnuoc'($ { )tsetal.S!( fi { >= )( = kcit tsnoc ;)remiTnwodtnuoc.S(lavretnIraelc { )(nwodtnuoCetadpu noitcnuf    
-} ;)0001 / ))(won.etaD - SM_DOIREP + )emitnepo.tsetal.S(sMst((roolf.htaM nruter ;0 nruter )tsetal.S!( fi { )(ceSniameRteg noitcnuf    
+    function updateTrendUI(trend) {
+        if (!trend) return;
+        document.getElementById('trendLevel').textContent = trend.level;
+        document.getElementById('trendLevel').className = 'trend-badge ' + (trend.level === '优' ? 'good' : (trend.level === '差' ? 'bad' : 'warn'));
+        document.getElementById('trendSuggest').textContent = trend.suggest;
+        document.getElementById('trendRecent5').textContent = trend.recentPatterns.join(' → ');
+        document.getElementById('trendRatio').textContent = (trend.ratio * 100).toFixed(0) + '%';
+        document.getElementById('trendNextHint').textContent = trend.nextHint;
+    }
 
-}    
-} ;'...中试重动自，败失步同' = tnetnoCtxet.)'sutatSoreh'($ { )e( hctac }        
-;)ataDstats.S(statSredner )'weiVstats' === weiVevitca.S( fi            
-;)ataDyrotsih.S(statSetupmoc = ataDstats.S            
-;)(nwodtnuoCetadpu            
-;`期}'--' || tcepxe.?tsetal.S{$ · 绪就据数` = tnetnoCtxet.)'sutatSoreh'($            
-} ;)(tciderPotuAnur )sisylanAruc.S!( fi ;)(sdroceRteBkcehc tiawa { esle            
-} ;)(tciderPotuAnur ;)(sdroceRteBkcehc tiawa { )tsetaLverp!( fi esle            
-} ;)'新更动自已测预，奖开已期一新'(tsaot )tnelis!( fi ;)(tciderPotuAnur ;)(sdroceRteBkcehc tiawa { )tcepxEwen ==! tcepxe.tsetaLverp && tcepxEwen && tsetaLverp( fi            
-;tcepxe.?tsetal.S = tcepxEwen tsnoc            
-;)(tsetaLredner            
-;)edocnepo.tsetal.S(edoCmus = mus.tsetal.S )tsetal.S( fi            
-;llun || ]0[ataDyrotsih.S = tsetal.S ;tsetal.S = tsetaLverp tsnoc            
-;))} emitnepo.meti :emitnepo ,edocnepo.meti :edocnepo ,)tcepxe.meti(gnirtS :tcepxe {( >= meti(pam.)05 ,0(ecils.atad.atad = ataDyrotsih.S            
-;)'常异口接'(rorrE wen worht ))atad.atad(yarrAsi.yarrA! || 1 ==! edoc.atad( fi ;)(nosj.ser tiawa = atad tsnoc ;)} 'erots-on' :ehcac { ,LRU_IPA(hctef tiawa = ser tsnoc            
-;'...据数步同' = tnetnoCtxet.)'sutatSoreh'($ )tnelis!( fi            
-{ yrt        
-{ )eslaf = tnelis(ataDhctef noitcnuf cnysa    
+    function computeStats(history) {
+        if (!history || history.length === 0) return null;
+        const sums = history.map(item => sumCode(item.opencode));
+        const stats = {};
+        for (let i = 0; i <= 27; i++) {
+            const idx = sums.indexOf(i);
+            stats[String(i).padStart(2, '0')] = idx === -1 ? history.length : idx;
+        }
+        const findMiss = (arr, cond) => { for (let i = 0; i < arr.length; i++) if (cond(arr[i])) return i; return arr.length; };
+        const findPatternMiss = (hist, cond) => { for (let i = 0; i < hist.length; i++) { const nums = parseCode(hist[i].opencode); if (cond(nums)) return i; } return hist.length; };
+        stats['单'] = findMiss(sums, v => v % 2 === 1);
+        stats['双'] = findMiss(sums, v => v % 2 === 0);
+        stats['大'] = findMiss(sums, v => v >= 14);
+        stats['小'] = findMiss(sums, v => v <= 13);
+        stats['大单'] = findMiss(sums, v => v >= 14 && v % 2 === 1);
+        stats['大双'] = findMiss(sums, v => v >= 14 && v % 2 === 0);
+        stats['小单'] = findMiss(sums, v => v <= 13 && v % 2 === 1);
+        stats['小双'] = findMiss(sums, v => v <= 13 && v % 2 === 0);
+        stats['极小'] = findMiss(sums, v => v <= 5);
+        stats['极大'] = findMiss(sums, v => v >= 22);
+        stats['小边'] = findMiss(sums, v => v >= 6 && v <= 9);
+        stats['大边'] = findMiss(sums, v => v >= 18 && v <= 21);
+        stats['中'] = findMiss(sums, v => v >= 10 && v <= 17);
+        stats['对子'] = findPatternMiss(history, nums => nums && nums.length === 3 && (nums[0] === nums[1] || nums[1] === nums[2] || nums[0] === nums[2]) && !(nums[0] === nums[1] && nums[1] === nums[2]));
+        stats['顺子'] = findPatternMiss(history, nums => nums && nums.length === 3 && (nums[1] - nums[0] === 1 && nums[2] - nums[1] === 1));
+        stats['豹子'] = findPatternMiss(history, nums => nums && nums.length === 3 && nums[0] === nums[1] && nums[1] === nums[2]);
+        stats['杂六'] = findPatternMiss(history, nums => nums && nums.length === 3 && getPattern(nums) === '杂六');
+        stats['龙'] = findMiss(sums, v => [0, 3, 6, 9].includes(v % 10));
+        stats['虎'] = findMiss(sums, v => [1, 4, 7].includes(v % 10));
+        stats['合'] = findMiss(sums, v => [2, 5, 8].includes(v % 10));
+        return stats;
+    }
 
-} ;'--' : '%' + )001 * htgnel.delttes / rroc(dnuor.htaM ? htgnel.delttes = tnetnoCtxet.)'weiverPetaRniw'($ ;htgnel.)'确正' === sutats.i >= i(retlif.delttes = rroc tsnoc ;)'误错' === sutats.i || '确正' === sutats.i >= i(retlif.yrotsiHderp.S = delttes tsnoc { )(etaRniWetadpu noitcnuf    
-}    
-;)))eteled.tesatad.tegrat.e(droceReteled >= e ,'kcilc'(renetsiLtnevEdda.b >= b(hcaErof.)'eteled-yrotsih.'(llArotceleSyreuq.tnemucod        
-;)''(nioj.)} ;`>vid/<>vid/<>vid/<>b/<}'奖开待' || tluseRlautca.meti{$>b<>naps/<际实>naps<>"wor-yrotsih"=ssalc vid<>vid/<>b/<}'--' || txeTyalpsid.meti{$>b<>naps/<测预>naps<>"wor-yrotsih"=ssalc vid<>"ydob-yrotsih"=ssalc vid<>vid/<>vid/<>nottub/<除删>"}tcepxe.meti{$"=eteled-atad "eteled-yrotsih"=ssalc nottub<>naps/<}sutats.meti{$>"}slc{$ gat-yrotsih"=ssalc naps<>"snoitca-yrotsih"=ssalc vid<>vid/<期}tcepxe.meti{$>"doirep-yrotsih"=ssalc vid<>"pot-meti-yrotsih"=ssalc vid<>"meti-yrotsih"=ssalc vid<` nruter ;'gnidnep' : 'gnorw' ? '误错' === sutats.meti : 'tcerroc' ? '确正' === sutats.meti = slc tsnoc { >= meti(pam.deretlif = LMTHrenni.tsil        
-} ;nruter ;'>vid/<>vid/<>vid/<>b/<录记无暂>b<>"wor-yrotsih"=ssalc vid<>"ydob-yrotsih"=ssalc vid<>"meti-yrotsih"=ssalc vid<' = LMTHrenni.tsil { )htgnel.deretlif!( fi        
-;)03 ,0(ecils.)(yrotsiHretlif = deretlif tsnoc        
-;'据数测回无暂' : `)}htgnel.delttes{$/}rroc{$( %})001 * htgnel.delttes / rroc(dnuor.htaM{$：率中命` ? htgnel.delttes = tnetnoCtxet.)'ycaruccAyrotsih'($        
-;htgnel.)'确正' === sutats.i >= i(retlif.delttes = rroc tsnoc ;)'误错' === sutats.i || '确正' === sutats.i >= i(retlif.yrotsiHderp.S = delttes tsnoc ;)'enilemiTyrotsih'($ = tsil tsnoc        
-{ )(yrotsiHredner noitcnuf    
-} ;yrotsiHderp.S nruter ;)'奖开待' === sutats.i >= i(retlif.yrotsiHderp.S nruter )'gnidnep' === f( fi ;)'误错' === sutats.i >= i(retlif.yrotsiHderp.S nruter )'gnorw' === f( fi ;)'确正' === sutats.i >= i(retlif.yrotsiHderp.S nruter )'tcerroc' === f( fi ;retliFyrotsih.S = f tsnoc { )(yrotsiHretlif noitcnuf    
-} } ;)'空清已'(tsaot ;)(etaRniWetadpu ;)(yrotsiHredner ;)(evas ;][ = yrotsiHderp.S { ))'？史历有所空清'(mrifnoc( fi { )(yrotsiHraelc noitcnuf    
-} ;)(etaRniWetadpu ;)(yrotsiHredner ;)(evas ;)tcepxe ==! tcepxe.i >= i(retlif.yrotsiHderp.S = yrotsiHderp.S { )tcepxe(droceReteled noitcnuf    
-}    
-;)(etaRniWetadpu ;)(yrotsiHredner ;)(evas ;)05 ,0(ecils.yrotsiHderp.S = yrotsiHderp.S        
-;)cer(tfihsnu.yrotsiHderp.S esle        
-;} cer... ,]xdi[yrotsiHderp.S... { = ]xdi[yrotsiHderp.S )1- > xdi( fi        
-;)tcepxe.cer === tcepxe.i >= i(xednIdnif.yrotsiHderp.S = xdi tsnoc        
-{ )cer(droceRevas noitcnuf    
+    function renderStats(stats) {
+        if (!stats) return;
+        let gridHtml = '';
+        for (let i = 0; i <= 27; i++) {
+            const key = String(i).padStart(2, '0');
+            gridHtml += `<div class="stats-subitem"><div class="num">${key}</div><div class="miss">${stats[key] ?? '--'}期</div></div>`;
+        }
+        document.getElementById('sumMissGrid').innerHTML = gridHtml;
+        const ids = {
+            '单': 'miss-dan', '双': 'miss-shuang', '大': 'miss-da', '小': 'miss-xiao',
+            '大单': 'miss-xiaodan', '大双': 'miss-xiaoshuang', '小单': 'miss-dadan', '小双': 'miss-dashuang',
+            '极小': 'miss-jixiao', '极大': 'miss-jida', '小边': 'miss-xiaobian', '大边': 'miss-dabian', '中': 'miss-zhong',
+            '对子': 'miss-duizi', '顺子': 'miss-shunzi', '豹子': 'miss-baozi', '杂六': 'miss-zaliu',
+            '龙': 'miss-long', '虎': 'miss-hu', '合': 'miss-he'
+        };
+        for (const [stat, id] of Object.entries(ids)) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = stats[stat] ?? '--';
+        }
+    }
 
-}    
-;)(evas        
-;)} '' :tluseRlautca ,'奖开待' :sutats ,)(won.etaD :tAdetareneg ,Degnar :cseDegnar ,txeTyalpsid ,sepyt.tluser :sepyt ,seulav.tluser :seulav ,tcepxEtegrat :tcepxe {(droceRevas )stsixe!( fi        
-;)tcepxEtegrat === tcepxe.i >= i(dnif.yrotsiHderp.S = stsixe tsnoc        
-;`期}tcepxEtegrat{$ · 成生动自已测预` = tnetnoCtxet.)'sutatSoreh'($        
-;]2[seulav.tluser = tnetnoCtxet.)'3mun'($ ;]1[seulav.tluser = tnetnoCtxet.)'2mun'($ ;]0[seulav.tluser = tnetnoCtxet.)'1mun'($        
-;`}3V{$ · }2V{$ · }1V{$` = tnetnoCtxet.)'weiverPlaiceps'($        
-;)' '(nioj.sepyt.tluser = tnetnoCtxet.)'weiverPdnemmocer'($ ;)' '(nioj.seulav.tluser = tnetnoCtxet.)'weiverPllik'($        
-;Degnar = tnetnoCtxet.)'dnemmoceRoreh'($ ;txeTyalpsid = tnetnoCtxet.)'lliKoreh'($        
-;sisylana = sisylanAruc.S        
-;} )(won.etaD :tAdetareneg ,]3V ,2V ,1V[ :seulaVecruos ,detsujdAsaw.tluser :detsujdAsaw ,corPsbo :ssecorPderucsbo ,Degnar :cseDegnar ,txeTyalpsid ,sepyt.tluser :sepyt ,seulav.tluser :seulav ,tcepxEtegrat :tcepxe { = sisylana tsnoc        
-;)detsujdAsaw.tluser ,sepyt.tluser(ssecorPderucsbo = corPsbo tsnoc        
-;)seulav.tluser(cseDegnar = Degnar tsnoc        
-;)sepyt.tluser ,seulav.tluser(derPtmf = txeTyalpsid tsnoc        
-;)1 + )tcepxe.tsetal.S(rebmuN(gnirtS = tcepxEtegrat tsnoc        
-;)3V ,2V ,1V(ecnalaBssorc = tluser tsnoc        
-;)edocnepo.]2[tnecer(edoCmus = 3V ,)edocnepo.]1[tnecer(edoCmus = 2V ,)edocnepo.]0[tnecer(edoCmus = 1V tsnoc        
-;nruter )3 < htgnel.tnecer( fi ;)(esrever.)3 ,0(ecils.ataDyrotsih.S = tnecer tsnoc        
-} ;nruter ;'...期3少至需，中热预据数' = tnetnoCtxet.)'sutatSoreh'($ { )3 < htgnel.ataDyrotsih.S || tsetal.S!( fi        
-{ )(tciderPotuAnur noitcnuf    
+    const S = {
+        latest: null, historyData: [], predHistory: [], curAnalysis: null,
+        countdownTimer: null, pollTimer: null,
+        historyFilter: 'all', activeView: 'homeView',
+        scratch: { canvas: null, ctx: null, drawing: false }, statsData: null
+    };
+    function $(id) { return document.getElementById(id); }
+    function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 1400); }
+    function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ predHistory: S.predHistory.slice(0, 50), curAnalysis: S.curAnalysis })); }
+    function load() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) { const d = JSON.parse(r); S.predHistory = d.predHistory || []; S.curAnalysis = d.curAnalysis || null; } } catch (e) {} }
+    function saveTheme(t) { localStorage.setItem(THEME_KEY, t); }
+    function loadTheme() { const t = localStorage.getItem(THEME_KEY); if (t) document.documentElement.setAttribute('data-theme', t); }
+    function toggleTheme() { const cur = document.documentElement.getAttribute('data-theme') || 'dark', nxt = cur === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nxt); saveTheme(nxt); toast(nxt === 'dark' ? '深色主题' : '浅色主题'); }
+    function fmtTime(sec) { const m = String(Math.floor(sec / 60)).padStart(2, '0'), s = String(sec % 60).padStart(2, '0'); return `${m}:${s}`; }
+    function tsMs(ts) { const n = Number(ts); return n < 1e12 ? n * 1000 : n; }
+    function parseCode(c) { return String(c || '').split(',').map(n => Number(n.trim())).filter(Number.isFinite); }
+    function sumCode(c) { const n = Array.isArray(c) ? c : parseCode(c); return n.reduce((a, b) => a + b, 0); }
 
-}    
-;)dnert(IUdnerTetadpu        
-;)ataDyrotsih.S(dnerTezylana = dnert tsnoc        
-;mus = tnetnoCtxet.)'muShctarcs'($ ;'-' ?? ]2[smun = tnetnoCtxet.)'3Nhctarcs'($ ;'-' ?? ]1[smun = tnetnoCtxet.)'2Nhctarcs'($ ;'-' ?? ]0[smun = tnetnoCtxet.)'1Nhctarcs'($        
-;)1 + )tcepxe.l(rebmuN(gnirtS = tnetnoCtxet.)'doirePtxeNiaPim'($ ;`果结期 }tcepxe.l{$ 第` = tnetnoCtxet.)'doirePiaPim'($        
-;`}epyt{$ · }mus{$ 值和` = tnetnoCtxet.)'muStsetal'($ ;`期}tcepxe.l{$` = tnetnoCtxet.)'doirePtsetal'($        
-;)mus(epyTteg = epyt ,)smun(edoCmus = mus ,)edocnepo.l(edoCesrap = smun tsnoc        
-} ;nruter ;)'-' = tnetnoCtxet.)di($ >= di(hcaErof.]'muShctarcs','3Nhctarcs','2Nhctarcs','1Nhctarcs'[ ;'--' = tnetnoCtxet.)'doirePtxeNiaPim'($ ;'果结期 -- 第' = tnetnoCtxet.)'doirePiaPim'($ ;'-- · -- 值和' = tnetnoCtxet.)'muStsetal'($ ;'期--' = tnetnoCtxet.)'doirePtsetal'($ { )l!( fi        
-;tsetal.S = l tsnoc        
-{ )(tsetaLredner noitcnuf    
+    function renderLatest() {
+        const l = S.latest;
+        if (!l) { $('latestPeriod').textContent = '--期'; $('latestSum').textContent = '和值 -- · --'; $('miPaiPeriod').textContent = '第 -- 期结果'; $('miPaiNextPeriod').textContent = '--'; ['scratchN1','scratchN2','scratchN3','scratchSum'].forEach(id => $(id).textContent = '-'); return; }
+        const nums = parseCode(l.opencode), sum = sumCode(nums), type = getType(sum);
+        $('latestPeriod').textContent = `${l.expect}期`; $('latestSum').textContent = `和值 ${sum} · ${type}`;
+        $('miPaiPeriod').textContent = `第 ${l.expect} 期结果`; $('miPaiNextPeriod').textContent = String(Number(l.expect) + 1);
+        $('scratchN1').textContent = nums[0] ?? '-'; $('scratchN2').textContent = nums[1] ?? '-'; $('scratchN3').textContent = nums[2] ?? '-'; $('scratchSum').textContent = sum;
+        const trend = analyzeTrend(S.historyData);
+        updateTrendUI(trend);
+    }
 
-} ;)0 ,b + a >= )b ,a((ecuder.n nruter ;)c(edoCesrap : c ? )c(yarrAsi.yarrA = n tsnoc { )c(edoCmus noitcnuf    
-} ;)etiniFsi.rebmuN(retlif.)))(mirt.n(rebmuN >= n(pam.)','(tilps.)'' || c(gnirtS nruter { )c(edoCesrap noitcnuf    
-} ;n : 0001 * n ? 21e1 < n nruter ;)st(rebmuN = n tsnoc { )st(sMst noitcnuf    
-} ;`}s{$:}m{$` nruter ;)'0' ,2(tratSdap.)06 % ces(gnirtS = s ,)'0' ,2(tratSdap.))06 / ces(roolf.htaM(gnirtS = m tsnoc { )ces(emiTtmf noitcnuf    
-} ;)'题主色浅' : '题主色深' ? 'krad' === txn(tsaot ;)txn(emehTevas ;)txn ,'emeht-atad'(etubirttAtes.tnemelEtnemucod.tnemucod ;'krad' : 'thgil' ? 'krad' === ruc = txn ,'krad' || )'emeht-atad'(etubirttAteg.tnemelEtnemucod.tnemucod = ruc tsnoc { )(emehTelggot noitcnuf    
-} ;)t ,'emeht-atad'(etubirttAtes.tnemelEtnemucod.tnemucod )t( fi ;)YEK_EMEHT(metIteg.egarotSlacol = t tsnoc { )(emehTdaol noitcnuf    
-} ;)t ,YEK_EMEHT(metItes.egarotSlacol { )t(emehTevas noitcnuf    
-} }{ )e( hctac } } ;llun || sisylanAruc.d = sisylanAruc.S ;][ || yrotsiHderp.d = yrotsiHderp.S ;)r(esrap.NOSJ = d tsnoc { )r( fi ;)YEK_EGAROTS(metIteg.egarotSlacol = r tsnoc { yrt { )(daol noitcnuf    
-} ;))} sisylanAruc.S :sisylanAruc ,)05 ,0(ecils.yrotsiHderp.S :yrotsiHderp {(yfignirts.NOSJ ,YEK_EGAROTS(metItes.egarotSlacol { )(evas noitcnuf    
-} ;)0041 ,)'wohs'(evomer.tsiLssalc.t >= )((tuoemiTtes = t_.tsaot ;)t_.tsaot(tuoemiTraelc ;)'wohs'(dda.tsiLssalc.t ;gsm = tnetnoCtxet.t ;)'tsaot'($ = t tsnoc { )gsm(tsaot noitcnuf    
-} ;)di(dIyBtnemelEteg.tnemucod nruter { )di($ noitcnuf    
-;}    
-llun :ataDstats ,} eslaf :gniward ,llun :xtc ,llun :savnac { :hctarcs        
-,'weiVemoh' :weiVevitca ,'lla' :retliFyrotsih        
-,llun :remiTllop ,llun :remiTnwodtnuoc        
-,llun :sisylanAruc ,][ :yrotsiHderp ,][ :ataDyrotsih ,llun :tsetal        
-{ = S tsnoc    
+    function runAutoPredict() {
+        if (!S.latest || S.historyData.length < 3) { $('heroStatus').textContent = '数据预热中，需至少3期...'; return; }
+        const recent = S.historyData.slice(0, 3).reverse(); if (recent.length < 3) return;
+        const V1 = sumCode(recent[0].opencode), V2 = sumCode(recent[1].opencode), V3 = sumCode(recent[2].opencode);
+        const result = crossBalance(V1, V2, V3);
+        const targetExpect = String(Number(S.latest.expect) + 1);
+        const displayText = fmtPred(result.values, result.types);
+        const rangeD = rangeDesc(result.values);
+        const obsProc = obscuredProcess(result.types, result.wasAdjusted);
+        const analysis = { expect: targetExpect, values: result.values, types: result.types, displayText, rangeDesc: rangeD, obscuredProcess: obsProc, wasAdjusted: result.wasAdjusted, sourceValues: [V1, V2, V3], generatedAt: Date.now() };
+        S.curAnalysis = analysis;
+        $('heroKill').textContent = displayText; $('heroRecommend').textContent = rangeD;
+        $('killPreview').textContent = result.values.join(' '); $('recommendPreview').textContent = result.types.join(' ');
+        $('specialPreview').textContent = `${V1} · ${V2} · ${V3}`;
+        $('num1').textContent = result.values[0]; $('num2').textContent = result.values[1]; $('num3').textContent = result.values[2];
+        $('heroStatus').textContent = `预测已自动生成 · ${targetExpect}期`;
+        const exists = S.predHistory.find(i => i.expect === targetExpect);
+        if (!exists) saveRecord({ expect: targetExpect, values: result.values, types: result.types, displayText, rangeDesc: rangeD, generatedAt: Date.now(), status: '待开奖', actualResult: '' });
+        save();
+    }
 
-}    
-}        
-;'--' ?? ]tats[stats = tnetnoCtxet.le )le( fi            
-;)di(dIyBtnemelEteg.tnemucod = le tsnoc            
-{ ))sdi(seirtne.tcejbO fo ]di ,tats[ tsnoc( rof        
-;}        
-'eh-ssim' :'合' ,'uh-ssim' :'虎' ,'gnol-ssim' :'龙'            
-,'uilaz-ssim' :'六杂' ,'izoab-ssim' :'子豹' ,'iznuhs-ssim' :'子顺' ,'iziud-ssim' :'子对'            
-,'gnohz-ssim' :'中' ,'naibad-ssim' :'边大' ,'naiboaix-ssim' :'边小' ,'adij-ssim' :'大极' ,'oaixij-ssim' :'小极'            
-,'gnauhsad-ssim' :'双小' ,'nadad-ssim' :'单小' ,'gnauhsoaix-ssim' :'双大' ,'nadoaix-ssim' :'单大'            
-,'oaix-ssim' :'小' ,'ad-ssim' :'大' ,'gnauhs-ssim' :'双' ,'nad-ssim' :'单'            
-{ = sdi tsnoc        
-;lmtHdirg = LMTHrenni.)'dirGssiMmus'(dIyBtnemelEteg.tnemucod        
-}        
-;`>vid/<>vid/<期}'--' ?? ]yek[stats{$>"ssim"=ssalc vid<>vid/<}yek{$>"mun"=ssalc vid<>"metibus-stats"=ssalc vid<` =+ lmtHdirg            
-;)'0' ,2(tratSdap.)i(gnirtS = yek tsnoc            
-{ )++i ;72 =< i ;0 = i tel( rof        
-;'' = lmtHdirg tel        
-;nruter )stats!( fi        
-{ )stats(statSredner noitcnuf    
+    function saveRecord(rec) {
+        const idx = S.predHistory.findIndex(i => i.expect === rec.expect);
+        if (idx > -1) S.predHistory[idx] = { ...S.predHistory[idx], ...rec };
+        else S.predHistory.unshift(rec);
+        S.predHistory = S.predHistory.slice(0, 50); save(); renderHistory(); updateWinRate();
+    }
+    function deleteRecord(expect) { S.predHistory = S.predHistory.filter(i => i.expect !== expect); save(); renderHistory(); updateWinRate(); }
+    function clearHistory() { if (confirm('清空所有历史？')) { S.predHistory = []; save(); renderHistory(); updateWinRate(); toast('已清空'); } }
+    function filterHistory() { const f = S.historyFilter; if (f === 'correct') return S.predHistory.filter(i => i.status === '正确'); if (f === 'wrong') return S.predHistory.filter(i => i.status === '错误'); if (f === 'pending') return S.predHistory.filter(i => i.status === '待开奖'); return S.predHistory; }
+    function renderHistory() {
+        const list = $('historyTimeline'); const settled = S.predHistory.filter(i => i.status === '正确' || i.status === '错误'); const corr = settled.filter(i => i.status === '正确').length;
+        $('historyAccuracy').textContent = settled.length ? `命中率：${Math.round(corr / settled.length * 100)}% (${corr}/${settled.length})` : '暂无回测数据';
+        const filtered = filterHistory().slice(0, 30);
+        if (!filtered.length) { list.innerHTML = '<div class="history-item"><div class="history-body"><div class="history-row"><b>暂无记录</b></div></div></div>'; return; }
+        list.innerHTML = filtered.map(item => { const cls = item.status === '正确' ? 'correct' : item.status === '错误' ? 'wrong' : 'pending'; return `<div class="history-item"><div class="history-item-top"><div class="history-period">${item.expect}期</div><div class="history-actions"><span class="history-tag ${cls}">${item.status}</span><button class="history-delete" data-delete="${item.expect}">删除</button></div></div><div class="history-body"><div class="history-row"><span>预测</span><b>${item.displayText || '--'}</b></div><div class="history-row"><span>实际</span><b>${item.actualResult || '待开奖'}</b></div></div></div>`; }).join('');
+        document.querySelectorAll('.history-delete').forEach(b => b.addEventListener('click', e => deleteRecord(e.target.dataset.delete)));
+    }
+    function updateWinRate() { const settled = S.predHistory.filter(i => i.status === '正确' || i.status === '错误'); const corr = settled.filter(i => i.status === '正确').length; $('winRatePreview').textContent = settled.length ? Math.round(corr / settled.length * 100) + '%' : '--'; }
 
-}    
-;stats nruter        
-;))01 % v(sedulcni.]8 ,5 ,2[ >= v ,smus(ssiMdnif = ]'合'[stats        
-;))01 % v(sedulcni.]7 ,4 ,1[ >= v ,smus(ssiMdnif = ]'虎'[stats        
-;))01 % v(sedulcni.]9 ,6 ,3 ,0[ >= v ,smus(ssiMdnif = ]'龙'[stats        
-;)'六杂' === )smun(nrettaPteg && 3 === htgnel.smun && smun >= smun ,yrotsih(ssiMnrettaPdnif = ]'六杂'[stats        
-;)]2[smun === ]1[smun && ]1[smun === ]0[smun && 3 === htgnel.smun && smun >= smun ,yrotsih(ssiMnrettaPdnif = ]'子豹'[stats        
-;))1 === ]1[smun - ]2[smun && 1 === ]0[smun - ]1[smun( && 3 === htgnel.smun && smun >= smun ,yrotsih(ssiMnrettaPdnif = ]'子顺'[stats        
-;))]2[smun === ]1[smun && ]1[smun === ]0[smun(! && )]2[smun === ]0[smun || ]2[smun === ]1[smun || ]1[smun === ]0[smun( && 3 === htgnel.smun && smun >= smun ,yrotsih(ssiMnrettaPdnif = ]'子对'[stats        
-;)71 =< v && 01 => v >= v ,smus(ssiMdnif = ]'中'[stats        
-;)12 =< v && 81 => v >= v ,smus(ssiMdnif = ]'边大'[stats        
-;)9 =< v && 6 => v >= v ,smus(ssiMdnif = ]'边小'[stats        
-;)22 => v >= v ,smus(ssiMdnif = ]'大极'[stats        
-;)5 =< v >= v ,smus(ssiMdnif = ]'小极'[stats        
-;)0 === 2 % v && 31 =< v >= v ,smus(ssiMdnif = ]'双小'[stats        
-;)1 === 2 % v && 31 =< v >= v ,smus(ssiMdnif = ]'单小'[stats        
-;)0 === 2 % v && 41 => v >= v ,smus(ssiMdnif = ]'双大'[stats        
-;)1 === 2 % v && 41 => v >= v ,smus(ssiMdnif = ]'单大'[stats        
-;)31 =< v >= v ,smus(ssiMdnif = ]'小'[stats        
-;)41 => v >= v ,smus(ssiMdnif = ]'大'[stats        
-;)0 === 2 % v >= v ,smus(ssiMdnif = ]'双'[stats        
-;)1 === 2 % v >= v ,smus(ssiMdnif = ]'单'[stats        
-;} ;htgnel.tsih nruter } ;i nruter ))smun(dnoc( fi ;)edocnepo.]i[tsih(edoCesrap = smun tsnoc { )++i ;htgnel.tsih < i ;0 = i tel( rof { >= )dnoc ,tsih( = ssiMnrettaPdnif tsnoc        
-;} ;htgnel.rra nruter ;i nruter ))]i[rra(dnoc( fi )++i ;htgnel.rra < i ;0 = i tel( rof { >= )dnoc ,rra( = ssiMdnif tsnoc        
-}        
-;xdi : htgnel.yrotsih ? 1- === xdi = ])'0' ,2(tratSdap.)i(gnirtS[stats            
-;)i(fOxedni.smus = xdi tsnoc            
-{ )++i ;72 =< i ;0 = i tel( rof        
-;}{ = stats tsnoc        
-;))edocnepo.meti(edoCmus >= meti(pam.yrotsih = smus tsnoc        
-;llun nruter )0 === htgnel.yrotsih || yrotsih!( fi        
-{ )yrotsih(statSetupmoc noitcnuf    
+    async function fetchData(silent = false) {
+        try {
+            if (!silent) $('heroStatus').textContent = '同步数据...';
+            const res = await fetch(API_URL, { cache: 'no-store' }); const data = await res.json(); if (data.code !== 1 || !Array.isArray(data.data)) throw new Error('接口异常');
+            S.historyData = data.data.slice(0, 50).map(item => ({ expect: String(item.expect), opencode: item.opencode, opentime: item.opentime }));
+            const prevLatest = S.latest; S.latest = S.historyData[0] || null;
+            if (S.latest) S.latest.sum = sumCode(S.latest.opencode);
+            renderLatest();
+            const newExpect = S.latest?.expect;
+            if (prevLatest && newExpect && prevLatest.expect !== newExpect) { await checkBetRecords(); runAutoPredict(); if (!silent) toast('新一期已开奖，预测已自动更新'); }
+            else if (!prevLatest) { await checkBetRecords(); runAutoPredict(); }
+            else { await checkBetRecords(); if (!S.curAnalysis) runAutoPredict(); }
+            $('heroStatus').textContent = `数据就绪 · ${S.latest?.expect || '--'}期`;
+            updateCountdown();
+            S.statsData = computeStats(S.historyData);
+            if (S.activeView === 'statsView') renderStats(S.statsData);
+        } catch (e) { $('heroStatus').textContent = '同步失败，自动重试中...'; }
+    }
 
-}    
-;tniHtxen.dnert = tnetnoCtxet.)'tniHtxeNdnert'(dIyBtnemelEteg.tnemucod        
-;'%' + )0(dexiFot.)001 * oitar.dnert( = tnetnoCtxet.)'oitaRdnert'(dIyBtnemelEteg.tnemucod        
-;)' → '(nioj.snrettaPtnecer.dnert = tnetnoCtxet.)'5tneceRdnert'(dIyBtnemelEteg.tnemucod        
-;tseggus.dnert = tnetnoCtxet.)'tsegguSdnert'(dIyBtnemelEteg.tnemucod        
-;))'nraw' : 'dab' ? '差' === level.dnert( : 'doog' ? '优' === level.dnert( + ' egdab-dnert' = emaNssalc.)'leveLdnert'(dIyBtnemelEteg.tnemucod        
-;level.dnert = tnetnoCtxet.)'leveLdnert'(dIyBtnemelEteg.tnemucod        
-;nruter )dnert!( fi        
-{ )dnert(IUdnerTetadpu noitcnuf    
+    function getRemainSec() { if (!S.latest) return 0; return Math.floor((tsMs(S.latest.opentime) + PERIOD_MS - Date.now()) / 1000); }
+    function updateCountdown() { clearInterval(S.countdownTimer); const tick = () => { if (!S.latest) { $('countdown').textContent = '--:--'; $('miPaiCountdown').textContent = '--:--'; return; } const r = getRemainSec(); if (r <= 0) { $('countdown').textContent = '开奖中'; $('miPaiCountdown').textContent = '开奖中'; return; } $('countdown').textContent = fmtTime(r); $('miPaiCountdown').textContent = fmtTime(r); $('countdownWrap').classList.toggle('countdown-warning', r <= 10); }; tick(); S.countdownTimer = setInterval(tick, 1000); }
+    function getPollInterval() { const r = getRemainSec(); if (r <= 10) return 2000; if (r <= 120) return 5000; return 30000; }
+    function schedulePolling() { clearInterval(S.pollTimer); const poll = () => { const interval = getPollInterval(); clearInterval(S.pollTimer); S.pollTimer = setInterval(() => { fetchData(true).then(() => { const newInterval = getPollInterval(); if (newInterval !== interval) schedulePolling(); }); }, interval); }; poll(); }
 
-}    
-;} tniHtxen ,oitar ,5tnecer :snrettaPtnecer ,tseggus ,level { nruter        
-} ;'断判慎谨，替交本回与六杂' = tniHtxen ;'期荡震' = tseggus ;'中' = level { esle        
-} ;'现出子豹/子顺/子对惕警' = tniHtxen ;'高率概本回' = tseggus ;'差' = level { )4.0 =< oitar( fi esle        
-} ;'为而势顺可，续延能可六杂' = tniHtxen ;'势强六杂' = tseggus ;'优' = level { )8.0 => oitar( fi        
-;tniHtxen ,tseggus ,level tel        
-;5 / tnuoCdexim = oitar tsnoc        
-;htgnel.)'六杂' === p >= p(retlif.5tnecer = tnuoCdexim tsnoc        
-;)))edocnepo.meti(edoCesrap(nrettaPteg >= meti(pam.)5 ,0(ecils.ataDyrotsih = 5tnecer tsnoc        
-;} '据数多更待等' :tniHtxen ,0 :oitar ,][ :snrettaPtnecer ,'足不据数' :tseggus ,'中' :level { nruter )5 < htgnel.ataDyrotsih || ataDyrotsih!( fi        
-{ )ataDyrotsih(dnerTezylana noitcnuf    
+    async function checkBetRecords() { if (!S.historyData.length || !S.predHistory.length) return; const map = new Map(); S.historyData.forEach(item => map.set(String(item.expect), item)); let changed = false; S.predHistory = S.predHistory.map(item => { if (item.status !== '待开奖') return item; const hit = map.get(String(item.expect)); if (!hit) return item; const sum = sumCode(hit.opencode), realType = getType(sum); const isCorrect = item.types && item.types.includes(realType); changed = true; return { ...item, actualResult: `${parseCode(hit.opencode).join('+')}=${sum} ${realType}`, status: isCorrect ? '正确' : '错误' }; }); if (changed) save(); }
 
-}    
-;'六杂' nruter        
-;'子顺' nruter )1 === b - c && 1 === a - b( fi        
-;'子对' nruter )c === a || c === b || b === a( fi        
-;'子豹' nruter )c === b && b === a( fi        
-;)y - x >= )y ,x((tros.smun = ]c ,b ,a[ tsnoc        
-;'知未' nruter )3 < htgnel.smun || smun!( fi        
-{ )smun(nrettaPteg noitcnuf    
+    function copyText(text) { if (navigator.clipboard) return navigator.clipboard.writeText(text); const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } finally { document.body.removeChild(ta); } }
 
-}    
-;)'n\'(nioj.]        
-'。理处装包觉视已值数体具，括概象抽的法衡平叉交态形为上以：注'            
-,`。})' / '(nioj.smys{$：属归限象其及点考参立独出输：步四第`            
-,'。器节调偿补过跳，叠重签标到测检未：步三第' : '。化分全完签标三至直，项突冲射映重则原移位小最按。器节调偿补活激，叠重签标到测检：步三第' ? jdAsaw            
-,'。性斥互签标限象验校，）δ/γ/β/α（限象四至射映列序准基将：步二第'            
-,'。列序准基元三建构，值势态期周三近集采：步一第'            
-,'】考参部内 · 法算家独yy【'            
-[ nruter        
-;))]t[} 'δ' :'双小' ,'γ' :'单小' ,'β' :'双大' ,'α' :'单大' {( >= t(pam.sepyt = smys tsnoc        
-{ )jdAsaw ,sepyt(ssecorPderucsbo noitcnuf    
-} ;`}xm{$-}nm{$` nruter ;)slav...(xam.htaM = xm ,)slav...(nim.htaM = nm tsnoc { )slav(cseDegnar noitcnuf    
-} ;)' ｜ '(nioj.)`}v{$ }]i[sepyt{$` >= )i ,v((pam.slav nruter { )sepyt ,slav(derPtmf noitcnuf    
+    function openProcessSheet() { if (!S.curAnalysis) { toast('暂无分析结果'); return; } const a = S.curAnalysis; $('sheetKillValue').textContent = a.displayText; $('sheetKillConf').textContent = '形态交叉平衡法'; $('sheetKillStrategy').textContent = a.wasAdjusted ? '已微调' : '直接通过'; $('sheetRecommendValue').textContent = a.values.join(' / '); $('sheetSpecialValue').textContent = a.sourceValues.join(' · '); $('sheetCalcSteps').textContent = a.obscuredProcess; $('resultSection').classList.add('show'); }
 
-}    
-;} eurt :detsujdAsaw ,))v(epyTteg >= v(pam.jda :sepyt ,jda :seulav { nruter        
-;vb = ]xdi[jda )tb( fi        
-}        
-} ;vc = vb ;m = tb ;d = db { ))vb < vc && db === d( || db < d( fi            
-;)giro - vc(sba.htaM = d tsnoc            
-;)m ,giro(epyTnItsesolc = vc tsnoc            
-{ )gnissim fo m tsnoc( rof        
-;ytinifnI = db ,llun = vb ,llun = tb tel        
-;]xdi[jda = giro tsnoc        
-;))t(sah.qinu! >= t(retlif.]'双小' ,'单小' ,'双大' ,'单大'[ = gnissim tsnoc        
-;2 = xdi )]0[sepyt === ]2[sepyt( fi esle        
-;1 = xdi )]0[sepyt === ]1[sepyt( fi esle        
-;2 = xdi )]1[sepyt === ]2[sepyt( fi        
-;2 = xdi tel        
-;eurt = jdAsaw        
-;} eslaf :detsujdAsaw ,sepyt :sepyt ,jda :seulav { nruter )3 === ezis.qinu( fi        
-;)sepyt(teS wen = qinu tsnoc        
-;eslaf = jdAsaw tel        
-;]slav...[ = jda tsnoc        
-;))v(epyTteg >= v(pam.slav = sepyt ,]3V ,2V ,1V[ = slav tsnoc        
-{ )3V ,2V ,1V(ecnalaBssorc noitcnuf    
+    function openMiPai() { $('miPaiModal').classList.add('show'); setTimeout(() => initScratch(), 60); }
+    function closeMiPai() { $('miPaiModal').classList.remove('show'); }
+    function initScratch() { const canvas = $('scratchCanvas'), wrap = $('scratchWrap'); if (!canvas || !wrap) return; const rect = wrap.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.floor(rect.width * dpr); canvas.height = Math.floor(rect.height * dpr); canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px'; const ctx = canvas.getContext('2d', { alpha: true }); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); S.scratch.ctx = ctx; S.scratch.canvas = canvas; S.scratch.drawing = false; drawCover(); bindScratch(); }
+    function drawCover() { const ctx = S.scratch.ctx; const w = S.scratch.canvas.clientWidth, h = S.scratch.canvas.clientHeight; ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#c0c0c0'; ctx.fillRect(0, 0, w, h); ctx.fillStyle = '#ffd74f'; ctx.font = 'bold 24px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('刮一刮', w / 2, h / 2 - 8); ctx.font = '14px sans-serif'; ctx.fillText('更刺激', w / 2, h / 2 + 18); }
+    function getPt(e) { const r = S.scratch.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    function scratchLine(f, t) { const ctx = S.scratch.ctx; if (!ctx) return; ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.lineWidth = 32; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(t.x, t.y); ctx.stroke(); ctx.restore(); }
+    function bindScratch() { const c = S.scratch.canvas; if (!c || c.dataset.bound) return; c.dataset.bound = '1'; let lp = null; c.addEventListener('pointerdown', e => { e.preventDefault(); S.scratch.drawing = true; lp = getPt(e); scratchDot(lp); }); c.addEventListener('pointermove', e => { if (!S.scratch.drawing) return; e.preventDefault(); const p = getPt(e); if (lp) scratchLine(lp, p); lp = p; }); window.addEventListener('pointerup', () => { S.scratch.drawing = false; lp = null; }); }
+    function scratchDot(p) { const ctx = S.scratch.ctx; ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+    function resetScratch() { drawCover(); toast('已重置'); }
+    function copyCurResult() { if (!S.latest) return; const n = parseCode(S.latest.opencode); copyText(`${S.latest.expect}期 ${n.join('+')}=${sumCode(n)} ${getType(sumCode(n))}`); toast('已复制'); }
 
-}    
-;tseb nruter        
-}        
-} ;d = tsiDtseb ;x = tseb { ))tseb < x && tsiDtseb === d( || tsiDtseb < d( fi            
-;)x - v(sba.htaM = d tsnoc            
-{ )c fo x tsnoc( rof        
-;)tseb - v(sba.htaM = tsiDtseb ,]0[c = tseb tel        
-;v nruter )htgnel.c!( fi        
-;)t(epyTroFsmun = c tsnoc        
-{ )t ,v(epyTnItsesolc noitcnuf    
-}    
-;r nruter        
-;)i(hsup.r )2 =+ i ;62 =< i ;41 = i tel( rof )'双大' === t( fi esle        
-;)i(hsup.r )2 =+ i ;72 =< i ;51 = i tel( rof )'单大' === t( fi esle        
-;)i(hsup.r )2 =+ i ;21 =< i ;0 = i tel( rof )'双小' === t( fi esle        
-;)i(hsup.r )2 =+ i ;31 =< i ;1 = i tel( rof )'单小' === t( fi        
-;][ = r tsnoc        
-{ )t(epyTroFsmun noitcnuf    
-} ;)'双小' : '单小' ? 1 === 2 % mus( : )'双大' : '单大' ? 1 === 2 % mus( ? 41 => mus nruter { )mus(epyTteg noitcnuf    
+    function bindEvents() {
+        $('themeBtn').addEventListener('click', toggleTheme); $('themeBtn2').addEventListener('click', toggleTheme);
+        $('processBtn').addEventListener('click', openProcessSheet);
+        $('copyKillBtn').addEventListener('click', () => { if (S.curAnalysis) { copyText(S.curAnalysis.displayText); toast('已复制预测结果'); } });
+        $('copyRecommendBtn').addEventListener('click', () => { if (S.curAnalysis) { copyText(S.curAnalysis.rangeDesc); toast('已复制参考区间'); } });
+        $('miPaiBtn').addEventListener('click', openMiPai); $('closeMiPaiBtn').addEventListener('click', closeMiPai); $('miPaiBackdrop').addEventListener('click', closeMiPai);
+        $('resetScratchBtn').addEventListener('click', resetScratch); $('copyCurrentDrawBtn').addEventListener('click', copyCurResult);
+        $('closeSheetBtn').addEventListener('click', () => $('resultSection').classList.remove('show')); $('sheetBackdrop').addEventListener('click', () => $('resultSection').classList.remove('show'));
+        $('clearHistoryBtn').addEventListener('click', clearHistory);
+        document.querySelectorAll('.mode-chip').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.mode-chip').forEach(x => x.classList.remove('active')); b.classList.add('active'); S.activeView = b.dataset.view; document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === b.dataset.view)); if (b.dataset.view === 'statsView' && S.statsData) renderStats(S.statsData); }));
+        document.querySelectorAll('.filter-chip').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.filter-chip').forEach(x => x.classList.remove('active')); b.classList.add('active'); S.historyFilter = b.dataset.historyFilter; renderHistory(); }));
+    }
 
-;000012 = SM_DOIREP tsnoc    
-;'82DNJ/yrotsih/moc.89982cp.repus//:sptth' = LRU_IPA tsnoc    
-;'emeht_borp' = YEK_EMEHT tsnoc    
-;'11v_otua_ogla_yy' = YEK_EGAROTS tsnoc    
-{ )(noitcnuf(
->tpircs<
->vid/<
->vid/<    
->vid/<        
->vid/<            
->vid/<                
->nottub/<果结制复>"ntBwarDtnerruCypoc"=di "yramirp ntb-iapim"=ssalc nottub<                    
->nottub/<牌咪新重>"ntBhctarcSteser"=di "ntb-iapim"=ssalc nottub<                    
->"snoitca-iapim"=ssalc vid<                
->vid/<>naps/<--:-->"nwodtnuoCiaPim"=di naps<：果结奖开期 >naps/<-->"doirePtxeNiaPim"=di naps< 第止截>"toof-iapim"=ssalc vid<                
->vid/<                
->savnac/<>"savnaChctarcs"=di savnac<                    
->vid/<                    
->vid/<                        
->vid/<->"muShctarcs"=di "llab-hctarcs"=ssalc vid<                            
->vid/<=>"lobmys-hctarcs"=ssalc vid<                            
->vid/<->"3Nhctarcs"=di "llab-hctarcs"=ssalc vid<                            
->vid/<+>"lobmys-hctarcs"=ssalc vid<                            
->vid/<->"2Nhctarcs"=di "llab-hctarcs"=ssalc vid<                            
->vid/<+>"lobmys-hctarcs"=ssalc vid<                            
->vid/<->"1Nhctarcs"=di "llab-hctarcs"=ssalc vid<                            
->"alumroFhctarcs"=di "alumrof-hctarcs"=ssalc vid<                        
->"tnetnoChctarcs"=di "tnetnoc-hctarcs"=ssalc vid<                    
->"parWhctarcs"=di "parw-hctarcs"=ssalc vid<                
->vid/<果结期 -- 第>"doirePiaPim"=di "doirep-iapim"=ssalc vid<                
->"ydob-iapim"=ssalc vid<            
->vid/<            
->vid/<>"dnab-duolc-iapim"=ssalc vid<                
->vid/<果结看查层涂开刮指手用>"bus-iapim"=ssalc vid<                
->vid/<乐刮刮牌咪>"eltit-iapim"=ssalc vid<                
->"redaeh-iapim"=ssalc vid<            
->nottub/<×>"ntBiaPiMesolc"=di "esolc-iapim"=ssalc nottub<            
->"drac-iapim"=ssalc vid<        
->"ladom-iapim"=ssalc vid<    
->vid/<>"pordkcaBiaPim"=di "pordkcab-ladom"=ssalc vid<    
->"ladoMiaPim"=di "parw-ladom"=ssalc vid<
->vid/<
->vid/<    
->vid/<        
->vid/<>vid/<。考参性理请，性定确不在存果结际实，装包觉视过经均值数有所。议建注投定固非，成生态动统系"法算家独yy"由容内本>"txetbus"=ssalc vid<>3h/<明声责免>3h<>"drac-teehs"=ssalc vid<            
->vid/<>vid/<...成生动自待等>"spetSclaCteehs"=di "ssecorp"=ssalc vid<>3h/<）版晦隐（程过算计>3h<>"drac-teehs"=ssalc vid<            
->vid/<            
->vid/<>vid/<-->"eulaVlaicepSteehs"=di "v"=ssalc vid<>vid/<源期3近>"k"=ssalc vid<>"drac-inim"=ssalc vid<                
->vid/<>vid/<-->"eulaVdnemmoceRteehs"=di "v"=ssalc vid<>vid/<点考参势态>"k"=ssalc vid<>vid/<fer yy>"xp8:ezis-tnof"=elyts "yalrevo-kramretaw"=ssalc vid<>"evitaler:noitisop"=elyts "drac-inim"=ssalc vid<                
->vid/<>vid/<-->"ygetartSlliKteehs"=di "v"=ssalc vid<>vid/<态状节调>"k"=ssalc vid<>"drac-inim"=ssalc vid<                
->vid/<>vid/<法衡平叉交态形>"fnoClliKteehs"=di "v"=ssalc vid<>vid/<本版法算>"k"=ssalc vid<>"drac-inim"=ssalc vid<                
->"dirg-teehs"=ssalc vid<            
->vid/<>vid/<-->"eulaVlliKteehs"=di "gib"=ssalc vid<>3h/<果结测预>3h<>vid/<考参统系 · 法算家独yy>"yalrevo-kramretaw"=ssalc vid<>"evitaler:noitisop"=elyts "drac-teehs"=ssalc vid<            
->"kcats-teehs"=ssalc vid<        
->vid/<>nottub/<✕>"ntBteehSesolc"=di "esolc-teehs"=ssalc nottub<>vid/<>p/<述描晦隐 · 考参部内>"eltitbuSteehs"=di p<>2h/<程过算计 · 法算家独yy>"eltiTteehs"=di 2h<>vid<>"pot-teehs"=ssalc vid<        
->vid/<>"eldnah-teehs"=ssalc vid<        
->"teehs"=ssalc vid<    
->vid/<>"pordkcaBteehs"=di "pordkcab-teehs"=ssalc vid<    
->"noitceStluser"=di "parw-teehs"=ssalc vid<
->vid/<
->noitces/<    
->noitces/<        
->vid/<            
->vid/<>vid/<>vid/<>naps/<-->"gnauhsad-ssim"=di "lav"=ssalc naps<>naps/<双小>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"nadad-ssim"=di "lav"=ssalc naps<>naps/<单小>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"gnauhsoaix-ssim"=di "lav"=ssalc naps<>naps/<双大>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"nadoaix-ssim"=di "lav"=ssalc naps<>naps/<单大>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>"tnetnoc"=ssalc vid<>vid/<布分态形>"eltit"=ssalc vid<>"drac-stats"=ssalc vid<                
->vid/<>vid/<>vid/<>naps/<-->"oaix-ssim"=di "lav"=ssalc naps<>naps/<小>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"ad-ssim"=di "lav"=ssalc naps<>naps/<大>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"gnauhs-ssim"=di "lav"=ssalc naps<>naps/<双>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>vid/<>naps/<-->"nad-ssim"=di "lav"=ssalc naps<>naps/<单>"yek"=ssalc naps<>"wor-stats"=ssalc vid<>"tnetnoc"=ssalc vid<>vid/<型类本基>"eltit"=ssalc vid<>"drac-stats"=ssalc vid<                
->"dirg-stats"=ssalc vid<            
->vid/<            
->vid/<>"dirGssiMmus"=di "dirgbus-stats"=ssalc vid<                
->vid/<>naps/<72~00>")3txet--(rav:roloc ;xp11:ezis-tnof"=elyts naps<>naps/<漏遗值和>"0001:thgiew-tnof ;xp61:ezis-tnof"=elyts naps<>"xp21:mottob-nigram ;xp01:pag ;retnec:smeti-ngila ;xelf:yalpsid"=elyts vid<                
->"xp41:mottob-nigram ;xp41:gniddap ;xp02:suidar-redrob ;)2lenap--(rav:dnuorgkcab"=elyts vid<            
->vid/<>vid/<>p/<计统类分与漏遗值和>p<>3h/<漏遗时实>3h<>vid<>"pot-noitces"=ssalc vid<            
->"noitces"=ssalc noitces<        
->"weiVstats"=di "weiv"=ssalc noitces<    
->noitces/<    
->noitces/<        
->vid/<>"enilemiTyrotsih"=di "tsil-yrotsih"=ssalc vid<            
->vid/<            
->nottub/<空清>"ntByrotsiHraelc"=di "ntb-tsohg"=ssalc nottub<                
->nottub/<奖开待>"gnidnep"=retlif-yrotsih-atad "pihc-retlif"=ssalc nottub<                
->nottub/<误错>"gnorw"=retlif-yrotsih-atad "pihc-retlif"=ssalc nottub<                
->nottub/<确正>"tcerroc"=retlif-yrotsih-atad "pihc-retlif"=ssalc nottub<                
->nottub/<部全>"lla"=retlif-yrotsih-atad "evitca pihc-retlif"=ssalc nottub<                
->"rabloot-yrotsih"=ssalc vid<            
->vid/<>vid/<>p/<--：率中命>"ycaruccAyrotsih"=di p<>3h/<）档归动自（史历测预>3h<>vid<>"pot-noitces"=ssalc vid<            
->"noitces"=ssalc noitces<        
->"weiVyrotsih"=di "weiv"=ssalc noitces<    
->noitces/<    
->noitces/<        
->elcitra/<>vid/<胜>"egdab-rab"=ssalc vid<>vid/<>vid/<测回史历于基>"bus-rab"=ssalc vid<>vid/<-->"weiverPetaRniw"=di "eulav-rab"=ssalc vid<>vid/<率胜测预>"lebal-rab"=ssalc vid<>"niam-rab"=ssalc vid<>vid/<↗>"noci-rab"=ssalc vid<>"etihw rab-tluser"=ssalc elcitra<            
->elcitra/<>vid/<源>"egdab-rab"=ssalc vid<>vid/<>vid/<照快源据数>"bus-rab"=ssalc vid<>vid/<-->"weiverPlaiceps"=di "eulav-rab"=ssalc vid<>vid/<值和期3近>"lebal-rab"=ssalc vid<>"niam-rab"=ssalc vid<>vid/<◌>"noci-rab"=ssalc vid<>"egnaro rab-tluser"=ssalc elcitra<            
->elcitra/<>vid/<形>"egdab-rab"=ssalc vid<>vid/<>vid/<果结析分维全>"bus-rab"=ssalc vid<>vid/<-->"weiverPdnemmocer"=di "eulav-rab"=ssalc vid<>vid/<态形测预>"lebal-rab"=ssalc vid<>"niam-rab"=ssalc vid<>vid/<◎>"noci-rab"=ssalc vid<>"elprup rab-tluser"=ssalc elcitra<            
->elcitra/<>vid/<数>"egdab-rab"=ssalc vid<>vid/<>vid/<点考参势态个四>"bus-rab"=ssalc vid<>vid/<-->"weiverPllik"=di "eulav-rab"=ssalc vid<>vid/<字数测预>"lebal-rab"=ssalc vid<>"niam-rab"=ssalc vid<>vid/<◉>"noci-rab"=ssalc vid<>"kcalb rab-tluser"=ssalc elcitra<            
->"srab-tluser"=ssalc noitces<        
->"weiVemoh"=di "evitca weiv"=ssalc noitces<    
->vid/<    
->nottub/<计统>"weiVstats"=weiv-atad "pihc-edom"=ssalc nottub<        
->nottub/<史历测预>"weiVyrotsih"=weiv-atad "pihc-edom"=ssalc nottub<        
->nottub/<页主>"weiVemoh"=weiv-atad "evitca pihc-edom"=ssalc nottub<        
->"wor-edom"=ssalc vid<    
->vid/<    
->vid/<>naps/<-->"tniHtxeNdnert"=di "eulav"=ssalc naps<>naps/<示提期下>"lebal"=ssalc naps<>"wor-dnert"=ssalc vid<        
->vid/<>naps/<-->"oitaRdnert"=di "eulav"=ssalc naps<>naps/<比占六杂>"lebal"=ssalc naps<>"wor-dnert"=ssalc vid<        
->vid/<>naps/<-->"5tneceRdnert"=di "eulav"=ssalc naps<>naps/<态形期5近最>"lebal"=ssalc naps<>"wor-dnert"=ssalc vid<        
->vid/<        
->vid/<            
->naps/<续延六杂>";xp11:ezis-tnof"=elyts "tsegguSdnert"=di naps<                
->naps/<优>"doog egdab-dnert"=ssalc "leveLdnert"=di naps<                
->"sutats-dnert"=ssalc vid<            
->4h/<断判势趋 ��>4h<            
->"redaeh-dnert"=ssalc vid<        
->"draCdnert"=di "drac-dnert"=ssalc vid<    
->noitces/<    
->vid/<        
->vid/<            
->nottub/<牌咪>"ntBiaPim"=di "ntb-yradnoces"=ssalc nottub<                
->nottub/<程过算计>"ntBssecorp"=di "ntb-yradnoces"=ssalc nottub<                
->vid/<中测预动自 · 法算家独yy>naps/<>"eslup"=ssalc naps<>"egdab-otua"=ssalc vid<                
->"snoitca-oreh"=ssalc vid<            
->vid/<            
->vid/<>nottub/<制复>"ntBdnemmoceRypoc"=di "ypoc-inim"=ssalc nottub<>vid/<-->"dnemmoceRoreh"=di "v"=ssalc vid<>vid/<间区考参>"k"=ssalc vid<>"enil-oreh"=ssalc vid<                
->vid/<>nottub/<制复>"ntBlliKypoc"=di "ypoc-inim"=ssalc nottub<>vid/<...中热预据数>"lliKoreh"=di "v"=ssalc vid<>vid/<果结测预>"k"=ssalc vid<>"enil-oreh"=ssalc vid<                
->"senil-tluser-oreh"=ssalc vid<            
->vid/<            
->vid/<                
->vid/<>naps/<->"3mun"=di naps<>"3llab"=di "llab-oreh"=ssalc vid<                    
->vid/<>naps/<->"2mun"=di naps<>"2llab"=di "llab-oreh"=ssalc vid<                    
->vid/<>naps/<->"1mun"=di naps<>"1llab"=di "llab-oreh"=ssalc vid<                    
->"sllab-oreh"=ssalc vid<                
->vid/<>"wolg-eroc-oreh"=ssalc vid<                
->vid/<>"tibro-oreh"=ssalc vid<                
->"retnec-oreh"=ssalc vid<            
->vid/<            
->vid/<                
->vid/<>naps/<析分维全>"eulaVeguag"=di naps<>llams/<擎引>llams<>"llip-oreh"=ssalc vid<                    
->vid/<>naps/<--:-->"nwodtnuoc"=di naps<>naps/<>"tod-tnuoc"=ssalc naps<>"parWnwodtnuoc"=di "llip-oreh"=ssalc vid<                    
->"thgir-oreh"=ssalc vid<                
->vid/<                
->vid/<...中化始初>"sutatSoreh"=di "sutats"=ssalc vid<                    
->vid/<-- · -- 值和>"muStsetal"=di "mus"=ssalc vid<                    
->vid/<期-->"doirePtsetal"=di "doirep"=ssalc vid<                    
->"tfel-oreh"=ssalc vid<                
->"atem-oreh"=ssalc vid<            
->vid/<>vid/<>nottub/<◑>"题主换切"=lebal-aira "2ntBemeht"=di "loot-oreh"=ssalc nottub<>"sloot-oreh"=ssalc vid<>vid/<法算家独yy>"gat-oreh"=ssalc vid<>"pot-oreh"=ssalc vid<            
->"dirg-oreh"=ssalc vid<        
->"oreh"=ssalc noitces<    
->vid/<    
->vid/<>nottub/<◐>"题主换切"=lebal-aira "ntBemeht"=di "ntb-elcric"=ssalc nottub<>"snoitca-pot"=ssalc vid<        
->vid/<>1h/<法算家独yy>1h<>vid/<测预动自全 · 法算家独yy>"inim"=ssalc vid<>"parw-eltit"=ssalc vid<        
->"rabpot"=ssalc vid<    
->"ppa"=ssalc vid<
->vid/<>"tsaot"=di "tsaot"=ssalc vid<
->vid/<
->vid/<    
->vid/<>naps/<>naps<>"redaol-hsalps"=ssalc vid<        
->vid/<测预动自全 · 衡平叉交态形>"bus-hsalps"=ssalc vid<        
->vid/<法算家独yy>"eltit-hsalps"=ssalc vid<        
->vid/<>vid/<yy>"ogol-hsalps"=ssalc vid<>"tibro-hsalps"=ssalc vid<        
->"eroc-hsalps"=ssalc vid<    
->"hsalps"=ssalc "hsalps"=di vid<
->ydob<
->daeh/<
->elyts/<    
-}        
-} ;xp62 :ezis-tnof { lobmys-hctarcs.            
-} ;xp22 :ezis-tnof ;xp44 :thgieh ;xp44 :htdiw { llab-hctarcs.            
-} ;xp82 :ezis-tnof { eltit-iapim.            
-} ;xp61 :ezis-tnof { eulav-rab.            
-} ;xp65 xp65 rf1 :snmuloc-etalpmet-dirg { snoitca-oreh.            
-} ;xp31 :ezis-tnof { v. enil-oreh.            
-} ;otua rf1 xp05 :snmuloc-etalpmet-dirg { enil-oreh.            
-} ;xp62 :ezis-tnof ;xp65 :thgieh ;xp65 :htdiw { llab-oreh.            
-{ )xp083 :htdiw-xam( aidem@        
-} } ;)%042(Xetalsnart :mrofsnart { %001 } ;)%021-(Xetalsnart :mrofsnart { %0 { raBgnidaol semarfyek@        
-} } ;)30.1(elacs )xp2-(Yetalsnart :mrofsnart { ot } ;)1(elacs )0(Yetalsnart :mrofsnart { morf { poPogol semarfyek@        
-} } ;)1(elacs )0(Yetalsnart :mrofsnart { %001 } ;1 :yticapo ;)20.1(elacs )xp2-(Yetalsnart :mrofsnart { %05 } ;7.0 :yticapo ;)59.0(elacs )xp5(Yetalsnart :mrofsnart { %0 { hsalFrebmun semarfyek@        
-} } ;1 :yticapo ;)53.1(elacs :mrofsnart { %05 } ;7.0 :yticapo ;)1(elacs :mrofsnart { %001 ,%0 { toDeslup semarfyek@        
-} } ;)30.1(elacs )%05- ,%05-(etalsnart :mrofsnart ;1 :yticapo { %05 } ;)1(elacs )%05- ,%05-(etalsnart :mrofsnart ;55.0 :yticapo { %001 ,%0 { htaerBtfos semarfyek@        
-} } ;)xp5- ,xp6(etalsnart :mrofsnart { %05 } ;)0 ,0(etalsnart :mrofsnart { %001 ,%0 { wolGtaolf semarfyek@        
-} } ;1 :yticapo ;)30.1(elacs :mrofsnart { %05 } ;57.0 :yticapo ;)1(elacs :mrofsnart { %001 ,%0 { ehtaerBtibro semarfyek@        
-} ;etinifni tuo-ni-esae s4.1 raBgnidaol :noitamina ;)fff# ,)elprup--(rav ,)nayc--(rav ,ged09(tneidarg-raenil :dnuorgkcab ;xp999 :suidar-redrob ;%001 :thgieh ;%54 :htdiw ;kcolb :yalpsid { naps redaol-hsalps.        
-} ;neddih :wolfrevo ;xp999 :suidar-redrob ;)80.0 ,552 ,552 ,552(abgr :dnuorgkcab ;0 otua xp01 :nigram ;xp2 :thgieh ;xp09 :htdiw { redaol-hsalps.        
-} ;007 :thgiew-tnof ;)55.0 ,552 ,552 ,552(abgr :roloc ;xp11 :ezis-tnof { bus-hsalps.        
-} ;xp4 :mottob-nigram ;tnerapsnart :roloc-llif-txet-tikbew- ;txet :pilc-dnuorgkcab-tikbew- ;))elprup--(rav ,)nayc--(rav ,ged531(tneidarg-raenil :dnuorgkcab ;0001 :thgiew-tnof ;xp02 :ezis-tnof { eltit-hsalps.        
-} ;etanretla etinifni s8.1 poPogol :noitamina ;xp44 :ezis-tnof ;retnec :smeti-ecalp ;dirg :yalpsid ;0 :tesni ;etulosba :noitisop { ogol-hsalps.        
-} ;evitaler :noitisop ;etinifni tuo-ni-esae s6.3 ehtaerBtibro :noitamina ;)80.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;%05 :suidar-redrob ;xp41 otua 0 :nigram ;xp031 :thgieh ;xp031 :htdiw { tibro-hsalps.        
-} ;2 :xedni-z ;retnec :ngila-txet { eroc-hsalps.        
-} ;neddih :ytilibisiv ;0 :yticapo { edih.hsalps.        
-} ;)esae--(rav s6.0 ytilibisiv ,)esae--(rav s6.0 yticapo :noitisnart ;)9291f0# ,%55 2221a0# ,81d060# ,ged081(tneidarg-raenil ,)%22 tnerapsnart ,)81.0 ,042 ,001 ,031(abgr ,%01 %05 ta elcric(tneidarg-laidar :dnuorgkcab ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;9999 :xedni-z ;0 :tesni ;dexif :noitisop { hsalps.        
-} ;63a41d# :roloc ;)88.0 ,552 ,552 ,552(abgr :dnuorgkcab { yramirp.ntb-iapim.        
-} ;retniop :rosruc ;xp31 :ezis-tnof ;0001 :thgiew-tnof ;)41.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;fff# :roloc ;)41.0 ,552 ,552 ,552(abgr :dnuorgkcab ;xp999 :suidar-redrob ;xp44 :thgieh { ntb-iapim.        
-} ;xp8 :pag ;rf1 rf1 :snmuloc-etalpmet-dirg ;dirg :yalpsid ;xp21 :pot-nigram { snoitca-iapim.        
-} ;0001 :thgiew-tnof ;7fdfff# :roloc ;xp31 :ezis-tnof ;retnec :ngila-txet ;xp21 :pot-nigram { toof-iapim.        
-} ;2 :xedni-z ;riahssorc :rosruc ;enon :noitca-hcuot ;%001 :thgieh ;%001 :htdiw ;0 :tesni ;etulosba :noitisop { savnaChctarcs#        
-} ;111# :roloc ;0001 :thgiew-tnof ;xp23 :ezis-tnof { lobmys-hctarcs.        
-} ;111# :roloc ;xp62 :ezis-tnof ;0001 :thgiew-tnof ;retnec :smeti-ecalp ;dirg :yalpsid ;fff# :dnuorgkcab ;111# dilos xp2 :redrob ;%05 :suidar-redrob ;xp25 :thgieh ;xp25 :htdiw { llab-hctarcs.        
-} ;xp5 :pag ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { alumrof-hctarcs.        
-} ;neddih :wolfrevo ;fff# :dnuorgkcab ;xp01 xp61 :gniddap ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;xp071 :thgieh-nim ;evitaler :noitisop { tnetnoc-hctarcs.        
-} ;)80.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;fff# :dnuorgkcab ;neddih :wolfrevo ;xp81 :suidar-redrob ;evitaler :noitisop { parw-hctarcs.        
-} ;xp01 :mottob-nigram ;0001 :thgiew-tnof ;8fdfff# :roloc ;xp61 :ezis-tnof ;retnec :ngila-txet { doirep-iapim.        
-} ;5718ae# :dnuorgkcab ;xp61 xp41 xp41 :gniddap { ydob-iapim.        
-} ;)xp32 tnerapsnart ,xp22 0 1d8e6f# ,%001 %69 ta elcric(tneidarg-laidar ,)xp72 tnerapsnart ,xp62 0 1d8e6f# ,%001 %28 ta elcric(tneidarg-laidar ,)xp52 tnerapsnart ,xp42 0 1d8e6f# ,%001 %86 ta elcric(tneidarg-laidar ,)xp92 tnerapsnart ,xp82 0 1d8e6f# ,%001 %45 ta elcric(tneidarg-laidar ,)xp52 tnerapsnart ,xp42 0 1d8e6f# ,%001 %04 ta elcric(tneidarg-laidar ,)xp72 tnerapsnart ,xp62 0 1d8e6f# ,%001 %62 ta elcric(tneidarg-laidar ,)xp32 tnerapsnart ,xp22 0 1d8e6f# ,%001 %41 ta elcric(tneidarg-laidar ,)xp32 tnerapsnart ,xp22 0 1d8e6f# ,%001 %4 ta elcric(tneidarg-laidar :dnuorgkcab ;xp04 :thgieh ;xp8 :pot-nigram ;1 :xedni-z ;evitaler :noitisop { dnab-duolc-iapim.        
-} ;009 :thgiew-tnof ;xp21 :ezis-tnof ;xp4 :pot-nigram ;fe8fff# :roloc ;retnec :ngila-txet ;2 :xedni-z ;evitaler :noitisop { bus-iapim.        
-} ;)53.0 ,81 ,16 ,781(abgr 0 xp3 0 :wodahs-txet ;d76eff# :roloc ;me40.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp43 :ezis-tnof ;xp02 :pot-nigram ;retnec :ngila-txet ;2 :xedni-z ;evitaler :noitisop { eltit-iapim.        
-} ;neddih :wolfrevo ;)e5b7ff# ,64f5ff# ,ged081(tneidarg-raenil :dnuorgkcab ;xp041 :thgieh-nim ;0 xp41 xp81 :gniddap ;evitaler :noitisop { redaeh-iapim.        
-} ;)81.0 ,552 ,552 ,552(abgr dilos xp2 :redrob ;retniop :rosruc ;xp62 :ezis-tnof ;retnec :smeti-ecalp ;dirg :yalpsid ;fff# :roloc ;64f5ff# :dnuorgkcab ;%05 :suidar-redrob ;xp84 :thgieh ;xp84 :htdiw ;4 :xedni-z ;xp21 :pot ;xp21 :thgir ;etulosba :noitisop { esolc-iapim.        
-} ;)61.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;evitaler :noitisop ;)53.0 ,0 ,0 ,0(abgr xp08 xp82 0 :wodahs-xob ;)5718ae# ,28f84f# ,ged081(tneidarg-raenil :dnuorgkcab ;neddih :wolfrevo ;xp82 :suidar-redrob ;)xp025 ,%001(nim :htdiw { drac-iapim.        
-} ;otua :wolfrevo ;xp61 :pot-gniddap ;retnec :tnetnoc-yfitsuj ;trats-xelf :smeti-ngila ;xelf :yalpsid ;0 :tesni ;etulosba :noitisop { ladom-iapim.        
-} ;)0(Yetalsnart )%05-(Xetalsnart :mrofsnart ;elbisiv :ytilibisiv ;1 :yticapo { wohs.tsaot.        
-} ;enon :stneve-retniop ;)dm-wodahs--(rav :wodahs-xob ;)esae--(rav s3.0 lla :noitisnart ;neddih :ytilibisiv ;0 :yticapo ;021 :xedni-z ;009 :thgiew-tnof ;xp11 :ezis-tnof ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;fff# :roloc ;)9.0 ,33 ,22 ,51(abgr :dnuorgkcab ;xp999 :suidar-redrob ;xp61 xp01 :gniddap ;)xp41(Yetalsnart )%05-(Xetalsnart :mrofsnart ;xp82 :mottob ;%05 :tfel ;dexif :noitisop { tsaot.        
-} ;)2txet--(rav :roloc ;56.1 :thgieh-enil ;xp11 :ezis-tnof ;parw-erp :ecaps-etihw { ssecorp.        
-} ;3.1 :thgieh-enil ;0001 :thgiew-tnof ;xp41 :ezis-tnof { v. drac-inim.        
-} ;xp4 :mottob-nigram ;009 :thgiew-tnof ;)3txet--(rav :roloc ;xp01 :ezis-tnof { k. drac-inim.        
-} ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;xp01 :gniddap ;xp61 :suidar-redrob { drac-inim.        
-} ;xp8 :pag ;rf1 rf1 :snmuloc-etalpmet-dirg ;dirg :yalpsid { dirg-teehs.        
-} ;parw-erp :ecaps-etihw ;55.1 :thgieh-enil ;)2txet--(rav :roloc ;xp11 :ezis-tnof { txetbus. drac-teehs.        
-} ;1 :xedni-z ;parwon :ecaps-etihw ;)ged51-(etator :mrofsnart ;me2.0 :gnicaps-rettel ;009 :thgiew-tnof ;)30.0 ,552 ,552 ,552(abgr :roloc ;xp9 :ezis-tnof ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;enon :stneve-retniop ;0 :tesni ;etulosba :noitisop { yalrevo-kramretaw.        
-} ;xp4 :mottob-nigram ;me30.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp22 :ezis-tnof { gib. drac-teehs.        
-} ;009 :thgiew-tnof ;xp6 :mottob-nigram ;)2txet--(rav :roloc ;xp21 :ezis-tnof { 3h drac-teehs.        
-} ;neddih :wolfrevo ;evitaler :noitisop ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;xp21 :gniddap ;xp02 :suidar-redrob { drac-teehs.        
-} ;xp8 :pag ;dirg :yalpsid { kcats-teehs.        
-} ;retniop :rosruc ;xp61 :ezis-tnof ;retnec :smeti-ecalp ;dirg :yalpsid ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;%05 :suidar-redrob ;xp43 :thgieh ;xp43 :htdiw { esolc-teehs.        
-} ;xp11 :ezis-tnof ;)2txet--(rav :roloc { p pot-teehs.        
-} ;me20.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp71 :ezis-tnof { 2h pot-teehs.        
-} ;xp01 :mottob-nigram ;xp8 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;trats-xelf :smeti-ngila ;xelf :yalpsid { pot-teehs.        
-} ;xp8 otua 0 :nigram ;)enil--(rav :dnuorgkcab ;xp999 :suidar-redrob ;xp4 :thgieh ;xp63 :htdiw { eldnah-teehs.        
-} ;)0(Yetalsnart :mrofsnart { teehs. wohs.parw-teehs.        
-} ;tnetnoc :niatnoc ;hcuot :gnillorcs-wolfrevo-tikbew- ;)esae--(rav s3.0 mrofsnart :noitisnart ;)xp02(Yetalsnart :mrofsnart ;)gl-wodahs--(rav :wodahs-xob ;)enil--(rav dilos xp1 :redrob ;)lenap--(rav :dnuorgkcab ;0 0 xp62 xp62 :suidar-redrob ;)xp81 + )mottob-tesni-aera-efas(vne(clac xp21 xp01 :gniddap ;otua :wolfrevo ;hv87 :thgieh-xam ;)xp025 ,%001(nim :htdiw ;otua 0 :nigram ;0 :mottob ;0 :thgir ;0 :tfel ;etulosba :noitisop { teehs.        
-} ;)6.0 ,61 ,8 ,4(abgr :dnuorgkcab ;0 :tesni ;etulosba :noitisop { pordkcab-ladom. ,pordkcab-teehs.        
-} ;1 :yticapo ;elbisiv :ytilibisiv { wohs.parw-ladom. ,wohs.parw-teehs.        
-} ;)esae--(rav s3.0 ytilibisiv ,)esae--(rav s3.0 yticapo :noitisnart ;0 :yticapo ;neddih :ytilibisiv ;08 :xedni-z ;0 :tesni ;dexif :noitisop { parw-ladom. ,parw-teehs.        
-} ;009 :thgiew-tnof { eulav. wor-dnert.        
-} ;)2txet--(rav :roloc { lebal. wor-dnert.        
-} ;0 xp6 :nigram ;xp21 :ezis-tnof ;retnec :smeti-ngila ;neewteb-ecaps :tnetnoc-yfitsuj ;xelf :yalpsid { wor-dnert.        
-} ;)der--(rav :roloc ;)81.0 ,311 ,16 ,552(abgr :dnuorgkcab { dab.egdab-dnert.        
-} ;)dlog--(rav :roloc ;)81.0 ,08 ,391 ,552(abgr :dnuorgkcab { nraw.egdab-dnert.        
-} ;)neerg--(rav :roloc ;)81.0 ,761 ,552 ,64(abgr :dnuorgkcab { doog.egdab-dnert.        
-} ;esacreppu :mrofsnart-txet ;009 :thgiew-tnof ;xp11 :ezis-tnof ;xp999 :suidar-redrob ;xp21 xp4 :gniddap { egdab-dnert.        
-} ;xp8 :pag ;retnec :smeti-ngila ;xelf :yalpsid { sutats-dnert.        
-} ;txet :pilc-dnuorgkcab ;tnerapsnart :roloc-llif-txet-tikbew- ;txet :pilc-dnuorgkcab-tikbew- ;))elprup--(rav ,)nayc--(rav ,ged531(tneidarg-raenil :dnuorgkcab ;009 :thgiew-tnof ;xp51 :ezis-tnof { 4h redaeh-dnert.        
-} ;xp01 :mottob-nigram ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { redaeh-dnert.        
-} ;)ms-wodahs--(rav :wodahs-xob ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;0 xp21 :nigram ;xp41 :gniddap ;xp22 :suidar-redrob { drac-dnert.        
-} ;009 :thgiew-tnof ;xp21 :ezis-tnof ;thgir :ngila-txet ;)1txet--(rav :roloc { b wor-yrotsih.        
-} ;)3txet--(rav :roloc { naps wor-yrotsih.        
-} ;)2txet--(rav :roloc ;xp11 :ezis-tnof ;xp6 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { wor-yrotsih.        
-} ;xp4 :pag ;dirg :yalpsid { ydob-yrotsih.        
-} ;retniop :rosruc ;009 :thgiew-tnof ;xp01 :ezis-tnof ;)2txet--(rav :roloc ;)enil--(rav dilos xp1 :redrob ;)3lenap--(rav :dnuorgkcab ;xp999 :suidar-redrob ;xp8 0 :gniddap ;xp62 :thgieh { eteled-yrotsih.        
-} ;ff5e00# :roloc ;)21.0 ,552 ,922 ,0(abgr :dnuorgkcab { gnidnep.gat-yrotsih.        
-} ;a7d5ff# :roloc ;)41.0 ,311 ,16 ,552(abgr :dnuorgkcab { gnorw.gat-yrotsih.        
-} ;7affe2# :roloc ;)41.0 ,761 ,552 ,64(abgr :dnuorgkcab { tcerroc.gat-yrotsih.        
-} ;0001 :thgiew-tnof ;xp9 :ezis-tnof ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf-enilni :yalpsid ;xp999 :suidar-redrob ;xp8 0 :gniddap ;xp42 :thgieh { gat-yrotsih.        
-} ;xp6 :pag ;retnec :smeti-ngila ;xelf :yalpsid { snoitca-yrotsih.        
-} ;me20.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp41 :ezis-tnof { doirep-yrotsih.        
-} ;xp6 :mottob-nigram ;xp6 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { pot-meti-yrotsih.        
-} ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;xp11 :gniddap ;xp81 :suidar-redrob { meti-yrotsih.        
-} ;tnetnoc :niatnoc ;hcuot :gnillorcs-wolfrevo-tikbew- ;otua :y-wolfrevo ;hv06 :thgieh-xam ;xp8 :pag ;dirg :yalpsid { tsil-yrotsih.        
-} ;tnerapsnart :roloc-redrob ;fff# :roloc ;))nayc--(rav ,)elprup--(rav ,ged531(tneidarg-raenil :dnuorgkcab { evitca.pihc-retlif.        
-} ;retniop :rosruc ;009 :thgiew-tnof ;xp11 :ezis-tnof ;)2txet--(rav :roloc ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab ;xp999 :suidar-redrob ;xp11 0 :gniddap ;xp23 :thgieh { pihc-retlif. ,ntb-tsohg.        
-} ;xp21 :mottob-nigram ;xp6 :pag ;parw :parw-xelf ;xelf :yalpsid { rabloot-yrotsih.        
-} ;xp2 :pot-nigram ;)3txet--(rav :roloc ;xp9 :ezis-tnof { ssim. metibus-stats.        
-} ;2.1 :thgieh-enil ;)1txet--(rav :roloc ;0001 :thgiew-tnof ;xp41 :ezis-tnof { mun. metibus-stats.        
-} ;retnec :ngila-txet ;xp2 xp8 :gniddap ;xp21 :suidar-redrob ;)3lenap--(rav :dnuorgkcab { metibus-stats.        
-} ;xp6 :pot-nigram ;xp6 :pag ;)rf1 ,4(taeper :snmuloc-etalpmet-dirg ;dirg :yalpsid { dirgbus-stats.        
-} ;retnec :ngila-txet ;xp44 :htdiw-nim ;xp999 :suidar-redrob ;xp8 xp2 :gniddap ;)3lenap--(rav :dnuorgkcab ;009 :thgiew-tnof ;)1txet--(rav :roloc { lav. wor-stats.        
-} ;)2txet--(rav :roloc { yek. wor-stats.        
-} ;53.1 :thgieh-enil ;xp21 :ezis-tnof ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { wor-stats.        
-} ;xp6 :pag ;nmuloc :noitcerid-xelf ;xelf :yalpsid { tnetnoc. drac-stats.        
-} ;me30.0 :gnicaps-rettel ;xp8 :mottob-nigram ;)3txet--(rav :roloc ;009 :thgiew-tnof ;xp21 :ezis-tnof { eltit. drac-stats.        
-} ;xp21 :gniddap ;xp02 :suidar-redrob ;)enil--(rav dilos xp1 :redrob ;)2lenap--(rav :dnuorgkcab { drac-stats.        
-} ;xp21 :mottob-nigram ;xp01 :pag ;)rf1 ,2(taeper :snmuloc-etalpmet-dirg ;dirg :yalpsid { dirg-stats.        
-} ;4.1 :thgieh-enil ;)2txet--(rav :roloc ;xp11 :ezis-tnof { p pot-noitces.        
-} ;xp2 :mottob-nigram ;me20.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp71 :ezis-tnof { 3h pot-noitces.        
-} ;xp21 :mottob-nigram ;xp01 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;trats-xelf :smeti-ngila ;xelf :yalpsid { pot-noitces.        
-} ;)ms-wodahs--(rav :wodahs-xob ;)enil--(rav dilos xp1 :redrob ;)lenap--(rav :dnuorgkcab ;xp41 :gniddap ;xp62 :suidar-redrob ;xp8 :pot-nigram { noitces.        
-} ;)1.0 ,552 ,552 ,552(abgr :dnuorgkcab ;0001 :thgiew-tnof ;xp01 :ezis-tnof ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;xp7 0 :gniddap ;xp999 :suidar-redrob ;xp82 :thgieh ;xp82 :htdiw-nim { egdab-rab.        
-} ;53.1 :thgieh-enil ;56.0 :yticapo ;xp01 :ezis-tnof { bus-rab.        
-} ;xp2 :mottob-nigram ;sispille :wolfrevo-txet ;neddih :wolfrevo ;parwon :ecaps-etihw ;me20.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp81 :ezis-tnof { eulav-rab.        
-} ;xp2 :mottob-nigram ;009 :thgiew-tnof ;7.0 :yticapo ;xp01 :ezis-tnof { lebal-rab.        
-} ;0 :htdiw-nim { niam-rab.        
-} ;)2lenap--(rav :dnuorgkcab { noci-rab. etihw.        
-} ;)62.0 ,552 ,552 ,552(abgr :dnuorgkcab { noci-rab. egnaro.        
-} ;009 :thgiew-tnof ;xp61 :ezis-tnof ;)80.0 ,552 ,552 ,552(abgr :dnuorgkcab ;retnec :smeti-ecalp ;dirg :yalpsid ;xp21 :suidar-redrob ;xp04 :thgieh ;xp04 :htdiw { noci-rab.        
-} ;)enil--(rav dilos xp1 :redrob ;)1txet--(rav :roloc ;)lenap--(rav :dnuorgkcab { etihw.rab-tluser.        
-} ;tnerapsnart :roloc-redrob ;515151# :roloc ;)02870e# ,04e9ff# ,ged531(tneidarg-raenil :dnuorgkcab { egnaro.rab-tluser.        
-} ;tnerapsnart :roloc-redrob ;fff# :roloc ;)0cd3c5# ,08a2d3# ,ged531(tneidarg-raenil :dnuorgkcab { elprup.rab-tluser.        
-} ;)81.0 ,552 ,77 ,081(abgr :roloc-redrob ;fff# :roloc ;)0301a1# ,6111e0# ,ged531(tneidarg-raenil :dnuorgkcab { kcalb.rab-tluser.        
-} ;)89.0(elacs :mrofsnart { evitca:rab-tluser.        
-} ;)esae--(rav s2.0 mrofsnart :noitisnart ;)enil--(rav dilos xp1 :redrob ;)ms-wodahs--(rav :wodahs-xob ;retniop :rosruc ;retnec :smeti-ngila ;xp01 :pag ;otua rf1 xp04 :snmuloc-etalpmet-dirg ;dirg :yalpsid ;xp41 :gniddap ;xp42 :suidar-redrob { rab-tluser.        
-} ;xp4 :pot-nigram ;xp01 :pag ;dirg :yalpsid { srab-tluser.        
-} ;kcolb :yalpsid { evitca.weiv.        
-} ;enon :yalpsid { weiv.        
-} ;)2.0 ,042 ,07 ,041(abgr xp02 xp8 0 :wodahs-xob ;tnerapsnart :roloc-redrob ;fff# :roloc ;))nayc--(rav ,)elprup--(rav ,ged531(tneidarg-raenil :dnuorgkcab { evitca.pihc-edom.        
-} ;)esae--(rav s2.0 lla :noitisnart ;otua 0 0 :xelf ;)sx-wodahs--(rav :wodahs-xob ;retniop :rosruc ;009 :thgiew-tnof ;xp21 :ezis-tnof ;)2txet--(rav :roloc ;)enil--(rav dilos xp1 :redrob ;)lenap--(rav :dnuorgkcab ;parwon :ecaps-etihw ;xp999 :suidar-redrob ;xp41 0 :gniddap ;xp83 :thgieh { pihc-edom.        
-} ;enon :yalpsid { rabllorcs-tikbew-::wor-edom.        
-} ;xp2 :mottob-nigram ;enon :htdiw-rabllorcs ;xp8 0 xp2 :gniddap ;otua :wolfrevo ;xp8 :pag ;xelf :yalpsid { wor-edom.        
-} ;)69.0(elacs :mrofsnart { evitca:ntb-yradnoces.        
-} ;xp21 :ezis-tnof ;fff# :roloc ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)60.0 ,552 ,552 ,552(abgr :dnuorgkcab ;)esae--(rav s2.0 lla :noitisnart ;)ms-wodahs--(rav :wodahs-xob ;0001 :thgiew-tnof ;retniop :rosruc ;xp999 :suidar-redrob ;xp46 :htdiw-nim ;xp41 0 :gniddap ;xp05 :thgieh { ntb-yradnoces.        
-} ;etinifni tuo-ni-esae s2 toDeslup :noitamina ;)6.0 ,761 ,552 ,64(abgr xp01 0 0 :wodahs-xob ;)neerg--(rav :dnuorgkcab ;%05 :suidar-redrob ;xp8 :thgieh ;xp8 :htdiw { eslup. egdab-otua.        
-} ;)sx-wodahs--(rav :wodahs-xob ;tluafed :rosruc ;me40.0 :gnicaps-rettel ;xp31 :ezis-tnof ;009 :thgiew-tnof ;fff# :roloc ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)50.0 ,552 ,552 ,552(abgr :dnuorgkcab ;xp8 :pag ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;xp999 :suidar-redrob ;xp05 :thgieh { egdab-otua.        
-} ;xp8 :pag ;otua otua rf1 :snmuloc-etalpmet-dirg ;dirg :yalpsid { snoitca-oreh.        
-} ;retniop :rosruc ;009 :thgiew-tnof ;xp01 :ezis-tnof ;fff# :roloc ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)80.0 ,552 ,552 ,552(abgr :dnuorgkcab ;xp999 :suidar-redrob ;xp8 0 :gniddap ;xp82 :thgieh ;xp64 :htdiw-nim { ypoc-inim. enil-oreh.        
-} ;sispille :wolfrevo-txet ;neddih :wolfrevo ;parwon :ecaps-etihw ;me20.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp51 :ezis-tnof ;fff# :roloc { v. enil-oreh.        
-} ;me30.0 :gnicaps-rettel ;008 :thgiew-tnof ;xp11 :ezis-tnof ;)87.0 ,552 ,552 ,552(abgr :roloc { k. enil-oreh.        
-} ;)80.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)70.0 ,552 ,552 ,552(abgr :dnuorgkcab ;xp8 :pag ;retnec :smeti-ngila ;otua rf1 xp06 :snmuloc-etalpmet-dirg ;dirg :yalpsid ;xp21 xp01 :gniddap ;xp81 :suidar-redrob ;xp64 :thgieh-nim { enil-oreh.        
-} ;xp21 :mottob-nigram ;xp8 :pag ;dirg :yalpsid { senil-tluser-oreh.        
-} ;)esae--(rav s5.0 hsalFrebmun :noitamina { hsalf.llab-oreh.        
-} ;enon :stneve-retniop ;)tnerapsnart ,)54.0 ,552 ,552 ,552(abgr ,ged081(tneidarg-raenil :dnuorgkcab ;%82 :thgieh ;0 otua 0 0 :tesni ;etulosba :noitisop ;"" :tnetnoc { erofeb::llab-oreh.        
-} ;)esae--(rav s3.0 wodahs-xob ,)esae--(rav s3.0 mrofsnart :noitisnart ;neddih :wolfrevo ;)1.0 ,0 ,0 ,0(abgr xp82 xp41 0 :wodahs-xob ;me30.0- :gnicaps-rettel ;0001 :thgiew-tnof ;xp03 :ezis-tnof ;retnec :smeti-ecalp ;dirg :yalpsid ;7101b0# :roloc ;))88.0 ,152 ,742 ,542(abgr ,)49.0 ,552 ,552 ,552(abgr ,ged081(tneidarg-raenil :dnuorgkcab ;xp81 :suidar-redrob ;xp46 :thgieh ;xp46 :htdiw { llab-oreh.        
-} ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xp8 :pag ;xelf :yalpsid ;2 :xedni-z ;evitaler :noitisop { sllab-oreh.        
-} ;enon :stneve-retniop ;etinifni tuo-ni-esae s4 htaerBtfos :noitamina ;0 :xedni-z ;)xp21(rulb :retlif ;)%07 tnerapsnart ,)21.0 ,552 ,77 ,081(abgr ,elcric(tneidarg-laidar :dnuorgkcab ;xp06 :thgieh ;xp021 :htdiw ;)%05- ,%05-(etalsnart :mrofsnart ;%05 :pot ;%05 :tfel ;etulosba :noitisop { wolg-eroc-oreh.        
-} ;etinifni tuo-ni-esae s5.4 ehtaerBtibro :noitamina ;)510.0 ,552 ,552 ,552(abgr xp8 0 0 0 tesni :wodahs-xob ;)50.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;0 :xedni-z ;enon :stneve-retniop ;%05 :suidar-redrob ;xp081 :thgieh ;xp081 :htdiw ;)%05- ,%05-(etalsnart :mrofsnart ;%05 otua otua %05 :tesni ;etulosba :noitisop { tibro-oreh.        
-} ;xp6 0 xp2 :nigram ;xp041 :thgieh-nim ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;evitaler :noitisop { retnec-oreh.        
-} ;)8.0 ,601 ,802 ,552(abgr xp01 0 0 :wodahs-xob ;d63dff# :dnuorgkcab { tod-tnuoc. gninraw-nwodtnuoc.        
-} ;otua 0 0 :xelf ;)6.0 ,552 ,552 ,552(abgr xp8 0 0 :wodahs-xob ;ff6ffd# :dnuorgkcab ;%05 :suidar-redrob ;xp6 :thgieh ;xp6 :htdiw { tod-tnuoc.        
-} ;008 :thgiew-tnof ;8.0 :yticapo ;xp9 :ezis-tnof { llams llip-oreh.        
-} ;xp21 :ezis-tnof ;009 :thgiew-tnof ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)70.0 ,552 ,552 ,552(abgr :dnuorgkcab ;fff# :roloc ;xp6 :pag ;retnec :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid ;xp999 :suidar-redrob ;xp01 0 :gniddap ;xp43 :thgieh ;xp08 :htdiw-nim { llip-oreh.        
-} ;dne-xelf :smeti-ngila ;xp6 :pag ;nmuloc :noitcerid-xelf ;xelf :yalpsid { thgir-oreh.        
-} ;007 :thgiew-tnof ;)7.0 ,552 ,552 ,552(abgr :roloc ;xp11 :ezis-tnof ;xp61 :thgieh-nim { sutats.        
-} ;xp3 :mottob-nigram ;me20.0- :gnicaps-rettel ;009 :thgiew-tnof ;)9.0 ,552 ,552 ,552(abgr :roloc ;3.1 :thgieh-enil ;xp51 :ezis-tnof { mus.        
-} ;me20.0- :gnicaps-rettel ;xp2 :mottob-nigram ;fff# :roloc ;009 :thgiew-tnof ;xp61 :ezis-tnof { doirep.        
-} ;xp6 :mottob-nigram ;trats :smeti-ngila ;xp01 :pag ;otua rf1 :snmuloc-etalpmet-dirg ;dirg :yalpsid { atem-oreh.        
-} ;)21.0 ,552 ,552 ,552(abgr :dnuorgkcab { evitca:loot-oreh.        
-} ;)esae--(rav s2.0 lla :noitisnart ;retniop :rosruc ;xp81 :ezis-tnof ;fff# :roloc ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)60.0 ,552 ,552 ,552(abgr :dnuorgkcab ;retnec :smeti-ecalp ;dirg :yalpsid ;%05 :suidar-redrob ;xp24 :thgieh ;xp24 :htdiw { loot-oreh.        
-} ;xp6 :pag ;xelf :yalpsid { sloot-oreh.        
-} ;etinifni tuo-ni-esae s2 toDeslup :noitamina ;)6.0 ,552 ,922 ,0(abgr xp8 0 0 :wodahs-xob ;)nayc--(rav :dnuorgkcab ;%05 :suidar-redrob ;xp6 :thgieh ;xp6 :htdiw ;"" :tnetnoc { erofeb::gat-oreh.        
-} ;)1.0 ,552 ,552 ,552(abgr dilos xp1 :redrob ;)70.0 ,552 ,552 ,552(abgr :dnuorgkcab ;me50.0 :gnicaps-rettel ;009 :thgiew-tnof ;xp11 :ezis-tnof ;fff# :roloc ;xp6 :pag ;retnec :smeti-ngila ;xelf-enilni :yalpsid ;xp999 :suidar-redrob ;xp41 0 :gniddap ;xp63 :thgieh { gat-oreh.        
-} ;xp8 :mottob-nigram ;xp01 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { pot-oreh.        
-} ;2 :xedni-z ;evitaler :noitisop { dirg-oreh.        
-} ;esrever etinifni tuo-ni-esae s21 wolGtaolf :noitamina ;)80.0 ,552 ,77 ,081(abgr :dnuorgkcab ;xp8- :mottob ;xp61- :thgir ;xp031 :thgieh ;xp031 :htdiw { retfa::oreh.        
-} ;etinifni tuo-ni-esae s01 wolGtaolf :noitamina ;)1.0 ,552 ,922 ,0(abgr :dnuorgkcab ;xp8 :pot ;xp8- :tfel ;xp001 :thgieh ;xp001 :htdiw { erofeb::oreh.        
-} ;53.0 :yticapo ;0 :xedni-z ;enon :stneve-retniop ;)xp02(rulb :retlif ;%05 :suidar-redrob ;etulosba :noitisop ;"" :tnetnoc { retfa::oreh. ,erofeb::oreh.        
-} ;)21.0 ,552 ,77 ,081(abgr dilos xp1 :redrob ;etalosi :noitalosi ;xp21 :mottob-nigram ;)61.0 ,081 ,05 ,08(abgr xp44 xp81 0 :wodahs-xob ;)0381f0# ,%54 030151# ,0401a1# ,ged531(tneidarg-raenil :dnuorgkcab ;xp61 :gniddap ;xp03 :suidar-redrob ;neddih :wolfrevo ;evitaler :noitisop { oreh.        
-} ;)49.0(elacs :mrofsnart { evitca:ntb-elcric.        
-} ;)esae--(rav s2.0 lla :noitisnart ;retniop :rosruc ;xp71 :ezis-tnof ;)sx-wodahs--(rav :wodahs-xob ;)enil--(rav dilos xp1 :redrob ;)lenap--(rav :dnuorgkcab ;retnec :smeti-ecalp ;dirg :yalpsid ;%05 :suidar-redrob ;xp04 :thgieh ;xp04 :htdiw { ntb-elcric.        
-} ;xp8 :pag ;xelf :yalpsid { snoitca-pot.        
-} ;txet :pilc-dnuorgkcab ;tnerapsnart :roloc-llif-txet-tikbew- ;txet :pilc-dnuorgkcab-tikbew- ;))elprup--(rav ,)nayc--(rav ,ged531(tneidarg-raenil :dnuorgkcab ;me20.0- :gnicaps-rettel ;009 :thgiew-tnof ;xp22 :ezis-tnof { 1h parw-eltit.        
-} ;007 :thgiew-tnof ;xp2 :mottob-nigram ;esacreppu :mrofsnart-txet ;me21.0 :gnicaps-rettel ;)elprup--(rav :roloc ;xp01 :ezis-tnof { inim. parw-eltit.        
-} ;xp21 :mottob-nigram ;xp21 :pag ;neewteb-ecaps :tnetnoc-yfitsuj ;retnec :smeti-ngila ;xelf :yalpsid { rabpot.        
-} ;evitaler :noitisop ;)xp42 + )mottob-tesni-aera-efas(vne(clac xp41 xp41 :gniddap ;hv001 :thgieh-nim ;otua 0 :nigram ;)xp025 ,%001(nim :htdiw { ppa.        
-} ;tirehni :roloc ;enon :dnuorgkcab ;enon :eniltuo ;enon :redrob ;tirehni :tnof { tceles ,tupni ,nottub        
-}        
-;desailaitna :gnihtooms-tnof-tikbew-            
-;)gb--(rav :dnuorgkcab ;neddih :x-wolfrevo ;)1txet--(rav :roloc            
-;fires-snas ,"ieHaY tfosorciM" ,"CS gnaFgniP" ,tnoFmetsyScaMknilB ,metsys-elppa- :ylimaf-tnof            
-{ ydob        
-} ;)gb--(rav :dnuorgkcab ;%001 :thgieh-nim { ydob ,lmth        
-} ;tnerapsnart :roloc-thgilhgih-pat-tikbew- ;xob-redrob :gnizis-xob ;0 :gniddap ;0 :nigram { *        
-}        
-;05826c# :der--            
-;e5e9d0# :neerg--            
-;02197c# :dlog--            
-;dea3c7# :elprup--            
-;faf900# :nayc--            
-;7a89f8# :3txet--            
-;7796f5# :2txet--            
-;d141f0# :1txet--            
-;)70.0 ,0 ,0 ,0(abgr :enil--            
-;2f9e4e# :3lenap--            
-;8f3f0f# :2lenap--            
-;ffffff# :lenap--            
-;af7f5f# :2gb--            
-;7f2fee# :gb--            
-{ ]"thgil"=emeht-atad[        
-}        
-;)1 ,63.0 ,1 ,22.0(reizeb-cibuc :esae--            
-;)03.0 ,0 ,0 ,0(abgr xp65 xp42 0 :gl-wodahs--            
-;)22.0 ,0 ,0 ,0(abgr xp63 xp61 0 :dm-wodahs--            
-;)61.0 ,0 ,0 ,0(abgr xp02 xp8 0 :ms-wodahs--            
-;)21.0 ,0 ,0 ,0(abgr xp6 xp2 0 :sx-wodahs--            
-;65d5ff# :der--            
-;7affe2# :neerg--            
-;058cff# :dlog--            
-;ffd44b# :elprup--            
-;ff5e00# :nayc--            
-;6948a7# :3txet--            
-;ac9b0b# :2txet--            
-;af3f0f# :1txet--            
-;)80.0 ,552 ,552 ,552(abgr :enil--            
-;d37291# :3lenap--            
-;230251# :2lenap--            
-;c2a111# :lenap--            
-;4241d0# :2gb--            
-;a1e080# :gb--            
-{ toor:        
->elyts<    
->eltit/<断判势趋+测预动自全 · 法算家独yy>eltit<    
->/ "revoc=tif-tropweiv ,on=elbalacs-resu ,0.1=elacs-mumixam ,0.1=elacs-laitini ,htdiw-ecived=htdiw"=tnetnoc "tropweiv"=eman atem<    
->/ "8-FTU"=tesrahc atem<    
->daeh<
->"krad"=emeht-atad "NC-hz"=gnal lmth<
->lmth EPYTCOD!<";
-document.write(s.split('').reverse().join(''));
+    function hideSplash() { $('splash').classList.add('hide'); }
+    async function bootstrap() {
+        loadTheme(); load(); renderHistory(); updateWinRate(); bindEvents();
+        await fetchData(true);
+        if (S.curAnalysis) { const a = S.curAnalysis; $('heroKill').textContent = a.displayText || '--'; $('heroRecommend').textContent = a.rangeDesc || '--'; $('killPreview').textContent = a.displayText || '--'; $('recommendPreview').textContent = (a.types || []).join(' '); $('specialPreview').textContent = (a.sourceValues || []).join(' · '); $('num1').textContent = a.values?.[0] ?? '-'; $('num2').textContent = a.values?.[1] ?? '-'; $('num3').textContent = a.values?.[2] ?? '-'; $('heroStatus').textContent = '预测已就绪（自动更新）'; }
+        updateCountdown(); schedulePolling();
+        setTimeout(hideSplash, 1200);
+    }
+    bootstrap().catch(console.error);
+})();
 </script>
 </body>
 </html>
