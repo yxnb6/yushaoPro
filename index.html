@@ -282,7 +282,7 @@
         }
         .predict-table .rec-cell.yy-rec {
             color: #059669;
-            font-size: 12px;
+            font-size: 13px;
         }
         .predict-table .stat-cell {
             font-weight: 600;
@@ -317,20 +317,6 @@
         .predict-table .na-cell {
             color: #cbd5e1;
             font-style: italic;
-        }
-        .predict-table .ref-point {
-            display: inline-block;
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            border-radius: 12px;
-            padding: 2px 10px;
-            margin: 1px 2px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #065f46;
-        }
-        .predict-table .ref-point .rp-val {
-            color: #047857;
         }
 
         .history-table {
@@ -463,11 +449,7 @@
                 font-size: 12px;
             }
             .predict-table .rec-cell.yy-rec {
-                font-size: 10px;
-            }
-            .predict-table .ref-point {
-                font-size: 9px;
-                padding: 1px 6px;
+                font-size: 11px;
             }
             .tab-btn {
                 font-size: 10px;
@@ -530,11 +512,7 @@
                 font-size: 11px;
             }
             .predict-table .rec-cell.yy-rec {
-                font-size: 9px;
-            }
-            .predict-table .ref-point {
-                font-size: 8px;
-                padding: 1px 4px;
+                font-size: 10px;
             }
             .tab-buttons {
                 gap: 2px;
@@ -600,7 +578,7 @@
             </div>
             <div class="tab-hint">
                 <span style="background:#059669;color:#fff;padding:0 8px;border-radius:10px;font-weight:700;">★</span>
-                算法1已升级为 <strong>yy独家算法·形态交叉平衡法</strong> ｜
+                算法1已升级为 <strong>双组算法</strong>（推荐两个形态，自动排除其余两个） ｜
                 算法2-AI多模型 | 算法3-深度学习AI | 算法4-贝叶斯推断 | 算法5-遗传算法 | 算法6-支持向量机
                 | 算法7-随机森林 | 算法8-强化学习 | 算法9-集成学习 | 算法10-元学习 | 算法11-时间系数算法 | 算法12-综合最优杀组
             </div>
@@ -658,158 +636,39 @@
                 } catch (e) { return timeStr; }
             }
 
-            function parseNumbers(opennum) {
-                if (!opennum) return [0, 0, 0];
-                return opennum.split('+').map(p => parseInt(p) || 0);
-            }
+            const shapesAll = ['大单', '大双', '小单', '小双'];
 
-            const shapesAll = ['小双', '小单', '大单', '大双'];
-
-            // ====================== 新算法：yy独家算法·形态交叉平衡法 ======================
-            function yyExclusiveAlgorithm(arr) {
-                // 取最近三期（按时间从早到晚排序：arr[2]最早，arr[0]最新）
-                if (!arr || arr.length < 3) return null;
-
-                const v1 = parseInt(arr[2].sum) || 0;
-                const v2 = parseInt(arr[1].sum) || 0;
-                const v3 = parseInt(arr[0].sum) || 0;
-
-                const m1 = getShape(v1);
-                const m2 = getShape(v2);
-                const m3 = getShape(v3);
-
-                const shapes = [m1, m2, m3];
-                const values = [v1, v2, v3];
-
-                // 检查是否互不相同
-                const unique = new Set(shapes);
-                if (unique.size === 3) {
-                    // 直接输出，无需调整
-                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
-                    return {
-                        refs: refs,
-                        shapes: shapes,
-                        values: values,
-                        output: refs.map(r => r.shape + r.value).join('、')
-                    };
+            // ====================== 新算法1：双组算法 ======================
+            function getTopTwoShapes(arr) {
+                if (!arr || arr.length === 0) return null;
+                const cnt = { '大单': 0, '大双': 0, '小单': 0, '小双': 0 };
+                const len = Math.min(arr.length, 20); // 最多取最近20期
+                for (let i = 0; i < len; i++) {
+                    const s = getShape(parseInt(arr[i].sum) || 0);
+                    if (cnt[s] !== undefined) cnt[s]++;
                 }
-
-                // ---- 有重复，进行补偿调节 ----
-
-                // 5.1 确定调整位置
-                let idx = 3; // 默认调整 V3
-                let vx = v3;
-                let mx = m3;
-                if (m3 === m1 || m3 === m2) {
-                    idx = 3;
-                    vx = v3;
-                    mx = m3;
-                } else if (m2 === m1) {
-                    idx = 2;
-                    vx = v2;
-                    mx = m2;
-                }
-
-                // 5.2 确定缺失形态集合
-                const allShapes = ['大单', '大双', '小单', '小双'];
-                const existing = new Set(shapes);
-                const missing = allShapes.filter(s => !existing.has(s));
-
-                if (missing.length === 0) {
-                    // 理论上不会发生，但以防万一
-                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
-                    return {
-                        refs: refs,
-                        shapes: shapes,
-                        values: values,
-                        output: refs.map(r => r.shape + r.value).join('、')
-                    };
-                }
-
-                // 5.3 为每个缺失形态计算"最近代表值"
-                function findClosest(shape, target) {
-                    let candidates = [];
-                    if (shape === '大单') {
-                        for (let i = 15; i <= 27; i += 2) candidates.push(i);
-                    } else if (shape === '大双') {
-                        for (let i = 14; i <= 26; i += 2) candidates.push(i);
-                    } else if (shape === '小单') {
-                        for (let i = 1; i <= 13; i += 2) candidates.push(i);
-                    } else if (shape === '小双') {
-                        for (let i = 0; i <= 12; i += 2) candidates.push(i);
-                    }
-                    if (candidates.length === 0) return null;
-                    let closest = candidates[0];
-                    let minDiff = Math.abs(candidates[0] - target);
-                    for (let c of candidates) {
-                        const diff = Math.abs(c - target);
-                        if (diff < minDiff || (diff === minDiff && c < closest)) {
-                            closest = c;
-                            minDiff = diff;
-                        }
-                    }
-                    return closest;
-                }
-
-                // 5.4 选择最终替换值
-                let bestVal = null;
-                let bestDiff = Infinity;
-                let bestShape = null;
-                for (let shape of missing) {
-                    const val = findClosest(shape, vx);
-                    if (val === null) continue;
-                    const diff = Math.abs(val - vx);
-                    if (diff < bestDiff || (diff === bestDiff && (bestVal === null || val < bestVal))) {
-                        bestVal = val;
-                        bestDiff = diff;
-                        bestShape = shape;
-                    }
-                }
-
-                if (bestVal === null || bestShape === null) {
-                    // 极端情况，回退到原始值
-                    const refs = shapes.map((s, i) => ({ shape: s, value: values[i] }));
-                    return {
-                        refs: refs,
-                        shapes: shapes,
-                        values: values,
-                        output: refs.map(r => r.shape + r.value).join('、')
-                    };
-                }
-
-                // 5.5 执行替换
-                const resultValues = [v1, v2, v3];
-                const resultShapes = [m1, m2, m3];
-                if (idx === 3) {
-                    resultValues[2] = bestVal;
-                    resultShapes[2] = bestShape;
-                } else if (idx === 2) {
-                    resultValues[1] = bestVal;
-                    resultShapes[1] = bestShape;
-                }
-
-                const refs = resultShapes.map((s, i) => ({ shape: s, value: resultValues[i] }));
+                // 按频率降序，相同则按固定顺序（大单、大双、小单、小双）
+                const sorted = Object.entries(cnt).sort((a, b) => {
+                    if (b[1] !== a[1]) return b[1] - a[1];
+                    const order = ['大单', '大双', '小单', '小双'];
+                    return order.indexOf(a[0]) - order.indexOf(b[0]);
+                });
+                if (sorted.length < 2) return null;
+                const rec1 = sorted[0][0];
+                const rec2 = sorted[1][0];
+                const all = ['大单', '大双', '小单', '小双'];
+                const recSet = new Set([rec1, rec2]);
+                const kills = all.filter(s => !recSet.has(s));
                 return {
-                    refs: refs,
-                    shapes: resultShapes,
-                    values: resultValues,
-                    output: refs.map(r => r.shape + r.value).join('、')
+                    killShape1: kills[0] || null,
+                    killShape2: kills[1] || null,
+                    final: rec1 + '、' + rec2
                 };
             }
 
-            // ====================== 算法1适配器 ======================
-            function algo1Combine(arr) {
-                const result = yyExclusiveAlgorithm(arr);
-                if (!result) return { shapes: [], killShape: null, killShape2: null, refs: [] };
-                // 返回兼容格式
-                return {
-                    shapes: result.shapes,
-                    killShape: null,
-                    killShape2: null,
-                    refs: result.refs,
-                    output: result.output,
-                    values: result.values
-                };
+            function algo1Predict(arr) {
+                if (arr.length < 1) return null;
+                return getTopTwoShapes(arr);
             }
 
             // ====================== 算法2：AI多模型集成 ======================
@@ -940,7 +799,10 @@
                 const entries = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
                 if (entries.length) k1 = entries[0][0];
                 if (entries.length > 1) k2 = entries[1][0];
-                return { aiKillGroup1: k1, aiKillGroup2: k2 };
+                // 最终建议：排除杀组后的所有形态
+                const all = ['大单', '大双', '小单', '小双'];
+                const finalShapes = all.filter(s => s !== k1 && s !== k2);
+                return { killShape1: k1, killShape2: k2, final: finalShapes.join('、') };
             }
 
             // ====================== 算法3：深度学习AI ======================
@@ -1027,7 +889,7 @@
             }
 
             function deepAIIntegratedKillAlgorithm(arr) {
-                if (arr.length < 15) return { killShape1: null, killShape2: null };
+                if (arr.length < 15) return { killShape1: null, killShape2: null, final: null };
                 const models1 = [new DeepLayer1(), new DeepLayer1(), new DeepLayer1(), new DeepAttention(),
                 new DeepAttention()];
                 const models2 = [new DeepLayer2(), new DeepLayer2(), new DeepLSTM(), new DeepLSTM(), new DeepResNet()];
@@ -1039,12 +901,16 @@
                     k] += s[k] || 0); });
                 const sorted1 = Object.entries(total1).sort((a, b) => a[1] - b[1]);
                 const sorted2 = Object.entries(total2).sort((a, b) => a[1] - b[1]);
-                return { killShape1: sorted1[0]?.[0] || null, killShape2: sorted2[0]?.[0] || null };
+                const k1 = sorted1[0]?.[0] || null;
+                const k2 = sorted2[0]?.[0] || null;
+                const all = ['大单', '大双', '小单', '小双'];
+                const finalShapes = all.filter(s => s !== k1 && s !== k2);
+                return { killShape1: k1, killShape2: k2, final: finalShapes.join('、') };
             }
 
             // ====================== 算法4-10通用生成 ======================
             function genericAlgorithm(arr, num) {
-                if (arr.length < 10) return { killShape1: null, killShape2: null };
+                if (arr.length < 10) return { killShape1: null, killShape2: null, final: null };
                 const scores = {};
                 shapesAll.forEach(s => scores[s] = 0);
                 const recent = arr.slice(0, 10);
@@ -1082,11 +948,15 @@
                         break;
                 }
                 const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-                return { killShape1: sorted[0]?.[0] || null, killShape2: sorted[1]?.[0] || null };
+                const k1 = sorted[0]?.[0] || null;
+                const k2 = sorted[1]?.[0] || null;
+                const all = ['大单', '大双', '小单', '小双'];
+                const finalShapes = all.filter(s => s !== k1 && s !== k2);
+                return { killShape1: k1, killShape2: k2, final: finalShapes.join('、') };
             }
 
             function timeCoefficientAlgorithm(arr) {
-                if (arr.length < 2) return { killShape1: null, killShape2: null };
+                if (arr.length < 2) return { killShape1: null, killShape2: null, final: null };
                 const cur = arr[0];
                 const sum = parseInt(cur.sum) || 0;
                 const periodEnd = parseInt((cur.qihao || '0').slice(-2)) || 97;
@@ -1109,21 +979,22 @@
                 const after = dot !== -1 && dot + 1 < str.length ? parseInt(str[dot + 1]) || 0 : 0;
                 const map = { 0: '大双', 1: '大单', 2: '大双', 3: '大单', 4: '大双', 5: '小单', 6: '小双', 7: '小单', 8: '小双',
                     9: '小单' };
-                return { killShape1: map[before] || null, killShape2: map[after] || null };
+                const k1 = map[before] || null;
+                const k2 = map[after] || null;
+                const all = ['大单', '大双', '小单', '小双'];
+                const finalShapes = all.filter(s => s !== k1 && s !== k2);
+                return { killShape1: k1, killShape2: k2, final: finalShapes.join('、') };
             }
 
             function comprehensiveOptimalKillAlgorithm(arr) {
                 const allKills = [];
                 if (arr.length >= 3) {
-                    const k1 = { killShape: null };
-                    const k2 = { killShape: null };
-                    if (k1.killShape) allKills.push({ shape: k1.killShape });
-                    if (k2.killShape) allKills.push({ shape: k2.killShape });
+                    // 旧算法已移除，跳过
                 }
                 if (arr.length >= 10) {
                     const ai = aiIntegratedKillAlgorithm(arr);
-                    if (ai.aiKillGroup1) allKills.push({ shape: ai.aiKillGroup1 });
-                    if (ai.aiKillGroup2) allKills.push({ shape: ai.aiKillGroup2 });
+                    if (ai.killShape1) allKills.push({ shape: ai.killShape1 });
+                    if (ai.killShape2) allKills.push({ shape: ai.killShape2 });
                 }
                 if (arr.length >= 15) {
                     const deep = deepAIIntegratedKillAlgorithm(arr);
@@ -1151,12 +1022,16 @@
                         if (selected.length >= 2) break;
                     }
                 }
-                return { killShape1: selected[0] || null, killShape2: selected[1] || null };
+                const k1 = selected[0] || null;
+                const k2 = selected[1] || null;
+                const all = ['大单', '大双', '小单', '小双'];
+                const finalShapes = all.filter(s => s !== k1 && s !== k2);
+                return { killShape1: k1, killShape2: k2, final: finalShapes.join('、') };
             }
 
             // ====================== 算法元数据 ======================
             const algoMeta = [
-                { num: 1, shortName: 'yy独家算法', fullName: '算法1-yy独家算法·形态交叉平衡法', isYY: true },
+                { num: 1, shortName: '双组算法', fullName: '算法1-双组算法（频率优选）', isYY: true },
                 { num: 2, shortName: 'AI多模型', fullName: '算法2-AI多模型集成' },
                 { num: 3, shortName: '深度学习AI', fullName: '算法3-深度学习AI' },
                 { num: 4, shortName: '贝叶斯推断', fullName: '算法4-贝叶斯推断' },
@@ -1173,8 +1048,8 @@
             // ====================== 获取预测结果 ======================
             function getPrediction(arr, algoNum) {
                 if (algoNum === 1) {
-                    if (arr.length < 3) return null;
-                    return algo1Combine(arr);
+                    if (arr.length < 1) return null;
+                    return algo1Predict(arr);
                 }
                 if (algoNum === 2) {
                     if (arr.length < 10) return null;
@@ -1199,42 +1074,6 @@
                 return null;
             }
 
-            // 从预测结果中提取统一的杀组1、杀组2、最终建议
-            function extractPredictionData(res, algoNum) {
-                if (!res) return { k1: null, k2: null, final: null, refs: null };
-
-                // 算法1特殊处理（yy独家算法）
-                if (algoNum === 1) {
-                    const refs = res.refs || [];
-                    const finalStr = refs.map(r => r.shape + r.value).join('、');
-                    return { k1: null, k2: null, final: finalStr || '--', refs: refs };
-                }
-
-                let k1 = null,
-                    k2 = null;
-                if (algoNum === 2) {
-                    k1 = res.aiKillGroup1 || null;
-                    k2 = res.aiKillGroup2 || null;
-                } else {
-                    k1 = res.killShape1 || null;
-                    k2 = res.killShape2 || null;
-                }
-                const finalShapes = shapesAll.filter(s => s !== k1 && s !== k2);
-                return { k1, k2, final: finalShapes.join('、') || '--', refs: null };
-            }
-
-            // 判断是否命中
-            function checkHit(algoNum, res, actual) {
-                if (!res) return false;
-                if (algoNum === 1) {
-                    const refs = res.refs || [];
-                    return refs.some(r => r.shape === actual);
-                }
-                const pred = extractPredictionData(res, algoNum);
-                if (!pred.final || pred.final === '--') return false;
-                return pred.final.includes(actual);
-            }
-
             // ====================== 构建UI ======================
             const algoNames = ['算法1', '算法2', '算法3', '算法4', '算法5', '算法6', '算法7', '算法8', '算法9', '算法10', '算法11',
                 '算法12'
@@ -1248,7 +1087,7 @@
                     const isYY = meta.isYY || false;
                     const nameClass = isYY ? 'algo-name yy-name' : 'algo-name';
                     const numClass = isYY ? 'algo-num yy-num' : 'algo-num';
-                    const yyBadge = isYY ? '<span class="yy-badge">★独家</span>' : '';
+                    const yyBadge = isYY ? '<span class="yy-badge">★双组</span>' : '';
                     row.innerHTML = `
                         <td class="${nameClass}"><span class="${numClass}">${meta.num}</span>${meta.shortName}${yyBadge}</td>
                         <td class="kill-cell" id="pred-k1-${meta.num}">--</td>
@@ -1273,6 +1112,7 @@
                 });
 
                 const histContainer = document.getElementById('history-container');
+                // 统一历史表格结构
                 for (let algoNum = 1; algoNum <= 12; algoNum++) {
                     const histCard = document.createElement('div');
                     histCard.className = 'card';
@@ -1280,21 +1120,30 @@
                     histCard.style.display = algoNum === 1 ? 'block' : 'none';
                     histCard.style.padding = '12px';
                     histCard.style.marginTop = '8px';
-                    const isAlgo1 = algoNum === 1;
                     const meta = algoMeta[algoNum - 1];
-                    const titleSuffix = isAlgo1 ? ' · yy独家算法·形态交叉平衡法' : '';
+                    const isYY = meta.isYY || false;
                     histCard.innerHTML = `
                         <div class="section-title" style="font-size:15px;">
                             <i class="fas fa-history"></i>
-                            <span>${meta.fullName}${titleSuffix}</span>
-                            ${isAlgo1 ? '<span style="background:#059669;color:#fff;font-size:10px;padding:0 8px;border-radius:10px;">★独家</span>' : ''}
+                            <span>${meta.fullName}</span>
+                            ${isYY ? '<span style="background:#059669;color:#fff;font-size:10px;padding:0 8px;border-radius:10px;">★双组</span>' : ''}
                         </div>
                         <div class="table-responsive">
                             <table class="history-table">
-                                <thead>${isAlgo1 ?
-                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>参考点1</th><th>参考点2</th><th>参考点3</th><th>命中</th><th>时间</th></tr>' :
-                                    '<tr><th>期号</th><th>号码</th><th>大小单双</th><th>杀组1</th><th>对错</th><th>杀组2</th><th>对错</th><th>最终建议</th><th>命中</th><th>时间</th></tr>'
-                                }</thead>
+                                <thead>
+                                    <tr>
+                                        <th>期号</th>
+                                        <th>号码</th>
+                                        <th>大小单双</th>
+                                        <th>杀组1</th>
+                                        <th>对错</th>
+                                        <th>杀组2</th>
+                                        <th>对错</th>
+                                        <th>最终建议</th>
+                                        <th>命中</th>
+                                        <th>时间</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="history-tbody-${algoNum}"></tbody>
                             </table>
                         </div>
@@ -1328,36 +1177,24 @@
             function renderPredictions() {
                 if (data.length < 2) return;
                 for (let algoNum = 1; algoNum <= 12; algoNum++) {
-                    const predData = data.slice(1);
+                    const predData = data.slice(1); // 用历史预测最新一期
                     const res = getPrediction(predData, algoNum);
-                    const pred = extractPredictionData(res, algoNum);
                     const k1El = document.getElementById(`pred-k1-${algoNum}`);
                     const k2El = document.getElementById(`pred-k2-${algoNum}`);
                     const finalEl = document.getElementById(`pred-final-${algoNum}`);
-
-                    if (algoNum === 1) {
+                    if (res) {
+                        if (k1El) k1El.textContent = res.killShape1 || '--';
+                        if (k2El) k2El.textContent = res.killShape2 || '--';
+                        if (finalEl) finalEl.textContent = res.final || '--';
+                    } else {
                         if (k1El) k1El.textContent = '--';
                         if (k2El) k2El.textContent = '--';
-                        if (finalEl) {
-                            if (pred.final && pred.final !== '--') {
-                                const refs = pred.refs || [];
-                                const html = refs.map(r =>
-                                    `<span class="ref-point">${r.shape} <span class="rp-val">${r.value}</span></span>`
-                                ).join(' ');
-                                finalEl.innerHTML = html;
-                            } else {
-                                finalEl.textContent = '--';
-                            }
-                        }
-                    } else {
-                        if (k1El) k1El.textContent = pred.k1 || '--';
-                        if (k2El) k2El.textContent = pred.k2 || '--';
-                        if (finalEl) finalEl.textContent = pred.final || '--';
+                        if (finalEl) finalEl.textContent = '--';
                     }
                 }
             }
 
-            // 更新所有算法的统计信息（总次数、命中、中奖率、连中）
+            // 更新所有算法的统计信息
             function updateAllStats() {
                 if (data.length < 2) return;
                 for (let algoNum = 1; algoNum <= 12; algoNum++) {
@@ -1368,8 +1205,10 @@
                         const actual = getTag(parseInt(cur.sum) || 0);
                         const predData = data.slice(i + 1);
                         const res = getPrediction(predData, algoNum);
-                        if (!res) continue;
-                        const hit = checkHit(algoNum, res, actual);
+                        if (!res) { hitArray.push(false); continue; }
+                        // 命中判断：实际形态是否在最终建议中
+                        const final = res.final || '';
+                        const hit = final.includes(actual);
                         hitArray.push(hit);
                     }
                     updateStats(algoNum, hitArray);
@@ -1382,53 +1221,32 @@
                 tbody.innerHTML = '';
                 if (data.length < 2) return;
                 const maxRows = 30;
-                const isAlgo1 = algoNum === 1;
-
                 for (let i = 0; i < Math.min(data.length - 1, maxRows); i++) {
                     const cur = data[i];
                     const actual = getTag(parseInt(cur.sum) || 0);
                     const predData = data.slice(i + 1);
                     const res = getPrediction(predData, algoNum);
                     if (!res) continue;
-                    const pred = extractPredictionData(res, algoNum);
-
-                    if (isAlgo1) {
-                        const refs = pred.refs || [];
-                        const hit = refs.some(r => r.shape === actual);
-                        const row = document.createElement('tr');
-                        const r1 = refs[0] ? `${refs[0].shape}${refs[0].value}` : '--';
-                        const r2 = refs[1] ? `${refs[1].shape}${refs[1].value}` : '--';
-                        const r3 = refs[2] ? `${refs[2].shape}${refs[2].value}` : '--';
-                        row.innerHTML = `
-                            <td>${cur.qihao}</td>
-                            <td>${cur.opennum}=${cur.sum}</td>
-                            <td>${actual}</td>
-                            <td>${r1}</td>
-                            <td>${r2}</td>
-                            <td>${r3}</td>
-                            <td class="${hit ? 'result-correct' : 'result-wrong'}">${hit ? '中' : '错'}</td>
-                            <td>${formatTime(cur.opentime)}</td>
-                        `;
-                        tbody.appendChild(row);
-                    } else {
-                        const k1Hit = pred.k1 && actual !== pred.k1;
-                        const k2Hit = pred.k2 && actual !== pred.k2;
-                        const finalHit = pred.final && pred.final !== '--' && pred.final.includes(actual);
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${cur.qihao}</td>
-                            <td>${cur.opennum}=${cur.sum}</td>
-                            <td>${actual}</td>
-                            <td>${pred.k1||'--'}</td>
-                            <td class="${k1Hit?'result-correct':'result-wrong'}">${k1Hit?'中':'错'}</td>
-                            <td>${pred.k2||'--'}</td>
-                            <td class="${k2Hit?'result-correct':'result-wrong'}">${k2Hit?'中':'错'}</td>
-                            <td>${pred.final||'--'}</td>
-                            <td class="${finalHit?'result-correct':'result-wrong'}">${finalHit?'中':'错'}</td>
-                            <td>${formatTime(cur.opentime)}</td>
-                        `;
-                        tbody.appendChild(row);
-                    }
+                    const k1 = res.killShape1 || '--';
+                    const k2 = res.killShape2 || '--';
+                    const final = res.final || '--';
+                    const k1Hit = (k1 !== '--') ? (actual !== k1) : false;
+                    const k2Hit = (k2 !== '--') ? (actual !== k2) : false;
+                    const finalHit = final.includes(actual);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${cur.qihao}</td>
+                        <td>${cur.opennum}=${cur.sum}</td>
+                        <td>${actual}</td>
+                        <td>${k1}</td>
+                        <td class="${k1Hit ? 'result-correct' : 'result-wrong'}">${k1Hit ? '中' : '错'}</td>
+                        <td>${k2}</td>
+                        <td class="${k2Hit ? 'result-correct' : 'result-wrong'}">${k2Hit ? '中' : '错'}</td>
+                        <td>${final}</td>
+                        <td class="${finalHit ? 'result-correct' : 'result-wrong'}">${finalHit ? '中' : '错'}</td>
+                        <td>${formatTime(cur.opentime)}</td>
+                    `;
+                    tbody.appendChild(row);
                 }
             }
 
@@ -1570,7 +1388,7 @@
             function renderAll() {
                 renderCurrent();
                 renderPredictions();
-                updateAllStats(); // 关键：自动更新所有统计
+                updateAllStats();
                 renderHistory();
                 setupCountdown();
             }
